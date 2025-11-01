@@ -25,6 +25,23 @@ export const assets = pgTable('assets', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
+// Number slots table (for efficient number availability tracking)
+export const numberSlots = pgTable('number_slots', {
+  id: serial('id').primaryKey(),
+  drawingId: varchar('drawing_id', { length: 255 })
+    .notNull()
+    .references(() => drawings.id, { onDelete: 'cascade' }),
+  number: integer('number').notNull(),
+  status: varchar('status', { length: 20 }).notNull().default('available'), // 'available', 'reserved', 'taken'
+  participantId: integer('participant_id').references(() => participants.id, {
+    onDelete: 'set null',
+  }),
+  reservedAt: timestamp('reserved_at'),
+  expiresAt: timestamp('expires_at'), // For temporary reservations
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
 // Participants table
 export const participants = pgTable('participants', {
   id: serial('id').primaryKey(),
@@ -144,7 +161,7 @@ export const drawingsRelations = relations(drawings, ({ one, many }) => ({
   }),
 }))
 
-export const participantsRelations = relations(participants, ({ one }) => ({
+export const participantsRelations = relations(participants, ({ one, many }) => ({
   drawing: one(drawings, {
     fields: [participants.drawingId],
     references: [drawings.id],
@@ -153,4 +170,26 @@ export const participantsRelations = relations(participants, ({ one }) => ({
     fields: [participants.paymentCaptureId],
     references: [assets.id],
   }),
+  numberSlots: many(numberSlots),
 }))
+
+export const numberSlotsRelations = relations(numberSlots, ({ one }) => ({
+  drawing: one(drawings, {
+    fields: [numberSlots.drawingId],
+    references: [drawings.id],
+  }),
+  participant: one(participants, {
+    fields: [numberSlots.participantId],
+    references: [participants.id],
+  }),
+}))
+
+// Type exports for TypeScript usage
+export type Drawing = typeof drawings.$inferSelect
+export type NewDrawing = typeof drawings.$inferInsert
+export type Participant = typeof participants.$inferSelect
+export type NewParticipant = typeof participants.$inferInsert
+export type NumberSlot = typeof numberSlots.$inferSelect
+export type NewNumberSlot = typeof numberSlots.$inferInsert
+export type Asset = typeof assets.$inferSelect
+export type NewAsset = typeof assets.$inferInsert
