@@ -273,7 +273,12 @@ export async function reserveNumber(
 
     return { success: true, expiresAt }
   } catch (error) {
-    return { success: false, message: 'Failed to reserve number' }
+    console.error('Failed to reserve number:', error)
+    return {
+      success: false,
+      message:
+        error instanceof Error ? error.message : 'Failed to reserve number',
+    }
   }
 }
 
@@ -309,7 +314,9 @@ export async function confirmNumberReservation(
       )
     )
 
-  if (!result.rowCount || result.rowCount === 0) {
+  // Check if any rows were affected
+  const rowsAffected = result.rowCount ?? 0
+  if (rowsAffected === 0) {
     throw new Error('Reservation not found or already expired')
   }
 }
@@ -413,7 +420,7 @@ export async function getDrawingStats(
     available: stats['available'] || 0,
     taken,
     reserved: stats['reserved'] || 0,
-    percentageTaken: total > 0 ? Math.round((taken / total) * 100 * 100) / 100 : 0,
+    percentageTaken: total > 0 ? Math.round((taken / total) * 10000) / 100 : 0,
   }
 }
 
