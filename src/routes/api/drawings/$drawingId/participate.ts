@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, max } from 'drizzle-orm'
 
 import { db } from '@/db/index'
 import { drawings, participants } from '@/db/schema'
@@ -16,7 +16,12 @@ export const Route = createFileRoute('/api/drawings/$drawingId/participate')({
         params: { drawingId: string }
       }) => {
         try {
-          const body = await request.json()
+          const body = (await request.json()) as {
+            name: string
+            email?: string
+            phone: string
+            selectedNumber?: number
+          }
 
           // Verify drawing exists
           const drawing = await db
@@ -66,6 +71,23 @@ export const Route = createFileRoute('/api/drawings/$drawingId/participate')({
               }
             }
           }
+          let selectedNumber: number | null = null
+
+          if (drawing[0].winnerSelection === 'random') {
+            const maxSelectedNumber = await db
+              .select({
+                value: max(participants.selectedNumber),
+              })
+              .from(participants)
+              .where(eq(participants.drawingId, params.drawingId))
+
+            selectedNumber = (maxSelectedNumber[0]?.value ?? 0) + 1
+          } else if (
+            drawing[0].winnerSelection === 'number' &&
+            body.selectedNumber
+          ) {
+            selectedNumber = body.selectedNumber
+          }
 
           // Create participant
           const newParticipant = await db
@@ -75,7 +97,7 @@ export const Route = createFileRoute('/api/drawings/$drawingId/participate')({
               name: body.name,
               email: body.email || null,
               phone: body.phone,
-              selectedNumber: body.selectedNumber || null,
+              selectedNumber,
               isEligible: drawing[0].isPaid ? null : true, // Pending if paid, auto-approve if free
             })
             .returning()
