@@ -560,3 +560,40 @@ export async function bulkReserveNumbers(
 
   return { successful, failed }
 }
+
+/**
+ * Bulk release multiple number reservations at once
+ * Useful when a user cancels their selection before completing registration
+ *
+ * @param drawingId - The drawing identifier
+ * @param numbers - Array of numbers to release
+ * @returns Number of reservations successfully released
+ *
+ * @example
+ * const count = await bulkReleaseReservations('drawing-123', [1, 5, 10])
+ * console.log(`Released ${count} reservations`)
+ */
+export async function bulkReleaseReservations(
+  drawingId: string,
+  numbers: Array<number>,
+): Promise<number> {
+  if (numbers.length === 0) return 0
+
+  const result = await db
+    .update(numberSlots)
+    .set({
+      status: 'available',
+      reservedAt: null,
+      expiresAt: null,
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(numberSlots.drawingId, drawingId),
+        inArray(numberSlots.number, numbers),
+        eq(numberSlots.status, 'reserved'),
+      ),
+    )
+
+  return result.rowCount || 0
+}

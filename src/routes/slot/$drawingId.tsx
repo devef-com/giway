@@ -200,7 +200,7 @@ function SlotDrawingParticipation() {
         fetch(`/api/drawings/${drawingId}/reserve`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ number, expirationMinutes: 15 }),
+          body: JSON.stringify({ number, expirationMinutes: 4 }),
         })
       )
 
@@ -262,6 +262,28 @@ function SlotDrawingParticipation() {
     }
 
     participateMutation.mutate(registrationData)
+  }
+
+  // Handle cancel and release reservations
+  const handleCancelReservation = async () => {
+    if (selectedNumbers.length > 0) {
+      try {
+        await fetch(`/api/drawings/${drawingId}/reserve`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ numbers: selectedNumbers }),
+        })
+
+        // Invalidate slots cache to show updated status
+        queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
+      } catch (error) {
+        console.error('Error releasing reservations:', error)
+      }
+    }
+
+    // Clear selected numbers and close drawer
+    setSelectedNumbers([])
+    setShowForm(false)
   }
 
   // Loading state
@@ -465,7 +487,7 @@ function SlotDrawingParticipation() {
 
       </div>
       {/* Registration Form - Drawer */}
-      <Drawer open={showForm} onOpenChange={setShowForm}>
+      <Drawer open={showForm} onOpenChange={setShowForm} dismissible={false}>
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>
@@ -603,7 +625,11 @@ function SlotDrawingParticipation() {
                   )}
                 </Button>
                 <DrawerClose asChild>
-                  <Button variant="outline" className="w-full">
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleCancelReservation}
+                  >
                     Cancel
                   </Button>
                 </DrawerClose>
