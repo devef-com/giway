@@ -22,6 +22,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+} from '@/components/ui/drawer'
 
 export const Route = createFileRoute('/slot/$drawingId')({
   component: SlotDrawingParticipation,
@@ -56,6 +65,7 @@ function SlotDrawingParticipation() {
   const [selectedNumbers, setSelectedNumbers] = useState<Array<number>>([])
   const [currentPage, setCurrentPage] = useState(0)
   const [isReserving, setIsReserving] = useState(false)
+  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -63,7 +73,6 @@ function SlotDrawingParticipation() {
   })
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const formSectionRef = useRef<HTMLDivElement>(null)
 
   const NUMBERS_PER_PAGE = 6 * 14 // 6 columns × 14 rows = 84 numbers per page
 
@@ -184,7 +193,7 @@ function SlotDrawingParticipation() {
   const handleReserveNumbers = async () => {
     if (isReserving || selectedNumbers.length === 0) return
 
-    setIsReserving(true)
+    setIsReserving(true);
     try {
       // Reserve all selected numbers
       const reservationPromises = selectedNumbers.map(number =>
@@ -199,8 +208,8 @@ function SlotDrawingParticipation() {
       const allSuccessful = responses.every(r => r.ok)
 
       if (allSuccessful) {
-        // Scroll to form section
-        formSectionRef.current?.scrollIntoView({ behavior: 'smooth' })
+        // Show form modal
+        setShowForm(true)
 
         // Invalidate slots cache to show updated status
         queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
@@ -454,13 +463,20 @@ function SlotDrawingParticipation() {
           </>
         )}
 
-        {/* Registration Form */}
-        <div ref={formSectionRef} className="hidden">
-          <Card className="p-6 bg-slate-800/50 border-slate-700 mt-4">
-            <h2 className="text-2xl font-bold text-white mb-4">
+      </div>
+      {/* Registration Form - Drawer */}
+      <Drawer open={showForm} onOpenChange={setShowForm}>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>
               {drawing.winnerSelection === 'number' ? 'Confirm Your Registration' : 'Register for Drawing'}
-            </h2>
+            </DrawerTitle>
+            <DrawerDescription>
+              Complete the form below to register for this drawing.
+            </DrawerDescription>
+          </DrawerHeader>
 
+          <div className="px-4 overflow-y-auto max-h-[60vh]">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <Label htmlFor="name" className="text-white">
@@ -530,22 +546,52 @@ function SlotDrawingParticipation() {
                 </div>
               )}
 
-              <div className="flex gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => navigate({ to: '/' })}
-                  className="flex-1 bg-slate-700 hover:bg-slate-600 text-white border-slate-600"
-                >
-                  Cancel
-                </Button>
+              {/* Help/Info Section */}
+              <Card className="p-4 bg-slate-800/30 border-slate-700">
+                <div className="flex items-start gap-3 text-sm text-gray-400">
+                  <svg
+                    className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="text-white font-medium mb-1">How it works:</p>
+                    <ul className="space-y-1">
+                      {drawing.winnerSelection === 'number' ? (
+                        <>
+                          <li>• Select {drawing.isPaid ? 'one or more numbers' : 'a number'} from the grid</li>
+                          <li>• Click the arrow button to proceed</li>
+                          <li>• Your {drawing.isPaid ? 'numbers' : 'number'} will be reserved for 15 minutes</li>
+                          <li>• Complete the registration form with your details</li>
+                          {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
+                          <li>• Wait for the drawing date to see if you win!</li>
+                        </>
+                      ) : (
+                        <>
+                          <li>• Fill out the registration form with your details</li>
+                          {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
+                          <li>• The winner will be selected randomly on the drawing date</li>
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              </Card>
+
+              <DrawerFooter className="px-0 pb-4">
                 <Button
                   type="submit"
                   disabled={
                     participateMutation.isPending ||
                     (drawing.winnerSelection === 'number' && selectedNumbers.length === 0)
                   }
-                  className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white"
+                  className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
                 >
                   {participateMutation.isPending ? (
                     <span className="flex items-center gap-2">
@@ -556,49 +602,16 @@ function SlotDrawingParticipation() {
                     'Complete Registration'
                   )}
                 </Button>
-              </div>
+                <DrawerClose asChild>
+                  <Button variant="outline" className="w-full">
+                    Cancel
+                  </Button>
+                </DrawerClose>
+              </DrawerFooter>
             </form>
-          </Card>
-
-          {/* Help/Info Section */}
-          <Card className="p-4 bg-slate-800/30 border-slate-700 mt-4">
-            <div className="flex items-start gap-3 text-sm text-gray-400">
-              <svg
-                className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <p className="text-white font-medium mb-1">How it works:</p>
-                <ul className="space-y-1">
-                  {drawing.winnerSelection === 'number' ? (
-                    <>
-                      <li>• Select {drawing.isPaid ? 'one or more numbers' : 'a number'} from the grid</li>
-                      <li>• Click the arrow button to proceed</li>
-                      <li>• Your {drawing.isPaid ? 'numbers' : 'number'} will be reserved for 15 minutes</li>
-                      <li>• Complete the registration form with your details</li>
-                      {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
-                      <li>• Wait for the drawing date to see if you win!</li>
-                    </>
-                  ) : (
-                    <>
-                      <li>• Fill out the registration form with your details</li>
-                      {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
-                      <li>• The winner will be selected randomly on the drawing date</li>
-                    </>
-                  )}
-                </ul>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
 
       <style>{`
         #scrollContainer::-webkit-scrollbar,
