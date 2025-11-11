@@ -327,6 +327,51 @@ export async function confirmNumberReservation(
 }
 
 /**
+ * Confirm multiple number reservations and assign them to a participant
+ * Should be called after payment verification or eligibility check
+ *
+ * @param drawingId - The drawing identifier
+ * @param numbers - Array of numbers to confirm
+ * @param participantId - The participant who gets the numbers
+ * @throws Error if any reservation doesn't exist or has expired
+ *
+ * @example
+ * await confirmNumberReservations('drawing-123', [42, 43, 44], participantId)
+ */
+export async function confirmNumberReservations(
+  drawingId: string,
+  numbers: Array<number>,
+  participantId: number,
+): Promise<void> {
+  if (numbers.length === 0) {
+    throw new Error('No numbers provided to confirm')
+  }
+
+  const result = await db
+    .update(numberSlots)
+    .set({
+      status: 'taken',
+      participantId,
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(numberSlots.drawingId, drawingId),
+        inArray(numberSlots.number, numbers),
+        eq(numberSlots.status, 'reserved'),
+      ),
+    )
+
+  // Check if all numbers were confirmed
+  const rowsAffected = result.rowCount ?? 0
+  if (rowsAffected !== numbers.length) {
+    throw new Error(
+      `Failed to confirm all reservations. Expected ${numbers.length}, confirmed ${rowsAffected}. Some reservations may have expired.`,
+    )
+  }
+}
+
+/**
  * Release a specific reservation back to available status
  * Useful when a user cancels their selection
  *
