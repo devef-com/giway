@@ -17,6 +17,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import type { DrawingStats } from '@/lib/number-slots'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -254,12 +255,12 @@ function SlotDrawingParticipation() {
         // Invalidate slots cache to show updated status
         queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
       } else {
-        alert('Some numbers could not be reserved. Please try again.')
+        toast.error('Some numbers could not be reserved. Please try again.')
         setSelectedNumbers([])
       }
     } catch (error) {
       console.error('Error reserving numbers:', error)
-      alert('An error occurred while reserving numbers')
+      toast.error('An error occurred while reserving numbers')
       setSelectedNumbers([])
     } finally {
       setIsReserving(false)
@@ -283,13 +284,13 @@ function SlotDrawingParticipation() {
       return response.json()
     },
     onSuccess: () => {
-      alert('Successfully registered for the drawing!')
+      toast.success('Successfully registered for the drawing!')
       queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
       queryClient.invalidateQueries({ queryKey: ['drawing-stats', drawingId] })
       navigate({ to: '/' })
     },
     onError: (error: Error) => {
-      alert(error.message)
+      toast.error(error.message)
     },
   })
 
