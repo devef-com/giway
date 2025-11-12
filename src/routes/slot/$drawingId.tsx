@@ -472,10 +472,7 @@ function SlotDrawingParticipation() {
             {totalPages > 1 && (
               <div
                 ref={floatingControlsRef}
-                className="p-2 rounded-lg z-10"
-                style={{
-                  background: 'linear-gradient(to top, rgb(250 250 250) 0%, rgb(250 250 250 / 0.8) 50%, transparent 100%)',
-                }}
+                className="p-2 rounded-lg z-10 bg-linear-to-t from-white via-white/80 to-transparent dark:from-slate-900 dark:via-slate-900/80 backdrop-blur-sm"
               >
                 <div>
                   <div
@@ -515,12 +512,12 @@ function SlotDrawingParticipation() {
       </div>
       {/* Registration Form - Drawer */}
       <Drawer open={showForm} onOpenChange={setShowForm} dismissible={false}>
-        <DrawerContent>
+        <DrawerContent className="bg-white dark:bg-slate-800">
           <DrawerHeader>
-            <DrawerTitle>
+            <DrawerTitle className="text-black dark:text-white">
               {drawing.winnerSelection === 'number' ? 'Confirm Your Registration' : 'Register for Drawing'}
             </DrawerTitle>
-            <DrawerDescription>
+            <DrawerDescription className="text-gray-600 dark:text-gray-400">
               Complete the form below to register for this drawing.
             </DrawerDescription>
           </DrawerHeader>
@@ -528,7 +525,7 @@ function SlotDrawingParticipation() {
           <div className="px-4 overflow-y-auto max-h-[60vh]">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="name" className="text-white">
+                <Label htmlFor="name" className="text-black dark:text-white mb-1">
                   Full Name *
                 </Label>
                 <Input
@@ -537,12 +534,12 @@ function SlotDrawingParticipation() {
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
                   placeholder="Enter your full name"
-                  className="bg-slate-700 text-white border-slate-600 focus:border-cyan-500"
+                  className="bg-white dark:bg-slate-700 text-black dark:text-white border-gray-300 dark:border-slate-600 focus:border-cyan-500"
                 />
               </div>
 
               <div>
-                <Label htmlFor="email" className="text-white">
+                <Label htmlFor="email" className="text-black dark:text-white mb-1">
                   Email (Optional)
                 </Label>
                 <Input
@@ -551,12 +548,12 @@ function SlotDrawingParticipation() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="your@email.com"
-                  className="bg-slate-700 text-white border-slate-600 focus:border-cyan-500"
+                  className="bg-white dark:bg-slate-700 text-black dark:text-white border-gray-300 dark:border-slate-600 focus:border-cyan-500"
                 />
               </div>
 
               <div>
-                <Label htmlFor="phone" className="text-white">
+                <Label htmlFor="phone" className="text-black dark:text-white mb-1">
                   Phone Number *
                 </Label>
                 <Input
@@ -566,15 +563,15 @@ function SlotDrawingParticipation() {
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   required
                   placeholder="+1 (555) 000-0000"
-                  className="bg-slate-700 text-white border-slate-600 focus:border-cyan-500"
+                  className="bg-white dark:bg-slate-700 text-black dark:text-white border-gray-300 dark:border-slate-600 focus:border-cyan-500"
                 />
               </div>
 
               {drawing.isPaid && (
-                <div className="p-4 bg-yellow-900/30 rounded-lg border border-yellow-700">
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg border border-yellow-200 dark:border-yellow-700">
                   <div className="flex items-start gap-3">
                     <svg
-                      className="w-6 h-6 text-yellow-400 shrink-0 mt-0.5"
+                      className="w-6 h-6 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5"
                       fill="none"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -585,8 +582,8 @@ function SlotDrawingParticipation() {
                       <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                     <div>
-                      <p className="text-yellow-200 font-medium">Payment Required</p>
-                      <p className="text-yellow-100 text-sm mt-1">
+                      <p className="text-yellow-800 dark:text-yellow-200 font-medium">Payment Required</p>
+                      <p className="text-yellow-700 dark:text-yellow-100 text-sm mt-1">
                         This is a paid event. After registration, you will need to complete the payment
                         and upload proof. Your number will be reserved during this process.
                       </p>
@@ -595,14 +592,23 @@ function SlotDrawingParticipation() {
                 </div>
               )}
 
-              <DrawerFooter className="px-0 pb-4">
+              <DrawerFooter className="px-0 pb-4 grid grid-cols-2">
+                <DrawerClose asChild>
+                  <Button
+                    variant="default"
+                    className="w-full"
+                    onClick={handleCancelReservation}
+                  >
+                    Cancel
+                  </Button>
+                </DrawerClose>
                 <Button
                   type="submit"
                   disabled={
                     participateMutation.isPending ||
                     (drawing.winnerSelection === 'number' && selectedNumbers.length === 0)
                   }
-                  className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white"
                 >
                   {participateMutation.isPending ? (
                     <span className="flex items-center gap-2">
@@ -613,15 +619,7 @@ function SlotDrawingParticipation() {
                     'Complete Registration'
                   )}
                 </Button>
-                <DrawerClose asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={handleCancelReservation}
-                  >
-                    Cancel
-                  </Button>
-                </DrawerClose>
+
               </DrawerFooter>
             </form>
           </div>
