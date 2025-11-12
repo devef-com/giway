@@ -365,27 +365,27 @@ function SlotDrawingParticipation() {
     <div className="relative bg-background-light dark:bg-background-dark font-display min-h-screen">
       <div className="flex w-full flex-col p-4 sm:max-w-[600px] sm:mx-auto">
         {/* Drawing Details Card */}
-        <Card className="p-6 bg-slate-800/50 border-slate-700 mb-4">
+        <Card className="p-6 dark:bg-slate-800/50 dark:border-slate-700 mb-4">
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div className="flex-1">
-              <h1 className="text-2xl md:text-3xl font-bold text-white mb-4">{drawing.title}</h1>
+              <h1 className="text-2xl md:text-3xl font-bold dark:text-white mb-4">{drawing.title}</h1>
 
-              <div className="grid grid-cols-1 gap-2 text-white text-sm">
-                <p className="text-gray-400">
-                  <strong className="text-white">Type:</strong>{' '}
+              <div className="grid grid-cols-1 gap-2 dark:text-white text-sm">
+                <p className="dark:text-gray-400">
+                  <strong className="dark:text-white">Type:</strong>{' '}
                   {drawing.isPaid ? (
                     <span className="text-yellow-400">Paid - ${(drawing.price / 100).toFixed(2)}</span>
                   ) : (
                     <span className="text-green-400">Free</span>
                   )}
                 </p>
-                <p className="text-gray-400">
-                  <strong className="text-white">End Date:</strong>{' '}
+                <p className="dark:text-gray-400">
+                  <strong className="dark:text-white">End Date:</strong>{' '}
                   {new Date(drawing.endAt).toLocaleString()}
                 </p>
                 {drawing.winnerSelection === 'number' && stats && (
-                  <p className="text-gray-400">
-                    <strong className="text-white">Availability:</strong>{' '}
+                  <p className="dark:text-gray-400">
+                    <strong className="dark:text-white">Availability:</strong>{' '}
                     <span className="text-cyan-400">
                       {stats.available} / {stats.total} available
                     </span>
@@ -465,7 +465,7 @@ function SlotDrawingParticipation() {
                   )
                 })}
               </div>
-              <div className="h-[100px] border border-amber-400"></div>
+              <div className="h-[100px]"></div>
             </div>
 
             {/* Floating Footer with Arrow and Dots - Positioned dynamically */}
@@ -513,9 +513,6 @@ function SlotDrawingParticipation() {
         )}
 
       </div>
-      <p className='w-sm mx-auto'>
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quidem asperiores fugiat placeat minima doloremque unde mollitia illum reiciendis harum modi labore nam tempore, velit, inventore rem temporibus aliquid, exercitationem quam.
-      </p>
       {/* Registration Form - Drawer */}
       <Drawer open={showForm} onOpenChange={setShowForm} dismissible={false}>
         <DrawerContent>
@@ -598,44 +595,6 @@ function SlotDrawingParticipation() {
                 </div>
               )}
 
-              {/* Help/Info Section */}
-              <Card className="p-4 bg-slate-800/30 border-slate-700">
-                <div className="flex items-start gap-3 text-sm text-gray-400">
-                  <svg
-                    className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <div>
-                    <p className="text-white font-medium mb-1">How it works:</p>
-                    <ul className="space-y-1">
-                      {drawing.winnerSelection === 'number' ? (
-                        <>
-                          <li>• Select {drawing.isPaid ? 'one or more numbers' : 'a number'} from the grid</li>
-                          <li>• Click the arrow button to proceed</li>
-                          <li>• Your {drawing.isPaid ? 'numbers' : 'number'} will be reserved for 15 minutes</li>
-                          <li>• Complete the registration form with your details</li>
-                          {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
-                          <li>• Wait for the drawing date to see if you win!</li>
-                        </>
-                      ) : (
-                        <>
-                          <li>• Fill out the registration form with your details</li>
-                          {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
-                          <li>• The winner will be selected randomly on the drawing date</li>
-                        </>
-                      )}
-                    </ul>
-                  </div>
-                </div>
-              </Card>
-
               <DrawerFooter className="px-0 pb-4">
                 <Button
                   type="submit"
@@ -668,6 +627,44 @@ function SlotDrawingParticipation() {
           </div>
         </DrawerContent>
       </Drawer>
+
+      {/* Help/Info Section */}
+      <Card className="p-4 bg-white dark:bg-slate-800/30 dark:border-slate-700 sm:max-w-[600px] mx-auto mt-2 mb-4">
+        <div className="flex items-start gap-3 text-sm text-gray-400">
+          <svg
+            className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div>
+            <p className="dark:text-white font-medium mb-1">How it works:</p>
+            <ul className="space-y-1">
+              {drawing.winnerSelection === 'number' ? (
+                <>
+                  <li>• Select {drawing.isPaid ? 'one or more numbers' : 'a number'} from the grid</li>
+                  <li>• Click the arrow button to proceed</li>
+                  <li>• Your {drawing.isPaid ? 'numbers' : 'number'} will be reserved for 15 minutes</li>
+                  <li>• Complete the registration form with your details</li>
+                  {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
+                  <li>• Wait for the drawing date to see if you win!</li>
+                </>
+              ) : (
+                <>
+                  <li>• Fill out the registration form with your details</li>
+                  {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
+                  <li>• The winner will be selected randomly on the drawing date</li>
+                </>
+              )}
+            </ul>
+          </div>
+        </div>
+      </Card>
 
       <style>{`
         #scrollContainer::-webkit-scrollbar,
