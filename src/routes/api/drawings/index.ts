@@ -66,11 +66,12 @@ export const Route = createFileRoute('/api/drawings/')({
               endAt: new Date(body.endAt),
             })
             .returning()
-
-          await initializeNumberSlots(
-            newDrawing[0].id,
-            newDrawing[0].quantityOfNumbers,
-          )
+          if (newDrawing[0].winnerSelection === 'number') {
+            await initializeNumberSlots(
+              newDrawing[0].id,
+              newDrawing[0].quantityOfNumbers,
+            )
+          }
           return new Response(JSON.stringify(newDrawing[0]), {
             status: 201,
             headers: { 'Content-Type': 'application/json' },
