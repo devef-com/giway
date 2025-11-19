@@ -532,7 +532,7 @@ function SlotDrawingParticipation() {
             {/* Floating Footer with Arrow and Dots - Positioned dynamically */}
             <div
               ref={floatingControlsRef}
-              className="p-2 rounded-lg z-10 bg-linear-to-t from-white via-white/80 to-transparent dark:from-slate-900 dark:via-slate-900/80 backdrop-blur-sm"
+              className={cn("p-2 rounded-lg z-10 bg-linear-to-t from-white via-white/80 to-transparent dark:from-slate-900 dark:via-slate-900/80 backdrop-blur-sm", selectedNumbers.length === 0 && totalPages <= 1 && 'hidden')}
             >
               <div
                 className={cn("w-[47px] h-[47px] grid justify-center items-center mx-auto bg-[#14b8a6] rounded-full cursor-pointer hover:bg-[#0d9488] transition-colors", selectedNumbers.length === 0 && 'hidden')}

@@ -4,16 +4,14 @@ import { useState } from 'react'
 import {
   ChevronDown,
   ChevronRight,
-  Database,
   Home,
   Menu,
-  Network,
-  SquareFunction,
   StickyNote,
   Ticket,
   X,
 } from 'lucide-react'
 import ThemeSwitcher from './ThemeSwitcher'
+import { cn } from '@/lib/utils'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
@@ -23,22 +21,18 @@ export default function Header() {
 
   return (
     <>
-      <header className="p-4 flex items-center justify-between bg-gray-800 text-white shadow-lg">
+      <header className="p-4 flex items-center justify-between dark:bg-gray-800 text-white shadow-lg border-dashed border-b border-gray-300 dark:border-gray-700">
         <div className="flex items-center">
           <button
             onClick={() => setIsOpen(true)}
-            className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 text-primary hover:text-blue-400 hover:dark:sbg-gray-700 rounded-lg transition-colors"
             aria-label="Open menu"
           >
             <Menu size={24} />
           </button>
-          <h1 className="ml-4 text-xl font-semibold">
+          <h1 className="ml-4 text-xl text-primary dark:text-white font-black">
             <Link to="/">
-              <img
-                src="/tanstack-word-logo-white.svg"
-                alt="TanStack Logo"
-                className="h-10"
-              />
+              Giway
             </Link>
           </h1>
         </div>
@@ -46,9 +40,10 @@ export default function Header() {
       </header>
 
       <aside
-        className={`fixed top-0 left-0 h-full w-80 bg-gray-900 text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={cn("fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 dark:text-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col border-r border-gray-200",
+          isOpen ? 'translate-x-0' : '-translate-x-full',
+          isOpen ? 'shadow-background-light dark:shadow-background-dark ' : ''
+        )}
       >
         <div className="flex items-center justify-between p-4 border-b border-gray-700">
           <h2 className="text-xl font-bold">Navigation</h2>
@@ -65,10 +60,10 @@ export default function Header() {
           <Link
             to="/"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+            className="flex items-center gap-3 p-3 rounded-lg hover:text-white hover:bg-gray-800 transition-colors mb-2"
             activeProps={{
               className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+                'text-white flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
             }}
           >
             <Home size={20} />
@@ -78,45 +73,17 @@ export default function Header() {
           <Link
             to="/drawings"
             onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
+            className="flex items-center gap-3 p-3 rounded-lg hover:text-white hover:bg-gray-800 transition-colors mb-2"
             activeProps={{
               className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
+                'text-white flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
             }}
           >
             <Ticket size={20} />
             <span className="font-medium">My Drawings</span>
           </Link>
 
-          {/* Demo Links Start */}
-
-          <Link
-            to="/demo/start/server-funcs"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <SquareFunction size={20} />
-            <span className="font-medium">Start - Server Functions</span>
-          </Link>
-
-          <Link
-            to="/demo/start/api-request"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <Network size={20} />
-            <span className="font-medium">Start - API Request</span>
-          </Link>
-
-          <div className="flex flex-row justify-between">
+          <div className="hidden flex-row justify-between">
             <Link
               to="/demo/start/ssr"
               onClick={() => setIsOpen(false)}
@@ -188,47 +155,14 @@ export default function Header() {
             </div>
           )}
 
-          <Link
-            to="/demo/neon"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <Database size={20} />
-            <span className="font-medium">Neon</span>
-          </Link>
-
-          <Link
-            to="/demo/drizzle"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <Database size={20} />
-            <span className="font-medium">Drizzle</span>
-          </Link>
-
-          <Link
-            to="/demo/tanstack-query"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors mb-2"
-            activeProps={{
-              className:
-                'flex items-center gap-3 p-3 rounded-lg bg-cyan-600 hover:bg-cyan-700 transition-colors mb-2',
-            }}
-          >
-            <Network size={20} />
-            <span className="font-medium">TanStack Query</span>
-          </Link>
 
           {/* Demo Links End */}
         </nav>
+        {/* <div className='grow'></div> */}
+        <div className='flex justify-center mb-2'>
+          <ThemeSwitcher />
+        </div>
+
       </aside>
     </>
   )

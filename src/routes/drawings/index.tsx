@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
+import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -24,7 +25,7 @@ function DrawingsList() {
 
   if (!session.data) {
     return (
-      <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 p-6">
+      <div className="min-h-screen dark:bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 p-6">
         <div className="max-w-4xl mx-auto">
           <Card className="p-6 bg-slate-800/50 border-slate-700">
             <p className="text-white text-center">
@@ -40,7 +41,7 @@ function DrawingsList() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen bg-white dark:bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-white">My Drawings</h1>
@@ -60,25 +61,25 @@ function DrawingsList() {
             {drawings.map((drawing: any) => (
               <Card
                 key={drawing.id}
-                className="p-6 bg-slate-800/50 border-slate-700 hover:border-cyan-500 transition-colors"
+                className="p-6 dark:bg-slate-800/50 border-slate-700 hover:border-cyan-500 transition-colors"
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h2 className="text-xl font-semibold text-white mb-2">
+                    <h2 className="text-xl font-semibold line-clamp-2 dark:text-white mb-2">
                       {drawing.title}
                     </h2>
-                    <p className="text-gray-400 mb-2">
+                    <p className="text-text-light-secondary dark:text-text-dark-secondary mb-2">
                       Selection: {drawing.winnerSelection === 'random' ? 'Random' : 'By Number'}
                     </p>
                     {drawing.winnerSelection === 'number' && (
-                      <p className="text-gray-400 mb-2">
+                      <p className="text-text-light-secondary dark:text-text-dark-secondary mb-2">
                         Numbers: {drawing.quantityOfNumbers}
                       </p>
                     )}
-                    <p className="text-gray-400 mb-2">
+                    <p className="text-text-light-secondary dark:text-text-dark-secondary mb-2">
                       Type: {drawing.isPaid ? `Paid ($${(drawing.price / 100).toFixed(2)})` : 'Free'}
                     </p>
-                    <p className="text-gray-400">
+                    <p className="text-text-light-secondary dark:text-text-dark-secondary">
                       End Date: {new Date(drawing.endAt).toLocaleString()}
                     </p>
                   </div>
@@ -90,9 +91,9 @@ function DrawingsList() {
                     </Link>
                     <Button
                       onClick={() => {
-                        const url = `${window.location.origin}/join/${drawing.id}`
+                        const url = `${window.location.origin}/slot/${drawing.id}`
                         navigator.clipboard.writeText(url)
-                        alert('Link copied to clipboard!')
+                        toast.success('Link copied to clipboard!')
                       }}
                       className="bg-slate-600 hover:bg-slate-700 text-white"
                     >
