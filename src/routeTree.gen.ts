@@ -27,6 +27,7 @@ import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.se
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
+import { Route as ApiDrawingsReservationTimeRouteImport } from './routes/api/drawings/reservation-time'
 import { Route as ApiDrawingsDrawingIdRouteImport } from './routes/api/drawings/$drawingId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
@@ -130,6 +131,12 @@ const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
   path: '/demo/api/names',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiDrawingsReservationTimeRoute =
+  ApiDrawingsReservationTimeRouteImport.update({
+    id: '/api/drawings/reservation-time',
+    path: '/api/drawings/reservation-time',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiDrawingsDrawingIdRoute = ApiDrawingsDrawingIdRouteImport.update({
   id: '/api/drawings/$drawingId',
   path: '/api/drawings/$drawingId',
@@ -205,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/drawings': typeof DrawingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
+  '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -236,6 +244,7 @@ export interface FileRoutesByTo {
   '/drawings': typeof DrawingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
+  '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -268,6 +277,7 @@ export interface FileRoutesById {
   '/drawings/': typeof DrawingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
+  '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
     | '/drawings'
     | '/api/auth/$'
     | '/api/drawings/$drawingId'
+    | '/api/drawings/reservation-time'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -332,6 +343,7 @@ export interface FileRouteTypes {
     | '/drawings'
     | '/api/auth/$'
     | '/api/drawings/$drawingId'
+    | '/api/drawings/reservation-time'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -363,6 +375,7 @@ export interface FileRouteTypes {
     | '/drawings/'
     | '/api/auth/$'
     | '/api/drawings/$drawingId'
+    | '/api/drawings/reservation-time'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -395,6 +408,7 @@ export interface RootRouteChildren {
   DrawingsIndexRoute: typeof DrawingsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDrawingsDrawingIdRoute: typeof ApiDrawingsDrawingIdRouteWithChildren
+  ApiDrawingsReservationTimeRoute: typeof ApiDrawingsReservationTimeRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -536,6 +550,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoApiNamesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/drawings/reservation-time': {
+      id: '/api/drawings/reservation-time'
+      path: '/api/drawings/reservation-time'
+      fullPath: '/api/drawings/reservation-time'
+      preLoaderRoute: typeof ApiDrawingsReservationTimeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/drawings/$drawingId': {
       id: '/api/drawings/$drawingId'
       path: '/api/drawings/$drawingId'
@@ -649,6 +670,7 @@ const rootRouteChildren: RootRouteChildren = {
   DrawingsIndexRoute: DrawingsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDrawingsDrawingIdRoute: ApiDrawingsDrawingIdRouteWithChildren,
+  ApiDrawingsReservationTimeRoute: ApiDrawingsReservationTimeRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,

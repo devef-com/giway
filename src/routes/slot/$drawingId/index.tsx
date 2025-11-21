@@ -132,6 +132,15 @@ function SlotDrawingParticipation() {
 
   const NUMBERS_PER_PAGE = 6 * 17 // 6 columns × 17 rows = 102 numbers per page
 
+  const { data: reservationTimeData } = useQuery<{ reservationTimeMinutes: number }>({
+    queryKey: ['reservation-time'],
+    queryFn: async () => {
+      const response = await fetch(`/api/drawings/reservation-time`)
+      if (!response.ok) throw new Error('Failed to fetch reservation time')
+      return response.json()
+    },
+  })
+
   // Fetch drawing details
   const { data: drawing, isLoading: drawingLoading } = useQuery<Drawing>({
     queryKey: ['public-drawing', drawingId],
@@ -189,6 +198,16 @@ function SlotDrawingParticipation() {
     staleTime: 30000,
     refetchOnWindowFocus: true,
   })
+
+  // Clear selections when returning to this page (e.g., user went back from reservation page)
+  useEffect(() => {
+    // Clear any selected numbers when page mounts/becomes visible again
+    setSelectedNumbers([])
+
+    // Invalidate slots query to refresh the grid and show any released numbers
+    queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
+  }, [drawingId, queryClient])
+
 
   // Handle scroll to update active page
   useEffect(() => {
@@ -291,7 +310,7 @@ function SlotDrawingParticipation() {
         fetch(`/api/drawings/${drawingId}/reserve`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ number, expirationMinutes: 0.34 }),
+          body: JSON.stringify({ number, expirationMinutes: reservationTimeData?.reservationTimeMinutes || 4 }),
         })
       )
 
@@ -601,7 +620,7 @@ function SlotDrawingParticipation() {
                 <>
                   <li>• Select {drawing.isPaid ? 'one or more numbers' : 'a number'} from the grid</li>
                   <li>• Click the arrow button to proceed</li>
-                  <li>• Your {drawing.isPaid ? 'numbers' : 'number'} will be reserved for 15 minutes</li>
+                  <li>• Your {drawing.isPaid ? 'numbers' : 'number'} will be reserved for {reservationTimeData?.reservationTimeMinutes || 4} minutes</li>
                   <li>• Complete the registration form with your details</li>
                   {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
                   <li>• Wait for the drawing date to see if you win!</li>

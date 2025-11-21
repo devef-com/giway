@@ -52,6 +52,15 @@ function ReserveNumberForm() {
       if (!response.ok) throw new Error('Failed to fetch drawing')
       return response.json()
     },
+  });
+
+  const { data: reservationTimeData } = useQuery<{ reservationTimeMinutes: number }>({
+    queryKey: ['reservation-time'],
+    queryFn: async () => {
+      const response = await fetch(`/api/drawings/reservation-time`)
+      if (!response.ok) throw new Error('Failed to fetch reservation time')
+      return response.json()
+    },
   })
 
   // Reserve numbers on mount (only if not already reserved from previous page)
@@ -65,10 +74,10 @@ function ReserveNumberForm() {
         try {
           const { timestamp, numbers } = JSON.parse(storedReservation)
           const now = Date.now()
-          const fourMinutes = 0.34 * 60 * 1000
+          const reservationTime = (reservationTimeData?.reservationTimeMinutes || 4) * 60 * 1000
 
           // Check if reservation is still valid (within 4 minutes)
-          if (now - timestamp < fourMinutes &&
+          if (now - timestamp < reservationTime &&
             JSON.stringify(numbers.sort()) === JSON.stringify(selectedNumbers.sort())) {
             // Reservation is still valid, mark as complete
             setReservationComplete(true)
@@ -94,18 +103,22 @@ function ReserveNumberForm() {
     }
 
     checkAndMarkReservation()
-  }, [drawingId, drawing, reservationComplete, reservationKey, selectedNumbers, navigate])
+  }, [drawingId, drawing, reservationComplete, reservationKey, selectedNumbers, reservationTimeData?.reservationTimeMinutes, navigate])
 
-  // Release reservations when leaving the page
+  // Release reservations when navigating away from the page (including back button)
   useEffect(() => {
     return () => {
-      // Cleanup: release reservations if user navigates away without completing
+
+      // Cleanup: release reservations if user navigates away without completing registration
+      // This will fire when user clicks back, goes to another route, etc.
       if (reservationComplete && selectedNumbers.length > 0) {
         localStorage.removeItem(reservationKey)
+        // Use fetch with keepalive for reliable cleanup during navigation
         fetch(`/api/drawings/${drawingId}/reserve`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ numbers: selectedNumbers }),
+          keepalive: true, // Allows request to complete even during navigation
         }).catch(err => console.error('Error releasing reservations:', err))
       }
     }
@@ -161,6 +174,7 @@ function ReserveNumberForm() {
         await fetch(`/api/drawings/${drawingId}/reserve`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
+          keepalive: true,
           body: JSON.stringify({ numbers: selectedNumbers }),
         })
 
@@ -226,16 +240,21 @@ function ReserveNumberForm() {
         </div>
 
         {/* Selected Numbers Info */}
-        <Card className="p-4 mb-6 bg-cyan-50 dark:bg-cyan-900/20 border-cyan-200 dark:border-cyan-800">
-          <div className="flex items-center gap-3">
-            <div className="flex-1">
-              <p className="font-medium text-cyan-900 dark:text-cyan-100">
-                Selected Number{selectedNumbers.length > 1 ? 's' : ''}
-              </p>
-              <p className="text-lg font-semibold text-cyan-600 dark:text-cyan-400 mt-1">
-                {selectedNumbers.join(', ')}
-              </p>
-            </div>
+        <Card className="p-4 mb-6 border border-gray-300 dark:border-gray-600">
+          <h2 className="text-center text-xl font-semibold text-gray-700 dark:text-gray-300 mb-0">
+            Selected Numbers
+          </h2>
+          <div className="flex justify-center gap-3 flex-wrap">
+            {selectedNumbers.map((num) => (
+              <div
+                key={num}
+                className="w-16 h-16 flex items-center justify-center bg-cyan-100 dark:bg-cyan-900/40 border-2 border-cyan-400 dark:border-cyan-600 rounded-lg shadow-[2px_-1px_0px_rgba(34,211,238,0.9),0px_3px_0px_rgba(41,20,198,0.25)]"
+              >
+                <span className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+                  {num}
+                </span>
+              </div>
+            ))}
           </div>
         </Card>
 
