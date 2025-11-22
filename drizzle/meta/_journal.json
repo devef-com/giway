@@ -15,6 +15,13 @@
       "when": 1761974835769,
       "tag": "0001_clumsy_landau",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763842993235,
+      "tag": "0002_wet_madame_masque",
+      "breakpoints": true
     }
   ]
 }

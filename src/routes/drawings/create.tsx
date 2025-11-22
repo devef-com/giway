@@ -21,6 +21,8 @@ function CreateDrawing() {
     winnerSelection: 'random' as 'random' | 'number',
     quantityOfNumbers: 100,
     isWinnerNumberRandom: true,
+    winnersAmount: 1,
+    winnerNumbers: [] as number[],
     endAt: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -62,7 +64,7 @@ function CreateDrawing() {
 
       if (response.ok) {
         const data = await response.json()
-        navigate({ to: '/drawings' })
+        navigate({ to: `/drawings/${data.id}` })
       } else {
         const error = await response.json()
         alert(error.message || 'Failed to create drawing. Please try again.')
@@ -76,7 +78,7 @@ function CreateDrawing() {
 
   if (!session.data) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-6">
+      <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 p-6">
         <div className="max-w-2xl mx-auto">
           <Card className="p-6 bg-slate-800/50 border-slate-700">
             <p className="text-white text-center">
@@ -95,16 +97,16 @@ function CreateDrawing() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen p-6">
       <div className="max-w-2xl mx-auto">
-        <Card className="p-6 bg-slate-800/50 border-slate-700">
-          <h1 className="text-3xl font-bold text-white mb-6">
+        <Card className="p-6">
+          <h1 className="text-3xl font-bold mb-3">
             Create New Drawing
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <Label htmlFor="title" className="text-white">
+              <Label htmlFor="title" className='mb-1'>
                 Title
               </Label>
               <Input
@@ -114,12 +116,11 @@ function CreateDrawing() {
                   setFormData({ ...formData, title: e.target.value })
                 }
                 required
-                className="bg-slate-700 text-white border-slate-600"
               />
             </div>
 
             <div>
-              <Label className="text-white">Guidelines (Optional)</Label>
+              <Label className='mb-1'>Guidelines (Optional)</Label>
               {formData.guidelines.map((guideline, index) => (
                 <div key={index} className="flex gap-2 mb-2">
                   <Input
@@ -128,7 +129,6 @@ function CreateDrawing() {
                       handleGuidelineChange(index, e.target.value)
                     }
                     placeholder={`Guideline ${index + 1}`}
-                    className="bg-slate-700 text-white border-slate-600"
                   />
                   {formData.guidelines.length > 1 && (
                     <Button
@@ -144,7 +144,7 @@ function CreateDrawing() {
               <Button
                 type="button"
                 onClick={addGuideline}
-                className="bg-slate-600 hover:bg-slate-700 text-white mt-2"
+                className="bg-slate-600 hover:bg-slate-700 mt-2"
               >
                 Add Guideline
               </Button>
@@ -160,14 +160,14 @@ function CreateDrawing() {
                 }
                 className="w-4 h-4"
               />
-              <Label htmlFor="isPaid" className="text-white">
+              <Label htmlFor="isPaid">
                 Paid Event
               </Label>
             </div>
 
             {formData.isPaid && (
               <div>
-                <Label htmlFor="price" className="text-white">
+                <Label htmlFor="price" className='mb-1'>
                   Price (in dollars)
                 </Label>
                 <Input
@@ -183,13 +183,12 @@ function CreateDrawing() {
                     })
                   }
                   required={formData.isPaid}
-                  className="bg-slate-700 text-white border-slate-600"
                 />
               </div>
             )}
 
             <div>
-              <Label htmlFor="winnerSelection" className="text-white">
+              <Label htmlFor="winnerSelection" className='mb-1'>
                 Winner Selection Method
               </Label>
               <select
@@ -201,7 +200,7 @@ function CreateDrawing() {
                     winnerSelection: e.target.value as 'random' | 'number',
                   })
                 }
-                className="w-full p-2 bg-slate-700 text-white border border-slate-600 rounded"
+                className="w-full p-2 border rounded"
                 required
               >
                 <option value="random">Random Selection</option>
@@ -209,10 +208,29 @@ function CreateDrawing() {
               </select>
             </div>
 
+            <div>
+              <Label htmlFor="winnersAmount" className='mb-1'>
+                Number of Winners
+              </Label>
+              <Input
+                id="winnersAmount"
+                type="number"
+                min="1"
+                value={formData.winnersAmount}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    winnersAmount: parseInt(e.target.value) || 1,
+                  })
+                }
+                required
+              />
+            </div>
+
             {formData.winnerSelection === 'number' && (
               <>
                 <div>
-                  <Label htmlFor="quantityOfNumbers" className="text-white">
+                  <Label htmlFor="quantityOfNumbers" className='mb-1'>
                     Quantity of Numbers
                   </Label>
                   <select
@@ -224,7 +242,7 @@ function CreateDrawing() {
                         quantityOfNumbers: parseInt(e.target.value),
                       })
                     }
-                    className="w-full p-2 bg-slate-700 text-white border border-slate-600 rounded"
+                    className="w-full p-2 border rounded"
                     required
                   >
                     <option value="100">100</option>
@@ -242,19 +260,21 @@ function CreateDrawing() {
                       setFormData({
                         ...formData,
                         isWinnerNumberRandom: e.target.checked,
+                        winnerNumbers: e.target.checked ? [] : formData.winnerNumbers,
                       })
                     }
                     className="w-4 h-4"
                   />
-                  <Label htmlFor="isWinnerNumberRandom" className="text-white">
-                    Random Winner Number (system generated)
+                  <Label htmlFor="isWinnerNumberRandom">
+                    Random Winner Numbers (system generated)
                   </Label>
                 </div>
+
               </>
             )}
 
             <div>
-              <Label htmlFor="endAt" className="text-white">
+              <Label htmlFor="endAt" className='mb-1'>
                 End Date & Time
               </Label>
               <Input
@@ -265,7 +285,6 @@ function CreateDrawing() {
                   setFormData({ ...formData, endAt: e.target.value })
                 }
                 required
-                className="bg-slate-700 text-white border-slate-600"
               />
             </div>
 
@@ -273,14 +292,14 @@ function CreateDrawing() {
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                className="bg-cyan-600 hover:bg-cyan-700"
               >
                 {isSubmitting ? 'Creating...' : 'Create Drawing'}
               </Button>
               <Button
                 type="button"
                 onClick={() => navigate({ to: '/drawings' })}
-                className="bg-slate-600 hover:bg-slate-700 text-white"
+                className="bg-slate-600 hover:bg-slate-700"
               >
                 Cancel
               </Button>
