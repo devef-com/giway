@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { CircleAlert, Image, InfoIcon } from 'lucide-react'
 import type { DrawingStats } from '@/lib/number-slots'
@@ -11,31 +11,15 @@ import { Card } from '@/components/ui/card'
 
 import { cn } from '@/lib/utils'
 import DrawingSlotHeader from '@/components/DrawingSlotHeader'
+import { useDrawing } from '@/querys/useDrawing'
+import { useDrawingStats } from '@/querys/useDrawingStats'
+import { useNumberSlots } from '@/querys/useNumberSlots'
+import { useReservationTime } from '@/querys/useReservationTime'
+import { useParticipate } from '@/querys/useParticipate'
 
 export const Route = createFileRoute('/slot/$drawingId/')({
   component: SlotDrawingParticipation,
 })
-
-interface Drawing {
-  id: string
-  title: string
-  guidelines: Array<string> | null
-  isPaid: boolean
-  price: number
-  winnerSelection: 'random' | 'number'
-  quantityOfNumbers: number
-  endAt: string
-  createdAt: string
-}
-
-interface NumberSlotsData {
-  slots: Array<{
-    number: number
-    status: 'available' | 'reserved' | 'taken'
-    participantName?: string
-    expiresAt?: string
-  }>
-}
 
 interface FormProps {
   formData: {
@@ -137,38 +121,17 @@ function SlotDrawingParticipation() {
 
   const NUMBERS_PER_PAGE = 6 * 17 // 6 columns × 17 rows = 102 numbers per page
 
-  const { data: reservationTimeData } = useQuery<{
-    reservationTimeMinutes: number
-  }>({
-    queryKey: ['reservation-time'],
-    queryFn: async () => {
-      const response = await fetch(`/api/drawings/reservation-time`)
-      if (!response.ok) throw new Error('Failed to fetch reservation time')
-      return response.json()
-    },
-  })
+  const { data: reservationTimeData } = useReservationTime()
 
   // Fetch drawing details
-  const { data: drawing, isLoading: drawingLoading } = useQuery<Drawing>({
-    queryKey: ['public-drawing', drawingId],
-    queryFn: async () => {
-      const response = await fetch(`/api/drawings/${drawingId}`)
-      if (!response.ok) throw new Error('Failed to fetch drawing')
-      return response.json()
-    },
-  })
+  const { data: drawing, isLoading: drawingLoading } = useDrawing(drawingId)
 
   // Fetch drawing statistics
-  const { data: stats } = useQuery<DrawingStats>({
-    queryKey: ['drawing-stats', drawingId],
-    queryFn: async () => {
-      const response = await fetch(`/api/drawings/${drawingId}/stats`)
-      if (!response.ok) throw new Error('Failed to fetch stats')
-      return response.json()
-    },
-    enabled: !!drawing && drawing.winnerSelection === 'number',
-    refetchInterval: 10000, // Refresh every 10 seconds
-  })
+  const { data: stats } = useDrawingStats(
+    drawingId,
+    !!drawing && drawing.winnerSelection === 'number',
+    10000,
+  )
 
   // Calculate total pages
   const totalPages = drawing
@@ -176,40 +139,40 @@ function SlotDrawingParticipation() {
     : 0
 
   // Fetch slots for current page and adjacent pages (batched loading for optimization)
-  const { data: slotsData } = useQuery<NumberSlotsData>({
-    queryKey: ['number-slots', drawingId, currentPage],
-    queryFn: async () => {
-      if (!drawing) return { slots: [] }
+  // Memoize the numbers calculation to avoid unnecessary recalculations
+  const numbersToFetch = useMemo(() => {
+    if (!drawing) return []
 
-      // Fetch current page + 1 page before and after for smooth scrolling
-      const pagesToFetch = [
-        Math.max(0, currentPage - 1),
-        currentPage,
-        Math.min(totalPages - 1, currentPage + 1),
-      ].filter((page, index, array) => array.indexOf(page) === index) // Remove duplicates
+    const pagesToFetch = [
+      Math.max(0, currentPage - 1),
+      currentPage,
+      Math.min(totalPages - 1, currentPage + 1),
+    ].filter((page, index, array) => array.indexOf(page) === index) // Remove duplicates
 
-      const numbersToFetch: Array<number> = []
-      pagesToFetch.forEach((page) => {
-        const startIdx = page * NUMBERS_PER_PAGE
-        const endIdx = Math.min(
-          startIdx + NUMBERS_PER_PAGE,
-          drawing.quantityOfNumbers,
-        )
-        for (let i = startIdx; i < endIdx; i++) {
-          numbersToFetch.push(i + 1)
-        }
-      })
-
-      const response = await fetch(
-        `/api/drawings/${drawingId}/slots?numbers=${numbersToFetch.join(',')}`,
+    const numbers: Array<number> = []
+    pagesToFetch.forEach((page) => {
+      const startIdx = page * NUMBERS_PER_PAGE
+      const endIdx = Math.min(
+        startIdx + NUMBERS_PER_PAGE,
+        drawing.quantityOfNumbers,
       )
-      if (!response.ok) throw new Error('Failed to fetch slots')
-      return response.json()
+      for (let i = startIdx; i < endIdx; i++) {
+        numbers.push(i + 1)
+      }
+    })
+
+    return numbers
+  }, [drawing?.quantityOfNumbers, currentPage])
+
+  const { data: slotsData } = useNumberSlots(
+    drawingId,
+    numbersToFetch,
+    !!drawing && drawing.winnerSelection === 'number',
+    {
+      staleTime: 30000,
+      refetchOnWindowFocus: true,
     },
-    enabled: !!drawing && drawing.winnerSelection === 'number',
-    staleTime: 30000,
-    refetchOnWindowFocus: true,
-  })
+  )
 
   // Clear selections when returning to this page (e.g., user went back from reservation page)
   useEffect(() => {
@@ -380,32 +343,8 @@ function SlotDrawingParticipation() {
   }
 
   // Submit registration mutation
-  const participateMutation = useMutation({
-    mutationFn: async (
-      data: typeof formData & { selectedNumbers?: Array<number> },
-    ) => {
-      const response = await fetch(`/api/drawings/${drawingId}/participate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Failed to register')
-      }
-
-      return response.json()
-    },
-    onSuccess: () => {
-      toast.success('Successfully registered for the drawing!')
-      queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
-      queryClient.invalidateQueries({ queryKey: ['drawing-stats', drawingId] })
-      navigate({ to: '/' })
-    },
-    onError: (error: Error) => {
-      toast.error(error.message)
-    },
+  const participateMutation = useParticipate(drawingId, () => {
+    navigate({ to: '/' })
   })
 
   const handleSubmit = (e: React.FormEvent) => {

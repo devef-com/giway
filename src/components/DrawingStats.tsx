@@ -5,32 +5,16 @@
  * Shows visual progress and key metrics at a glance
  */
 
-import { useQuery } from '@tanstack/react-query'
 import { cn } from '@/lib/utils'
+import { useDrawingStats } from '@/querys/useDrawingStats'
 
 interface DrawingStatsProps {
   drawingId: string
   className?: string
 }
 
-interface StatsData {
-  total: number
-  available: number
-  taken: number
-  reserved: number
-  percentageTaken: number
-}
-
 export function DrawingStats({ drawingId, className }: DrawingStatsProps) {
-  const { data, isLoading } = useQuery<StatsData>({
-    queryKey: ['drawing-stats', drawingId],
-    queryFn: async () => {
-      const response = await fetch(`/api/drawings/${drawingId}/stats`)
-      if (!response.ok) throw new Error('Failed to fetch stats')
-      return response.json()
-    },
-    refetchInterval: 30000, // Refresh every 30 seconds
-  })
+  const { data, isLoading } = useDrawingStats(drawingId, true, 30000)
 
   if (isLoading) {
     return (

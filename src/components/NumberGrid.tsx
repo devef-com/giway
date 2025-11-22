@@ -6,10 +6,10 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
 import { NumberCell } from './NumberCell'
 import type { NumberSlotStatus } from './NumberCell'
 import { cn } from '@/lib/utils'
+import { useNumberSlots } from '@/querys/useNumberSlots'
 
 interface NumberGridProps {
   drawingId: string
@@ -17,15 +17,6 @@ interface NumberGridProps {
   onNumberSelect?: (number: number) => void
   isSelectable?: boolean
   className?: string
-}
-
-interface NumberSlotsData {
-  slots: Array<{
-    number: number
-    status: 'available' | 'reserved' | 'taken'
-    participantName?: string
-    expiresAt?: string
-  }>
 }
 
 export function NumberGrid({
@@ -61,20 +52,13 @@ export function NumberGrid({
   }, [])
 
   // Fetch slots for visible range
-  const { data, isLoading } = useQuery<NumberSlotsData>({
+  const numbers = Array.from(
+    { length: visibleRange.end - visibleRange.start + 1 },
+    (_, i) => visibleRange.start + i,
+  )
+  const { data, isLoading } = useNumberSlots(drawingId, numbers, true, {
     queryKey: ['number-slots', drawingId, visibleRange.start, visibleRange.end],
-    queryFn: async () => {
-      const numbers = Array.from(
-        { length: visibleRange.end - visibleRange.start + 1 },
-        (_, i) => visibleRange.start + i,
-      )
-      const response = await fetch(
-        `/api/drawings/${drawingId}/slots?numbers=${numbers.join(',')}`,
-      )
-      if (!response.ok) throw new Error('Failed to fetch slots')
-      return response.json()
-    },
-    staleTime: 30000, // Cache for 30 seconds
+    staleTime: 30000,
     refetchOnWindowFocus: true,
   })
 

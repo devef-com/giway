@@ -1,10 +1,10 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
+import { useDrawings } from '@/querys/useDrawings'
 
 export const Route = createFileRoute('/drawings/')({
   component: DrawingsList,
@@ -13,15 +13,7 @@ export const Route = createFileRoute('/drawings/')({
 function DrawingsList() {
   const session = authClient.useSession()
 
-  const { data: drawings, isLoading } = useQuery({
-    queryKey: ['drawings'],
-    queryFn: async () => {
-      const response = await fetch('/api/drawings')
-      if (!response.ok) throw new Error('Failed to fetch drawings')
-      return response.json()
-    },
-    enabled: !!session.data,
-  })
+  const { data: drawings, isLoading } = useDrawings(!!session.data)
 
   if (!session.data) {
     return (

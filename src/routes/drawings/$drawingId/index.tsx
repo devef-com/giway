@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
 import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
+import { useDrawing } from '@/querys/useDrawing'
+import { useParticipants } from '@/querys/useParticipants'
 
 export const Route = createFileRoute('/drawings/$drawingId/')({
   component: DrawingDetail,
@@ -11,32 +12,13 @@ function DrawingDetail() {
   const { drawingId } = Route.useParams()
   const session = authClient.useSession()
 
-  const { data: drawing, isLoading: drawingLoading } = useQuery({
-    queryKey: ['drawing', drawingId],
-    queryFn: async () => {
-      const response = await fetch(`/api/drawings/${drawingId}`)
-      if (!response.ok) throw new Error('Failed to fetch drawing')
-      return response.json()
-    },
-    enabled: !!session.data,
-    retry(failureCount, error) {
-      // Retry up to 2 times for network errors
-      if (error instanceof TypeError && failureCount < 2) {
-        return true
-      }
-      return false
-    },
-  })
+  const { data: drawing, isLoading: drawingLoading } = useDrawing(
+    drawingId,
+    !!session.data,
+  )
 
-  const { data: participants, isLoading: participantsLoading } = useQuery({
-    queryKey: ['participants', drawingId],
-    queryFn: async () => {
-      const response = await fetch(`/api/drawings/${drawingId}/participants`)
-      if (!response.ok) throw new Error('Failed to fetch participants')
-      return response.json()
-    },
-    enabled: !!session.data,
-  })
+  const { data: participants, isLoading: participantsLoading } =
+    useParticipants(drawingId, !!session.data)
 
   if (!session.data) {
     return (

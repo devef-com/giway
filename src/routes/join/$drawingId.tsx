@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
+import { useDrawing } from '@/querys/useDrawing'
+import { usePublicParticipants } from '@/querys/useParticipants'
 
 export const Route = createFileRoute('/join/$drawingId')({
   component: JoinDrawing,
@@ -21,24 +22,12 @@ function JoinDrawing() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const { data: drawing, isLoading: drawingLoading } = useQuery({
-    queryKey: ['public-drawing', drawingId],
-    queryFn: async () => {
-      const response = await fetch(`/api/drawings/${drawingId}`)
-      if (!response.ok) throw new Error('Failed to fetch drawing')
-      return response.json()
-    },
-  })
+  const { data: drawing, isLoading: drawingLoading } = useDrawing(drawingId)
 
-  const { data: participants } = useQuery({
-    queryKey: ['public-participants', drawingId],
-    queryFn: async () => {
-      const response = await fetch(`/api/drawings/${drawingId}/participants`)
-      if (!response.ok) throw new Error('Failed to fetch participants')
-      return response.json()
-    },
-    enabled: !!drawing && drawing.winnerSelection === 'number',
-  })
+  const { data: participants } = usePublicParticipants(
+    drawingId,
+    !!drawing && drawing.winnerSelection === 'number',
+  )
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

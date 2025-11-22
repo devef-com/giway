@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { ArrowLeft, CircleAlert, Clock } from 'lucide-react'
@@ -9,22 +9,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
+import { useDrawing } from '@/querys/useDrawing'
+import { useReservationTime } from '@/querys/useReservationTime'
+import { useParticipate } from '@/querys/useParticipate'
 
 export const Route = createFileRoute('/slot/$drawingId/$numberToReserve')({
   component: ReserveNumberForm,
 })
-
-interface Drawing {
-  id: string
-  title: string
-  guidelines: Array<string> | null
-  isPaid: boolean
-  price: number
-  winnerSelection: 'random' | 'number'
-  quantityOfNumbers: number
-  endAt: string
-  createdAt: string
-}
 
 function ReserveNumberForm() {
   const { drawingId, numberToReserve } = Route.useParams()
@@ -52,25 +43,9 @@ function ReserveNumberForm() {
   const reservationKey = `reservation_${drawingId}_${sortedNumbers.join('_')}`
 
   // Fetch drawing details
-  const { data: drawing, isLoading: drawingLoading } = useQuery<Drawing>({
-    queryKey: ['public-drawing', drawingId],
-    queryFn: async () => {
-      const response = await fetch(`/api/drawings/${drawingId}`)
-      if (!response.ok) throw new Error('Failed to fetch drawing')
-      return response.json()
-    },
-  })
+  const { data: drawing, isLoading: drawingLoading } = useDrawing(drawingId)
 
-  const { data: reservationTimeData } = useQuery<{
-    reservationTimeMinutes: number
-  }>({
-    queryKey: ['reservation-time'],
-    queryFn: async () => {
-      const response = await fetch(`/api/drawings/reservation-time`)
-      if (!response.ok) throw new Error('Failed to fetch reservation time')
-      return response.json()
-    },
-  })
+  const { data: reservationTimeData } = useReservationTime()
 
   // Reserve numbers on mount (only if not already reserved from previous page)
   useEffect(() => {
@@ -227,36 +202,17 @@ function ReserveNumberForm() {
   }, []) // Empty deps - only runs on mount/unmount
 
   // Submit registration mutation
-  const participateMutation = useMutation({
-    mutationFn: async (
-      data: typeof formData & { selectedNumbers?: Array<number> },
-    ) => {
-      const response = await fetch(`/api/drawings/${drawingId}/participate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Failed to register')
-      }
-
-      return response.json()
-    },
-    onSuccess: (data: Participant) => {
+  const participateMutation = useParticipate(
+    drawingId,
+    (data: Participant) => {
       // Clean up localStorage on successful registration
       localStorage.removeItem(reservationKey)
 
-      toast.success('Successfully registered for the drawing!')
       queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
       queryClient.invalidateQueries({ queryKey: ['drawing-stats', drawingId] })
       navigate({ to: `/drawings/${drawingId}/p/${data.id}`, replace: true })
     },
-    onError: (error: Error) => {
-      toast.error(error.message)
-    },
-  })
+  )
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
