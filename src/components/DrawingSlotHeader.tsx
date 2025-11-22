@@ -34,13 +34,13 @@ function DrawingSlotHeader({ drawing, stats }: DrawingSlotHeaderProps) {
     <div>
       <div className="flex flex-col gap-2 justify-center">
         {/* Title */}
-        <h1 className="text-2xl md:text-3xl font-bold line-clamp-2 dark:text-white">{drawing.title}</h1>
+        <h1 className="text-xl md:text-2xl font-bold line-clamp-2 dark:text-white">{drawing.title}</h1>
         <div className="flex items-center justify-between gap-6 ">
 
           {/* Prize Badge */}
-          <div className="flex items-center gap-2 px-2 py-2 md:px-4 border-2 border-teal-500 rounded-lg bg-teal-50 dark:bg-teal-950">
+          <div className="flex items-center gap-2 px-2 py-1 md:px-4 border-2 border-teal-500 rounded-lg bg-teal-50 dark:bg-teal-950">
             <HandCoins className="w-6 h-6 text-teal-600 dark:text-teal-400" />
-            <span className="text-md font-semibold text-teal-700 dark:text-teal-300">
+            <span className="text-sm font-semibold text-teal-700 dark:text-teal-300">
               {drawing.isPaid ? (
                 `$${drawing.price.toLocaleString()}`
               ) : 'Gratis'}
@@ -48,9 +48,9 @@ function DrawingSlotHeader({ drawing, stats }: DrawingSlotHeaderProps) {
           </div>
 
           {/* Time Remaining Badge */}
-          <div className="flex items-center gap-2 px-2 py-2 md:px-4 border-2 border-blue-500 rounded-lg bg-blue-50 dark:bg-blue-950">
+          <div className="flex items-center gap-2 px-2 py-1 md:px-4 border-2 border-blue-500 rounded-lg bg-blue-50 dark:bg-blue-950">
             <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-            <span className="text-md font-semibold text-blue-600 dark:text-blue-300">
+            <span className="text-sm font-semibold text-blue-600 dark:text-blue-300">
               {getTimeRemaining(drawing.endAt)}
             </span>
           </div>

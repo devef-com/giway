@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Image, CircleAlert } from 'lucide-react'
+import { Image, CircleAlert, InfoIcon } from 'lucide-react'
 import type { DrawingStats } from '@/lib/number-slots'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -451,7 +451,7 @@ function SlotDrawingParticipation() {
               <h2 className="font-regular mb-2 text-text-light-primary dark:text-text-dark-primary">
                 Guidelines
               </h2>
-              <ul className="list-disc list-inside space-y-1 text-text-light-secondary dark:text-text-dark-secondary">
+              <ul className="list-disc list-inside space-y-1 text-sm text-text-light-secondary dark:text-text-dark-secondary">
                 {drawing.guidelines.map((guideline, index) => (
                   <li key={index}>{guideline}</li>
                 ))}
@@ -600,41 +600,32 @@ function SlotDrawingParticipation() {
 
 
       {/* Help/Info Section */}
-      <Card className="p-4 bg-white dark:bg-slate-800/30 dark:border-slate-700 sm:max-w-[600px] mx-auto mt-2 mb-4">
-        <div className="flex items-start gap-3 text-sm text-gray-400">
-          <svg
-            className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <p className="dark:text-white font-medium mb-1">How it works:</p>
-            <ul className="space-y-1">
-              {drawing.winnerSelection === 'number' ? (
-                <>
-                  <li>• Select {drawing.isPaid ? 'one or more numbers' : 'a number'} from the grid</li>
-                  <li>• Click the arrow button to proceed</li>
-                  <li>• Your {drawing.isPaid ? 'numbers' : 'number'} will be reserved for {reservationTimeData?.reservationTimeMinutes || 4} minutes</li>
-                  <li>• Complete the registration form with your details</li>
-                  {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
-                  <li>• Wait for the drawing date to see if you win!</li>
-                </>
-              ) : (
-                <>
-                  <li>• Fill out the registration form with your details</li>
-                  {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
-                  <li>• The winner will be selected randomly on the drawing date</li>
-                </>
-              )}
-            </ul>
-          </div>
+      <Card className="p-4 gap-2 bg-white dark:bg-slate-800/30 dark:border-slate-700 sm:max-w-[600px] mx-2 md:mx-auto mt-2 mb-4">
+        <div className="flex items-center gap-2 text-sm text-gray-400">
+          <InfoIcon
+            className="w-5 h-5 text-cyan-400"
+          />
+          <p className="text-text-light-primary dark:text-text-dark-primary font-medium ">How it works:</p>
+
         </div>
+        <ul className="space-y-1 ml-4 text-sm text-gray-600 dark:text-gray-400">
+          {drawing.winnerSelection === 'number' ? (
+            <>
+              <li>• Select {drawing.isPaid ? 'one or more numbers' : 'a number'} from the grid</li>
+              <li>• Click the arrow button to proceed</li>
+              <li>• Your {drawing.isPaid ? 'numbers' : 'number'} will be reserved for {reservationTimeData?.reservationTimeMinutes || 4} minutes</li>
+              <li>• Complete the registration form with your details</li>
+              {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
+              <li>• Wait for the drawing date to see if you win!</li>
+            </>
+          ) : (
+            <>
+              <li>• Fill out the registration form with your details</li>
+              {drawing.isPaid && <li>• Upload payment proof to confirm your participation</li>}
+              <li>• The winner will be selected randomly on the drawing date</li>
+            </>
+          )}
+        </ul>
       </Card>
 
       <style>{`

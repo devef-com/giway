@@ -56,7 +56,7 @@ code {
 
   /* Custom variables for drawing page */
   --background-light: #ffffff;
-  --background-dark: #18181b;
+  --background-dark: #000000;
   --surface-light: #f4f4f5;
   --surface-dark: #27272a;
   --text-light-primary: #18181b;
