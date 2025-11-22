@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
+import { Participant } from '@/db/schema'
 
 export const Route = createFileRoute('/slot/$drawingId/$numberToReserve')({
   component: ReserveNumberForm,
@@ -37,6 +39,7 @@ function ReserveNumberForm() {
   const [reservationComplete, setReservationComplete] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null)
   const [reservationTimestamp, setReservationTimestamp] = useState<number | null>(null)
+  const [isTitleExpanded, setIsTitleExpanded] = useState(false)
 
   // Parse selected numbers from the route parameter
   const selectedNumbers = numberToReserve.split(',').map(n => parseInt(n, 10))
@@ -206,14 +209,14 @@ function ReserveNumberForm() {
 
       return response.json()
     },
-    onSuccess: () => {
+    onSuccess: (data: Participant) => {
       // Clean up localStorage on successful registration
       localStorage.removeItem(reservationKey)
 
       toast.success('Successfully registered for the drawing!')
       queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
       queryClient.invalidateQueries({ queryKey: ['drawing-stats', drawingId] })
-      navigate({ to: '/' })
+      navigate({ to: `/drawings/${drawingId}/p/${data.id}`, replace: true })
     },
     onError: (error: Error) => {
       toast.error(error.message)
@@ -339,9 +342,19 @@ function ReserveNumberForm() {
           <h1 className="text-2xl font-semibold text-text-light-primary dark:text-text-dark-primary mb-2">
             Confirm Your Registration
           </h1>
-          <p className="text-text-light-secondary dark:text-text-dark-secondary">
-            {drawing.title}
-          </p>
+          <div>
+            <p className={cn("text-text-light-secondary dark:text-text-dark-secondary", !isTitleExpanded && drawing.title.length > 158 ? 'line-clamp-2' : '')}>
+              {drawing.title}
+            </p>
+            {drawing.title.length > 158 && (
+              <button
+                onClick={() => setIsTitleExpanded(!isTitleExpanded)}
+                className="text-cyan-600 dark:text-cyan-400 text-sm hover:underline mt-1"
+              >
+                {isTitleExpanded ? 'less' : 'more'}
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Selected Numbers Info */}

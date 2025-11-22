@@ -14,13 +14,13 @@ import { Route as DrawingsIndexRouteImport } from './routes/drawings/index'
 import { Route as AuthenticationIndexRouteImport } from './routes/authentication/index'
 import { Route as JoinDrawingIdRouteImport } from './routes/join/$drawingId'
 import { Route as DrawingsCreateRouteImport } from './routes/drawings/create'
-import { Route as DrawingsDrawingIdRouteImport } from './routes/drawings/$drawingId'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoNeonRouteImport } from './routes/demo/neon'
 import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
 import { Route as AuthenticationSignupRouteImport } from './routes/authentication/signup'
 import { Route as AuthenticationLoginRouteImport } from './routes/authentication/login'
 import { Route as SlotDrawingIdIndexRouteImport } from './routes/slot/$drawingId/index'
+import { Route as DrawingsDrawingIdIndexRouteImport } from './routes/drawings/$drawingId/index'
 import { Route as ApiDrawingsIndexRouteImport } from './routes/api/drawings/index'
 import { Route as SlotDrawingIdNumberToReserveRouteImport } from './routes/slot/$drawingId/$numberToReserve'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
@@ -31,6 +31,7 @@ import { Route as ApiDrawingsReservationTimeRouteImport } from './routes/api/dra
 import { Route as ApiDrawingsDrawingIdRouteImport } from './routes/api/drawings/$drawingId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
+import { Route as DrawingsDrawingIdPParticipateIdRouteImport } from './routes/drawings/$drawingId/p.$participateId'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
@@ -65,11 +66,6 @@ const DrawingsCreateRoute = DrawingsCreateRouteImport.update({
   path: '/drawings/create',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DrawingsDrawingIdRoute = DrawingsDrawingIdRouteImport.update({
-  id: '/drawings/$drawingId',
-  path: '/drawings/$drawingId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DemoTanstackQueryRoute = DemoTanstackQueryRouteImport.update({
   id: '/demo/tanstack-query',
   path: '/demo/tanstack-query',
@@ -98,6 +94,11 @@ const AuthenticationLoginRoute = AuthenticationLoginRouteImport.update({
 const SlotDrawingIdIndexRoute = SlotDrawingIdIndexRouteImport.update({
   id: '/slot/$drawingId/',
   path: '/slot/$drawingId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DrawingsDrawingIdIndexRoute = DrawingsDrawingIdIndexRouteImport.update({
+  id: '/drawings/$drawingId/',
+  path: '/drawings/$drawingId/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiDrawingsIndexRoute = ApiDrawingsIndexRouteImport.update({
@@ -152,6 +153,12 @@ const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
   path: '/demo/start/ssr/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DrawingsDrawingIdPParticipateIdRoute =
+  DrawingsDrawingIdPParticipateIdRouteImport.update({
+    id: '/drawings/$drawingId/p/$participateId',
+    path: '/drawings/$drawingId/p/$participateId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
   id: '/demo/start/ssr/spa-mode',
   path: '/demo/start/ssr/spa-mode',
@@ -205,7 +212,6 @@ export interface FileRoutesByFullPath {
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/neon': typeof DemoNeonRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/drawings/$drawingId': typeof DrawingsDrawingIdRoute
   '/drawings/create': typeof DrawingsCreateRoute
   '/join/$drawingId': typeof JoinDrawingIdRoute
   '/authentication': typeof AuthenticationIndexRoute
@@ -219,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
   '/api/drawings': typeof ApiDrawingsIndexRoute
+  '/drawings/$drawingId': typeof DrawingsDrawingIdIndexRoute
   '/slot/$drawingId': typeof SlotDrawingIdIndexRoute
   '/api/drawings/$drawingId/participants': typeof ApiDrawingsDrawingIdParticipantsRoute
   '/api/drawings/$drawingId/participate': typeof ApiDrawingsDrawingIdParticipateRoute
@@ -228,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/drawings/$drawingId/p/$participateId': typeof DrawingsDrawingIdPParticipateIdRoute
   '/demo/start/ssr': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesByTo {
@@ -237,7 +245,6 @@ export interface FileRoutesByTo {
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/neon': typeof DemoNeonRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/drawings/$drawingId': typeof DrawingsDrawingIdRoute
   '/drawings/create': typeof DrawingsCreateRoute
   '/join/$drawingId': typeof JoinDrawingIdRoute
   '/authentication': typeof AuthenticationIndexRoute
@@ -251,6 +258,7 @@ export interface FileRoutesByTo {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
   '/api/drawings': typeof ApiDrawingsIndexRoute
+  '/drawings/$drawingId': typeof DrawingsDrawingIdIndexRoute
   '/slot/$drawingId': typeof SlotDrawingIdIndexRoute
   '/api/drawings/$drawingId/participants': typeof ApiDrawingsDrawingIdParticipantsRoute
   '/api/drawings/$drawingId/participate': typeof ApiDrawingsDrawingIdParticipateRoute
@@ -260,6 +268,7 @@ export interface FileRoutesByTo {
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/drawings/$drawingId/p/$participateId': typeof DrawingsDrawingIdPParticipateIdRoute
   '/demo/start/ssr': typeof DemoStartSsrIndexRoute
 }
 export interface FileRoutesById {
@@ -270,7 +279,6 @@ export interface FileRoutesById {
   '/demo/drizzle': typeof DemoDrizzleRoute
   '/demo/neon': typeof DemoNeonRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
-  '/drawings/$drawingId': typeof DrawingsDrawingIdRoute
   '/drawings/create': typeof DrawingsCreateRoute
   '/join/$drawingId': typeof JoinDrawingIdRoute
   '/authentication/': typeof AuthenticationIndexRoute
@@ -284,6 +292,7 @@ export interface FileRoutesById {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
   '/api/drawings/': typeof ApiDrawingsIndexRoute
+  '/drawings/$drawingId/': typeof DrawingsDrawingIdIndexRoute
   '/slot/$drawingId/': typeof SlotDrawingIdIndexRoute
   '/api/drawings/$drawingId/participants': typeof ApiDrawingsDrawingIdParticipantsRoute
   '/api/drawings/$drawingId/participate': typeof ApiDrawingsDrawingIdParticipateRoute
@@ -293,6 +302,7 @@ export interface FileRoutesById {
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/drawings/$drawingId/p/$participateId': typeof DrawingsDrawingIdPParticipateIdRoute
   '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
 export interface FileRouteTypes {
@@ -304,7 +314,6 @@ export interface FileRouteTypes {
     | '/demo/drizzle'
     | '/demo/neon'
     | '/demo/tanstack-query'
-    | '/drawings/$drawingId'
     | '/drawings/create'
     | '/join/$drawingId'
     | '/authentication'
@@ -318,6 +327,7 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/slot/$drawingId/$numberToReserve'
     | '/api/drawings'
+    | '/drawings/$drawingId'
     | '/slot/$drawingId'
     | '/api/drawings/$drawingId/participants'
     | '/api/drawings/$drawingId/participate'
@@ -327,6 +337,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/drawings/$drawingId/p/$participateId'
     | '/demo/start/ssr'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -336,7 +347,6 @@ export interface FileRouteTypes {
     | '/demo/drizzle'
     | '/demo/neon'
     | '/demo/tanstack-query'
-    | '/drawings/$drawingId'
     | '/drawings/create'
     | '/join/$drawingId'
     | '/authentication'
@@ -350,6 +360,7 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/slot/$drawingId/$numberToReserve'
     | '/api/drawings'
+    | '/drawings/$drawingId'
     | '/slot/$drawingId'
     | '/api/drawings/$drawingId/participants'
     | '/api/drawings/$drawingId/participate'
@@ -359,6 +370,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/drawings/$drawingId/p/$participateId'
     | '/demo/start/ssr'
   id:
     | '__root__'
@@ -368,7 +380,6 @@ export interface FileRouteTypes {
     | '/demo/drizzle'
     | '/demo/neon'
     | '/demo/tanstack-query'
-    | '/drawings/$drawingId'
     | '/drawings/create'
     | '/join/$drawingId'
     | '/authentication/'
@@ -382,6 +393,7 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/slot/$drawingId/$numberToReserve'
     | '/api/drawings/'
+    | '/drawings/$drawingId/'
     | '/slot/$drawingId/'
     | '/api/drawings/$drawingId/participants'
     | '/api/drawings/$drawingId/participate'
@@ -391,6 +403,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/drawings/$drawingId/p/$participateId'
     | '/demo/start/ssr/'
   fileRoutesById: FileRoutesById
 }
@@ -401,7 +414,6 @@ export interface RootRouteChildren {
   DemoDrizzleRoute: typeof DemoDrizzleRoute
   DemoNeonRoute: typeof DemoNeonRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
-  DrawingsDrawingIdRoute: typeof DrawingsDrawingIdRoute
   DrawingsCreateRoute: typeof DrawingsCreateRoute
   JoinDrawingIdRoute: typeof JoinDrawingIdRoute
   AuthenticationIndexRoute: typeof AuthenticationIndexRoute
@@ -415,10 +427,12 @@ export interface RootRouteChildren {
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
   SlotDrawingIdNumberToReserveRoute: typeof SlotDrawingIdNumberToReserveRoute
   ApiDrawingsIndexRoute: typeof ApiDrawingsIndexRoute
+  DrawingsDrawingIdIndexRoute: typeof DrawingsDrawingIdIndexRoute
   SlotDrawingIdIndexRoute: typeof SlotDrawingIdIndexRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
+  DrawingsDrawingIdPParticipateIdRoute: typeof DrawingsDrawingIdPParticipateIdRoute
   DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
 }
 
@@ -457,13 +471,6 @@ declare module '@tanstack/react-router' {
       path: '/drawings/create'
       fullPath: '/drawings/create'
       preLoaderRoute: typeof DrawingsCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/drawings/$drawingId': {
-      id: '/drawings/$drawingId'
-      path: '/drawings/$drawingId'
-      fullPath: '/drawings/$drawingId'
-      preLoaderRoute: typeof DrawingsDrawingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/tanstack-query': {
@@ -506,6 +513,13 @@ declare module '@tanstack/react-router' {
       path: '/slot/$drawingId'
       fullPath: '/slot/$drawingId'
       preLoaderRoute: typeof SlotDrawingIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drawings/$drawingId/': {
+      id: '/drawings/$drawingId/'
+      path: '/drawings/$drawingId'
+      fullPath: '/drawings/$drawingId'
+      preLoaderRoute: typeof DrawingsDrawingIdIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/drawings/': {
@@ -576,6 +590,13 @@ declare module '@tanstack/react-router' {
       path: '/demo/start/ssr'
       fullPath: '/demo/start/ssr'
       preLoaderRoute: typeof DemoStartSsrIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drawings/$drawingId/p/$participateId': {
+      id: '/drawings/$drawingId/p/$participateId'
+      path: '/drawings/$drawingId/p/$participateId'
+      fullPath: '/drawings/$drawingId/p/$participateId'
+      preLoaderRoute: typeof DrawingsDrawingIdPParticipateIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/ssr/spa-mode': {
@@ -663,7 +684,6 @@ const rootRouteChildren: RootRouteChildren = {
   DemoDrizzleRoute: DemoDrizzleRoute,
   DemoNeonRoute: DemoNeonRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
-  DrawingsDrawingIdRoute: DrawingsDrawingIdRoute,
   DrawingsCreateRoute: DrawingsCreateRoute,
   JoinDrawingIdRoute: JoinDrawingIdRoute,
   AuthenticationIndexRoute: AuthenticationIndexRoute,
@@ -677,10 +697,12 @@ const rootRouteChildren: RootRouteChildren = {
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
   SlotDrawingIdNumberToReserveRoute: SlotDrawingIdNumberToReserveRoute,
   ApiDrawingsIndexRoute: ApiDrawingsIndexRoute,
+  DrawingsDrawingIdIndexRoute: DrawingsDrawingIdIndexRoute,
   SlotDrawingIdIndexRoute: SlotDrawingIdIndexRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
+  DrawingsDrawingIdPParticipateIdRoute: DrawingsDrawingIdPParticipateIdRoute,
   DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
 }
 export const routeTree = rootRouteImport

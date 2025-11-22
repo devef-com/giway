@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
 
-export const Route = createFileRoute('/drawings/$drawingId')({
+export const Route = createFileRoute('/drawings/$drawingId/')({
   component: DrawingDetail,
 })
 
