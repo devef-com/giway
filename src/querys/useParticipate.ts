@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { Participant } from '@/db/schema'
 
 interface ParticipateData {
   name: string
@@ -10,7 +11,7 @@ interface ParticipateData {
 
 export function useParticipate(
   drawingId: string,
-  onSuccess?: (data: any) => void,
+  onSuccess?: (data: Participant) => void,
   onError?: (error: Error) => void,
 ) {
   const queryClient = useQueryClient()
@@ -30,7 +31,7 @@ export function useParticipate(
 
       return response.json()
     },
-    onSuccess: (data) => {
+    onSuccess: (data: Participant) => {
       toast.success('Successfully registered for the drawing!')
       queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
       queryClient.invalidateQueries({ queryKey: ['drawing-stats', drawingId] })

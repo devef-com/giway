@@ -162,14 +162,13 @@ function SlotDrawingParticipation() {
     })
 
     return numbers
-  }, [drawing, currentPage, totalPages])
+  }, [drawing?.quantityOfNumbers, currentPage])
 
   const { data: slotsData } = useNumberSlots(
     drawingId,
     numbersToFetch,
     !!drawing && drawing.winnerSelection === 'number',
     {
-      queryKey: ['number-slots', drawingId, currentPage],
       staleTime: 30000,
       refetchOnWindowFocus: true,
     },
