@@ -550,8 +550,8 @@ function SlotDrawingParticipation() {
                       key={i}
                       onClick={() => goToPage(i)}
                       className={`rounded-full transition-all duration-200 cursor-pointer hover:opacity-80 ${i === currentPage
-                          ? 'w-3 h-3 bg-[#14b8a6]'
-                          : 'w-2.5 h-2.5 bg-border-light dark:bg-border-dark'
+                        ? 'w-3 h-3 bg-[#14b8a6]'
+                        : 'w-2.5 h-2.5 bg-border-light dark:bg-border-dark'
                         }`}
                     />
                   ))}
@@ -598,46 +598,49 @@ function SlotDrawingParticipation() {
           </form>
         </div>
       )}
+      <div className='px-2'>
 
-      {/* Help/Info Section */}
-      <Card className="p-4 gap-2 bg-white dark:bg-slate-800/30 dark:border-slate-700 sm:max-w-[600px] mx-2 md:mx-auto mt-2 mb-4">
-        <div className="flex items-center gap-2 text-sm text-gray-400">
-          <InfoIcon className="w-5 h-5 text-cyan-400" />
-          <p className="text-text-light-primary dark:text-text-dark-primary font-medium ">
-            How it works:
-          </p>
-        </div>
-        <ul className="space-y-1 ml-4 text-sm text-gray-600 dark:text-gray-400">
-          {drawing.winnerSelection === 'number' ? (
-            <>
-              <li>
-                • Select {drawing.isPaid ? 'one or more numbers' : 'a number'}{' '}
-                from the grid
-              </li>
-              <li>• Click the arrow button to proceed</li>
-              <li>
-                • Your {drawing.isPaid ? 'numbers' : 'number'} will be reserved
-                for {reservationTimeData?.reservationTimeMinutes || 4} minutes
-              </li>
-              <li>• Complete the registration form with your details</li>
-              {drawing.isPaid && (
-                <li>• Upload payment proof to confirm your participation</li>
-              )}
-              <li>• Wait for the drawing date to see if you win!</li>
-            </>
-          ) : (
-            <>
-              <li>• Fill out the registration form with your details</li>
-              {drawing.isPaid && (
-                <li>• Upload payment proof to confirm your participation</li>
-              )}
-              <li>
-                • The winner will be selected randomly on the drawing date
-              </li>
-            </>
-          )}
-        </ul>
-      </Card>
+        {/* Help/Info Section */}
+        <Card className="p-4 gap-2 bg-white dark:bg-slate-800/30 dark:border-slate-700 sm:max-w-[600px] mx-auto mt-2 mb-4">
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <InfoIcon className="w-5 h-5 text-cyan-400" />
+            <p className="text-text-light-primary dark:text-text-dark-primary font-medium ">
+              How it works:
+            </p>
+          </div>
+          <ul className="space-y-1 ml-4 text-sm text-gray-600 dark:text-gray-400">
+            {drawing.winnerSelection === 'number' ? (
+              <>
+                <li>
+                  • Select {drawing.isPaid ? 'one or more numbers' : 'a number'}{' '}
+                  from the grid
+                </li>
+                <li>• Click the arrow button to proceed</li>
+                <li>
+                  • Your {drawing.isPaid ? 'numbers' : 'number'} will be reserved
+                  for {reservationTimeData?.reservationTimeMinutes || 4} minutes
+                </li>
+                <li>• Complete the registration form with your details</li>
+                {drawing.isPaid && (
+                  <li>• Upload payment proof to confirm your participation</li>
+                )}
+                <li>• Wait for the drawing date to see if you win!</li>
+              </>
+            ) : (
+              <>
+                <li>• Fill out the registration form with your details</li>
+                {drawing.isPaid && (
+                  <li>• Upload payment proof to confirm your participation</li>
+                )}
+                <li>
+                  • The winner will be selected randomly on the drawing date
+                </li>
+              </>
+            )}
+          </ul>
+        </Card>
+      </div>
+
 
       <style>{`
         #scrollContainer::-webkit-scrollbar,

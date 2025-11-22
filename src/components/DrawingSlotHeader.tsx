@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { Drawing } from '@/db/schema'
 import { Clock, HandCoins } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface DrawingSlotHeaderProps {
   drawing: Drawing
@@ -10,6 +12,8 @@ interface DrawingSlotHeaderProps {
 }
 
 function DrawingSlotHeader({ drawing, stats }: DrawingSlotHeaderProps) {
+  const [isTitleExpanded, setIsTitleExpanded] = useState(false)
+
   // Calculate time remaining
   const getTimeRemaining = (endDate: string) => {
     const end = new Date(endDate)
@@ -31,9 +35,21 @@ function DrawingSlotHeader({ drawing, stats }: DrawingSlotHeaderProps) {
     <div>
       <div className="flex flex-col gap-2 justify-center">
         {/* Title */}
-        <h1 className="text-xl md:text-2xl font-bold line-clamp-2 dark:text-white">
-          {drawing.title}
-        </h1>
+        <section>
+          <h1 className={cn("text-xl md:text-2xl font-bold dark:text-white", !isTitleExpanded && drawing.title.length > 158
+            ? 'line-clamp-2'
+            : '',)}>
+            {drawing.title}
+          </h1>
+          {drawing.title.length > 158 && (
+            <button
+              onClick={() => setIsTitleExpanded(!isTitleExpanded)}
+              className="text-cyan-600 dark:text-cyan-400 text-sm hover:underline self-start"
+            >
+              {isTitleExpanded ? 'less' : 'more'}
+            </button>
+          )}
+        </section>
         <div className="flex items-center justify-between gap-6 ">
           {/* Prize Badge */}
           <div className="flex items-center gap-2 px-2 py-1 md:px-4 border-2 border-teal-500 rounded-lg bg-teal-50 dark:bg-teal-950">
