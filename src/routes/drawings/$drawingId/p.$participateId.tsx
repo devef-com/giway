@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { Download } from 'lucide-react'
+import { Download, InfoIcon } from 'lucide-react'
 // import html2pdf from "html2pdf.js";
 import QRCodeSVG from 'qrcode-svg'
 import { jsPDF } from 'jspdf'
@@ -9,6 +9,9 @@ import type { Participant } from '@/db/schema'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { useDrawing } from '@/querys/useDrawing'
+
+const HOST = import.meta.env.APP_HOST || 'http://localhost:3000'
 
 export const Route = createFileRoute('/drawings/$drawingId/p/$participateId')({
   component: RouteComponent,
@@ -16,6 +19,8 @@ export const Route = createFileRoute('/drawings/$drawingId/p/$participateId')({
 
 function RouteComponent() {
   const { drawingId, participateId } = Route.useParams()
+
+  const { data: drawingData } = useDrawing(drawingId);
 
   const {
     data: participantData,
@@ -60,7 +65,7 @@ function RouteComponent() {
 
     // Generate QR SVG string
     const qrSvgString = new QRCodeSVG({
-      content: 'https://giway.vip/p/fkw34ffe',
+      content: `${HOST}/drawings/${drawingId}/p/${participateId}`,
       padding: 4,
       width: 180,
       height: 180,
@@ -79,9 +84,9 @@ function RouteComponent() {
               <line x1="280" y1="25" x2="280" y2="225" stroke="#ffffff" stroke-width="2" />
               <g transform="translate(305, 35)">
                 ${qrSvgString.replace(
-                  '<?xml version="1.0" standalone="yes"?>',
-                  '',
-                )}
+      '<?xml version="1.0" standalone="yes"?>',
+      '',
+    )}
               </g>
             </svg>
           `
@@ -118,8 +123,8 @@ function RouteComponent() {
       {participantData ? (
         <>
           <Card className="p-4">
-            <h1 className="text-regular font-semibold">
-              Participant for Drawing ("drawing name")
+            <h1 className="text-regular font-semibold line-clamp-2">
+              Participant for Drawing - {drawingData?.title}
             </h1>
             <div className="flex items-center gap-4">
               <p className="m-0">Status:</p>
@@ -128,11 +133,11 @@ function RouteComponent() {
                 className={cn(
                   'border',
                   participantData.isEligible &&
-                    'border-green-500 text-green-600 bg-green-700/20',
+                  'border-green-500 text-green-600 bg-green-700/20',
                   participantData.isEligible == null
                     ? 'border-2'
                     : !participantData.isEligible &&
-                        'border-red-500 text-red-700 bg-red-900/20',
+                    'border-red-500 text-red-700 bg-red-900/20',
                   'px-3 py-1 rounded inline-block font-medium',
                 )}
               >
@@ -143,6 +148,12 @@ function RouteComponent() {
                     : 'Not Eligible'}
               </p>
             </div>
+
+            <span className='text-sm inline-flex items-center gap-2 text-text-light-secondary dark:text-text-dark-secondary'>
+              <InfoIcon size={18} />
+              {participantData.isEligible == null ? 'Your participation is pending approval.' :
+                ''}
+            </span>
           </Card>
 
           <div className="max-w-[500px] h-[250px] mt-4 bg-[#000000] rounded-[2.5rem] grid grid-cols-[1fr_2px_1fr] items-center overflow-hidden relative p-2 shadow-2xl border border-white/20">
@@ -169,7 +180,7 @@ function RouteComponent() {
                   className="w-[200px]"
                   dangerouslySetInnerHTML={{
                     __html: new QRCodeSVG({
-                      content: 'https://giway.vip/p/fkw34ffe',
+                      content: `${HOST}/drawings/${drawingId}/p/${participateId}`,
                       padding: 4,
                       width: 180,
                       height: 180,

@@ -10,6 +10,7 @@ export function useDrawing(drawingId: string, enabled = true) {
       return response.json()
     },
     enabled,
+    staleTime: Infinity,
     retry(failureCount, error) {
       // Retry up to 2 times for network errors
       if (error instanceof TypeError && failureCount < 2) {
