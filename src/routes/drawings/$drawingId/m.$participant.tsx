@@ -52,9 +52,7 @@ function RouteComponent() {
       toast.success(data.message || 'Participant status updated successfully')
       
       // Navigate back after successful update
-      setTimeout(() => {
-        navigate({ to: '/drawings/$drawingId', params: { drawingId: participant.drawingId } })
-      }, 1000)
+      navigate({ to: '/drawings/$drawingId', params: { drawingId: participant.drawingId } })
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Failed to update participant status')
     } finally {

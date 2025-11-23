@@ -5,9 +5,9 @@
  * Provides utilities for updating participant eligibility status.
  */
 
-import { eq, and } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { db } from '@/db/index'
-import { participants, drawings } from '@/db/schema'
+import { drawings, participants } from '@/db/schema'
 
 // ============================================================================
 // Types and Interfaces

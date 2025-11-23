@@ -58,13 +58,24 @@ export const Route = createFileRoute('/api/participant/$participantId')({
           }
 
           // Parse request body
-          const body = (await request.json()) as {
-            status: ParticipantStatus
+          let body: { status?: ParticipantStatus }
+          try {
+            body = (await request.json()) as {
+              status?: ParticipantStatus
+            }
+          } catch (error) {
+            return new Response(
+              JSON.stringify({ error: 'Invalid JSON body' }),
+              {
+                status: 400,
+                headers: { 'Content-Type': 'application/json' },
+              },
+            )
           }
 
-          if (!body.status) {
+          if (!body.status || typeof body.status !== 'string') {
             return new Response(
-              JSON.stringify({ error: 'Status is required' }),
+              JSON.stringify({ error: 'Status is required and must be a string' }),
               {
                 status: 400,
                 headers: { 'Content-Type': 'application/json' },
