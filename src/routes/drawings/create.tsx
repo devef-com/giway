@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   EraserIcon,
@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/drawer'
 import { authClient } from '@/lib/auth-client'
 import { format } from 'date-fns'
+import useMobile from '@/hooks/useMobile'
 
 export const Route = createFileRoute('/drawings/create')({
   component: CreateDrawing,
@@ -64,17 +65,8 @@ function CreateDrawing() {
     minutes: '00',
   })
   const [isOpen, setIsOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const isMobile = useMobile()
   const [endAtError, setEndAtError] = useState('')
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
 
   const addGuideline = () => {
     if (!currentGuideline.trim()) return
@@ -243,7 +235,7 @@ function CreateDrawing() {
                     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                       e.preventDefault()
                       addGuideline()
-                      ;(e.target as HTMLTextAreaElement).style.height = 'auto'
+                        ; (e.target as HTMLTextAreaElement).style.height = 'auto'
                     }
                   }}
                   placeholder="Enter guideline text..."
@@ -391,12 +383,12 @@ function CreateDrawing() {
                   })
                 }}
                 onInvalid={(e) => {
-                  ;(e.target as HTMLInputElement).setCustomValidity(
+                  ; (e.target as HTMLInputElement).setCustomValidity(
                     'Please enter a number greater than 0',
                   )
                 }}
                 onInput={(e) => {
-                  ;(e.target as HTMLInputElement).setCustomValidity('')
+                  ; (e.target as HTMLInputElement).setCustomValidity('')
                 }}
                 required
               />
@@ -731,7 +723,7 @@ function CreateDrawing() {
                 disabled={isSubmitting}
                 variant="primary"
 
-                // className="bg-cyan-600 hover:bg-cyan-700"
+              // className="bg-cyan-600 hover:bg-cyan-700"
               >
                 {isSubmitting ? 'Creating...' : 'Create Drawing'}
               </Button>

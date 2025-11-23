@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
 import { useDrawing } from '@/querys/useDrawing'
 import { useParticipants } from '@/querys/useParticipants'
+import useMobile from '@/hooks/useMobile'
 
 export const Route = createFileRoute('/drawings/$drawingId/')({
   component: DrawingDetail,
@@ -11,6 +12,8 @@ export const Route = createFileRoute('/drawings/$drawingId/')({
 function DrawingDetail() {
   const { drawingId } = Route.useParams()
   const session = authClient.useSession()
+
+  const isMobile = useMobile()
 
   const { data: drawing, isLoading: drawingLoading } = useDrawing(
     drawingId,
@@ -110,7 +113,7 @@ function DrawingDetail() {
         </Card>
 
         <Card className="p-6 border-slate-700">
-          <h2 className="text-2xl font-bold">
+          <h2 className="text-xl font-bold">
             Participants ({participants?.length || 0})
           </h2>
 
@@ -135,9 +138,9 @@ function DrawingDetail() {
                       className="border-b border-slate-700"
                     >
                       <td className="p-2 text-sm">
-                        {participant.name.trim().length > 7
+                        {isMobile ? participant.name.trim().length > 7
                           ? participant.name.substring(0, 7) + '...'
-                          : participant.name}
+                          : participant.name : participant.name}
                       </td>
                       {/* <td className="p-2">{participant.phone}</td> */}
                       {drawing.winnerSelection === 'number' && (
