@@ -32,6 +32,7 @@ import { Route as ApiDrawingsDrawingIdRouteImport } from './routes/api/drawings/
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
 import { Route as DrawingsDrawingIdPParticipateIdRouteImport } from './routes/drawings/$drawingId/p.$participateId'
+import { Route as DrawingsDrawingIdMParticipantRouteImport } from './routes/drawings/$drawingId/m.$participant'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
@@ -160,6 +161,12 @@ const DrawingsDrawingIdPParticipateIdRoute =
     path: '/drawings/$drawingId/p/$participateId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DrawingsDrawingIdMParticipantRoute =
+  DrawingsDrawingIdMParticipantRouteImport.update({
+    id: '/drawings/$drawingId/m/$participant',
+    path: '/drawings/$drawingId/m/$participant',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DemoStartSsrSpaModeRoute = DemoStartSsrSpaModeRouteImport.update({
   id: '/demo/start/ssr/spa-mode',
   path: '/demo/start/ssr/spa-mode',
@@ -243,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/drawings/$drawingId/m/$participant': typeof DrawingsDrawingIdMParticipantRoute
   '/drawings/$drawingId/p/$participateId': typeof DrawingsDrawingIdPParticipateIdRoute
   '/demo/start/ssr': typeof DemoStartSsrIndexRoute
 }
@@ -277,6 +285,7 @@ export interface FileRoutesByTo {
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/drawings/$drawingId/m/$participant': typeof DrawingsDrawingIdMParticipantRoute
   '/drawings/$drawingId/p/$participateId': typeof DrawingsDrawingIdPParticipateIdRoute
   '/demo/start/ssr': typeof DemoStartSsrIndexRoute
 }
@@ -312,6 +321,7 @@ export interface FileRoutesById {
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
+  '/drawings/$drawingId/m/$participant': typeof DrawingsDrawingIdMParticipantRoute
   '/drawings/$drawingId/p/$participateId': typeof DrawingsDrawingIdPParticipateIdRoute
   '/demo/start/ssr/': typeof DemoStartSsrIndexRoute
 }
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/drawings/$drawingId/m/$participant'
     | '/drawings/$drawingId/p/$participateId'
     | '/demo/start/ssr'
   fileRoutesByTo: FileRoutesByTo
@@ -382,6 +393,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/drawings/$drawingId/m/$participant'
     | '/drawings/$drawingId/p/$participateId'
     | '/demo/start/ssr'
   id:
@@ -416,6 +428,7 @@ export interface FileRouteTypes {
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
+    | '/drawings/$drawingId/m/$participant'
     | '/drawings/$drawingId/p/$participateId'
     | '/demo/start/ssr/'
   fileRoutesById: FileRoutesById
@@ -445,6 +458,7 @@ export interface RootRouteChildren {
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
+  DrawingsDrawingIdMParticipantRoute: typeof DrawingsDrawingIdMParticipantRoute
   DrawingsDrawingIdPParticipateIdRoute: typeof DrawingsDrawingIdPParticipateIdRoute
   DemoStartSsrIndexRoute: typeof DemoStartSsrIndexRoute
 }
@@ -612,6 +626,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DrawingsDrawingIdPParticipateIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/drawings/$drawingId/m/$participant': {
+      id: '/drawings/$drawingId/m/$participant'
+      path: '/drawings/$drawingId/m/$participant'
+      fullPath: '/drawings/$drawingId/m/$participant'
+      preLoaderRoute: typeof DrawingsDrawingIdMParticipantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/start/ssr/spa-mode': {
       id: '/demo/start/ssr/spa-mode'
       path: '/demo/start/ssr/spa-mode'
@@ -725,6 +746,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,
+  DrawingsDrawingIdMParticipantRoute: DrawingsDrawingIdMParticipantRoute,
   DrawingsDrawingIdPParticipateIdRoute: DrawingsDrawingIdPParticipateIdRoute,
   DemoStartSsrIndexRoute: DemoStartSsrIndexRoute,
 }

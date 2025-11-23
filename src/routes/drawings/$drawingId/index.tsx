@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
 import { useDrawing } from '@/querys/useDrawing'
@@ -12,6 +12,8 @@ export const Route = createFileRoute('/drawings/$drawingId/')({
 function DrawingDetail() {
   const { drawingId } = Route.useParams()
   const session = authClient.useSession()
+
+  const navigate = useNavigate()
 
   const isMobile = useMobile()
 
@@ -132,10 +134,12 @@ function DrawingDetail() {
                   </tr>
                 </thead>
                 <tbody>
-                  {participants.map((participant: any) => (
+                  {participants.map((participant) => (
                     <tr
                       key={participant.id}
-                      className="border-b border-slate-700"
+                      className="border-b border-slate-700 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800"
+                      //@ts-ignore
+                      onClick={() => navigate({ to: `/drawings/${drawingId}/m/${participant.id}`, state: participant })}
                     >
                       <td className="p-2 text-sm">
                         {isMobile ? participant.name.trim().length > 7
