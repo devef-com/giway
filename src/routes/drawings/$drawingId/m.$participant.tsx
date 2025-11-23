@@ -27,17 +27,46 @@ function RouteComponent() {
   const [participant, setParticipant] = useState<Participant | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<ParticipantStatus>('pending')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    // Get participant from navigation state (client-only)
-    const state = window.history.state
-    if (state) {
-      setParticipant(state as Participant)
+    const fetchParticipant = async () => {
+      // Try to get participant from navigation state first
+      const state = window.history.state
+      if (state && state.name) {
+        setParticipant(state as Participant)
+        setIsLoading(false)
+        return
+      }
+
+      // If no state, fetch from API
+      try {
+        const response = await fetch(`/api/participant/${participantId}`)
+        if (!response.ok) {
+          throw new Error('Failed to fetch participant')
+        }
+        const data = await response.json()
+        setParticipant(data)
+      } catch (error) {
+        toast.error('Failed to load participant data')
+        navigate({
+          to: '/drawings/$drawingId',
+          params: { drawingId },
+        })
+      } finally {
+        setIsLoading(false)
+      }
     }
-  }, [])
+
+    fetchParticipant()
+  }, [participantId, drawingId, navigate])
+
+  if (isLoading) {
+    return <div className="container mx-auto p-4">Loading participant...</div>
+  }
 
   if (!participant) {
-    return <div>Loading participant...</div>
+    return <div className="container mx-auto p-4">Participant not found</div>
   }
 
   const currentStatus: ParticipantStatus =
