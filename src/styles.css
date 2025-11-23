@@ -76,6 +76,8 @@ code {
   --border-light: #e4e4e7;
   --border-dark: #3f3f46;
   --teal-primary: #14b8a6;
+  --teal-primary-dark: #0f766e;
+  --teal-primary-light: #5eead4;
 }
 
 .dark {

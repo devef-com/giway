@@ -22,7 +22,6 @@ import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -260,8 +259,8 @@ function CreateDrawing() {
               {formData.guidelines.length > 0 && (
                 <ul className="mt-3 space-y-2">
                   {formData.guidelines.map((guideline, index) => (
-                    <li key={index} className="flex items-start gap-2 group ml-2">
-                      <span className="flex-1 inline-flex items-center gap-2 text-sm py-1.5"><div className='bg-primary w-2 h-2 rounded-full' /> {guideline}</span>
+                    <li key={index} className="flex items-start gap-2 group ml-1">
+                      <span className="flex-1 inline-flex gap-2 text-sm py-1.5"><div className='bg-primary w-1 h-1 rounded-full aspect-square mt-2' /> {guideline}</span>
                       <div className="flex gap-1">
                         <Button
                           type="button"
@@ -356,12 +355,21 @@ function CreateDrawing() {
                 type="number"
                 min="1"
                 value={formData.winnersAmount}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const value = e.target.value
                   setFormData({
                     ...formData,
-                    winnersAmount: parseInt(e.target.value) || 1,
+                    winnersAmount: parseInt(value),
                   })
-                }
+                }}
+                onInvalid={(e) => {
+                  (e.target as HTMLInputElement).setCustomValidity(
+                    'Please enter a number greater than 0'
+                  )
+                }}
+                onInput={(e) => {
+                  (e.target as HTMLInputElement).setCustomValidity('')
+                }}
                 required
               />
             </div>
@@ -419,11 +427,12 @@ function CreateDrawing() {
                 End Date & Time
               </Label>
 
-              <div className="flex gap-2 mb-2">
+              <div className="flex gap-2 mb-2 flex-wrap">
                 <Button
                   type="button"
                   size="sm"
                   variant="outline"
+                  className='text-xs font-thin'
                   onClick={() => handleQuickPreset(168)}
                 >
                   Next week
@@ -432,6 +441,7 @@ function CreateDrawing() {
                   type="button"
                   size="sm"
                   variant="outline"
+                  className='text-xs font-thin'
                   onClick={() => handleQuickPreset(360)}
                 >
                   15 days
@@ -440,6 +450,7 @@ function CreateDrawing() {
                   type="button"
                   size="sm"
                   variant="outline"
+                  className='text-xs font-thin'
                   onClick={() => handleQuickPreset(720)}
                 >
                   Next Month
@@ -662,20 +673,22 @@ function CreateDrawing() {
               )}
             </div>
 
-            <div className="flex gap-4">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="bg-cyan-600 hover:bg-cyan-700"
-              >
-                {isSubmitting ? 'Creating...' : 'Create Drawing'}
-              </Button>
+            <div className="grid grid-cols-2 gap-4 max-w-md mx-auto">
               <Button
                 type="button"
                 onClick={() => navigate({ to: '/drawings' })}
-                className="bg-slate-600 hover:bg-slate-700"
+                variant="outline"
               >
                 Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                variant="primary"
+
+              // className="bg-cyan-600 hover:bg-cyan-700"
+              >
+                {isSubmitting ? 'Creating...' : 'Create Drawing'}
               </Button>
             </div>
           </form>

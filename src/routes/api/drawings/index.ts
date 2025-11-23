@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 
 import { db } from '@/db/index'
-import { drawings } from '@/db/schema'
+import { Drawing, drawings } from '@/db/schema'
 import { auth } from '@/lib/auth'
 import { initializeNumberSlots } from '@/lib/number-slots'
 
@@ -49,7 +49,7 @@ export const Route = createFileRoute('/api/drawings/')({
         }
 
         try {
-          const body = await request.json()
+          const body = (await request.json()) as Omit<Drawing, 'id' | 'userId'>
 
           const newDrawing = await db
             .insert(drawings)
@@ -64,6 +64,7 @@ export const Route = createFileRoute('/api/drawings/')({
               quantityOfNumbers: body.quantityOfNumbers || 0,
               isWinnerNumberRandom: body.isWinnerNumberRandom ?? true,
               endAt: new Date(body.endAt),
+              winnersAmount: body.winnersAmount || 1,
             })
             .returning()
           if (newDrawing[0].winnerSelection === 'number') {
