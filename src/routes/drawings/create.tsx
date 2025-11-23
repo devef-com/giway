@@ -56,6 +56,7 @@ function CreateDrawing() {
   const [selectedTime, setSelectedTime] = useState({ hours: '12', minutes: '00' })
   const [isOpen, setIsOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [endAtError, setEndAtError] = useState('')
 
   useEffect(() => {
     const checkMobile = () => {
@@ -107,7 +108,7 @@ function CreateDrawing() {
       const hours = String(dateTime.getHours()).padStart(2, '0')
       const minutes = String(dateTime.getMinutes()).padStart(2, '0')
       const isoString = `${year}-${month}-${day}T${hours}:${minutes}`
-
+      setEndAtError('')
       setFormData({ ...formData, endAt: isoString })
       setIsOpen(false)
     }
@@ -129,11 +130,24 @@ function CreateDrawing() {
     const mins = String(now.getMinutes()).padStart(2, '0')
     const isoString = `${year}-${month}-${day}T${hrs}:${mins}`
 
+    setEndAtError('')
     setFormData({ ...formData, endAt: isoString })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validate endAt before submission
+    if (!formData.endAt) {
+      setEndAtError('Please select an end date and time')
+      const endAtSection = document.getElementById('endAt-section')
+      if (endAtSection) {
+        endAtSection.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+      return
+    }
+
+    setEndAtError('')
     setIsSubmitting(true)
 
     try {
@@ -422,11 +436,13 @@ function CreateDrawing() {
               </>
             )}
 
-            <div>
+            <div id="endAt-section">
               <Label className='mb-1'>
                 End Date & Time
               </Label>
-
+              {endAtError && (
+                <p className="text-sm text-destructive mt-1 mb-2">{endAtError}</p>
+              )}
               <div className="flex gap-2 mb-2 flex-wrap">
                 <Button
                   type="button"
