@@ -52,6 +52,7 @@ export const participants = pgTable('participants', {
   email: varchar('email', { length: 255 }),
   phone: varchar('phone', { length: 50 }).notNull(),
   selectedNumber: integer('selected_number'), // The number chosen by participant (if applicable)
+  logNumbers: integer('log_numbers').array(), // Track numbers selected by rejected participants
   isEligible: boolean('is_eligible'), // null = pending, true = approved, false = rejected
   paymentCaptureId: integer('payment_capture_id').references(() => assets.id), // Reference to payment proof asset
   createdAt: timestamp('created_at').notNull().defaultNow(),

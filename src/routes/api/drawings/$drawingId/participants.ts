@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { eq, sql } from 'drizzle-orm'
 
 import { db } from '@/db/index'
-import { participants, numberSlots } from '@/db/schema'
+import { numberSlots, participants } from '@/db/schema'
 
 export const Route = createFileRoute('/api/drawings/$drawingId/participants')({
   server: {
@@ -17,11 +17,12 @@ export const Route = createFileRoute('/api/drawings/$drawingId/participants')({
               email: participants.email,
               phone: participants.phone,
               selectedNumber: participants.selectedNumber,
+              logNumbers: participants.logNumbers,
               isEligible: participants.isEligible,
               paymentCaptureId: participants.paymentCaptureId,
               createdAt: participants.createdAt,
               numbers: sql<
-                number[]
+                Array<number>
               >`array_agg(${numberSlots.number}) filter (where ${numberSlots.number} is not null)`.as(
                 'numbers',
               ),
