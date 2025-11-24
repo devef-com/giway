@@ -39,6 +39,7 @@ import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
 import { Route as ApiDrawingsDrawingIdStatsRouteImport } from './routes/api/drawings/$drawingId.stats'
 import { Route as ApiDrawingsDrawingIdSlotsRouteImport } from './routes/api/drawings/$drawingId.slots'
+import { Route as ApiDrawingsDrawingIdSelectWinnersRouteImport } from './routes/api/drawings/$drawingId.select-winners'
 import { Route as ApiDrawingsDrawingIdReserveRouteImport } from './routes/api/drawings/$drawingId.reserve'
 import { Route as ApiDrawingsDrawingIdParticipateRouteImport } from './routes/api/drawings/$drawingId/participate'
 import { Route as ApiDrawingsDrawingIdParticipantsRouteImport } from './routes/api/drawings/$drawingId/participants'
@@ -201,6 +202,12 @@ const ApiDrawingsDrawingIdSlotsRoute =
     path: '/slots',
     getParentRoute: () => ApiDrawingsDrawingIdRoute,
   } as any)
+const ApiDrawingsDrawingIdSelectWinnersRoute =
+  ApiDrawingsDrawingIdSelectWinnersRouteImport.update({
+    id: '/select-winners',
+    path: '/select-winners',
+    getParentRoute: () => ApiDrawingsDrawingIdRoute,
+  } as any)
 const ApiDrawingsDrawingIdReserveRoute =
   ApiDrawingsDrawingIdReserveRouteImport.update({
     id: '/reserve',
@@ -253,6 +260,7 @@ export interface FileRoutesByFullPath {
   '/api/drawings/$drawingId/participants': typeof ApiDrawingsDrawingIdParticipantsRoute
   '/api/drawings/$drawingId/participate': typeof ApiDrawingsDrawingIdParticipateRoute
   '/api/drawings/$drawingId/reserve': typeof ApiDrawingsDrawingIdReserveRoute
+  '/api/drawings/$drawingId/select-winners': typeof ApiDrawingsDrawingIdSelectWinnersRoute
   '/api/drawings/$drawingId/slots': typeof ApiDrawingsDrawingIdSlotsRoute
   '/api/drawings/$drawingId/stats': typeof ApiDrawingsDrawingIdStatsRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
@@ -289,6 +297,7 @@ export interface FileRoutesByTo {
   '/api/drawings/$drawingId/participants': typeof ApiDrawingsDrawingIdParticipantsRoute
   '/api/drawings/$drawingId/participate': typeof ApiDrawingsDrawingIdParticipateRoute
   '/api/drawings/$drawingId/reserve': typeof ApiDrawingsDrawingIdReserveRoute
+  '/api/drawings/$drawingId/select-winners': typeof ApiDrawingsDrawingIdSelectWinnersRoute
   '/api/drawings/$drawingId/slots': typeof ApiDrawingsDrawingIdSlotsRoute
   '/api/drawings/$drawingId/stats': typeof ApiDrawingsDrawingIdStatsRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
@@ -326,6 +335,7 @@ export interface FileRoutesById {
   '/api/drawings/$drawingId/participants': typeof ApiDrawingsDrawingIdParticipantsRoute
   '/api/drawings/$drawingId/participate': typeof ApiDrawingsDrawingIdParticipateRoute
   '/api/drawings/$drawingId/reserve': typeof ApiDrawingsDrawingIdReserveRoute
+  '/api/drawings/$drawingId/select-winners': typeof ApiDrawingsDrawingIdSelectWinnersRoute
   '/api/drawings/$drawingId/slots': typeof ApiDrawingsDrawingIdSlotsRoute
   '/api/drawings/$drawingId/stats': typeof ApiDrawingsDrawingIdStatsRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
@@ -364,6 +374,7 @@ export interface FileRouteTypes {
     | '/api/drawings/$drawingId/participants'
     | '/api/drawings/$drawingId/participate'
     | '/api/drawings/$drawingId/reserve'
+    | '/api/drawings/$drawingId/select-winners'
     | '/api/drawings/$drawingId/slots'
     | '/api/drawings/$drawingId/stats'
     | '/demo/start/ssr/data-only'
@@ -400,6 +411,7 @@ export interface FileRouteTypes {
     | '/api/drawings/$drawingId/participants'
     | '/api/drawings/$drawingId/participate'
     | '/api/drawings/$drawingId/reserve'
+    | '/api/drawings/$drawingId/select-winners'
     | '/api/drawings/$drawingId/slots'
     | '/api/drawings/$drawingId/stats'
     | '/demo/start/ssr/data-only'
@@ -436,6 +448,7 @@ export interface FileRouteTypes {
     | '/api/drawings/$drawingId/participants'
     | '/api/drawings/$drawingId/participate'
     | '/api/drawings/$drawingId/reserve'
+    | '/api/drawings/$drawingId/select-winners'
     | '/api/drawings/$drawingId/slots'
     | '/api/drawings/$drawingId/stats'
     | '/demo/start/ssr/data-only'
@@ -689,6 +702,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDrawingsDrawingIdSlotsRouteImport
       parentRoute: typeof ApiDrawingsDrawingIdRoute
     }
+    '/api/drawings/$drawingId/select-winners': {
+      id: '/api/drawings/$drawingId/select-winners'
+      path: '/select-winners'
+      fullPath: '/api/drawings/$drawingId/select-winners'
+      preLoaderRoute: typeof ApiDrawingsDrawingIdSelectWinnersRouteImport
+      parentRoute: typeof ApiDrawingsDrawingIdRoute
+    }
     '/api/drawings/$drawingId/reserve': {
       id: '/api/drawings/$drawingId/reserve'
       path: '/reserve'
@@ -725,6 +745,7 @@ interface ApiDrawingsDrawingIdRouteChildren {
   ApiDrawingsDrawingIdParticipantsRoute: typeof ApiDrawingsDrawingIdParticipantsRoute
   ApiDrawingsDrawingIdParticipateRoute: typeof ApiDrawingsDrawingIdParticipateRoute
   ApiDrawingsDrawingIdReserveRoute: typeof ApiDrawingsDrawingIdReserveRoute
+  ApiDrawingsDrawingIdSelectWinnersRoute: typeof ApiDrawingsDrawingIdSelectWinnersRoute
   ApiDrawingsDrawingIdSlotsRoute: typeof ApiDrawingsDrawingIdSlotsRoute
   ApiDrawingsDrawingIdStatsRoute: typeof ApiDrawingsDrawingIdStatsRoute
 }
@@ -735,6 +756,8 @@ const ApiDrawingsDrawingIdRouteChildren: ApiDrawingsDrawingIdRouteChildren = {
   ApiDrawingsDrawingIdParticipantsRoute: ApiDrawingsDrawingIdParticipantsRoute,
   ApiDrawingsDrawingIdParticipateRoute: ApiDrawingsDrawingIdParticipateRoute,
   ApiDrawingsDrawingIdReserveRoute: ApiDrawingsDrawingIdReserveRoute,
+  ApiDrawingsDrawingIdSelectWinnersRoute:
+    ApiDrawingsDrawingIdSelectWinnersRoute,
   ApiDrawingsDrawingIdSlotsRoute: ApiDrawingsDrawingIdSlotsRoute,
   ApiDrawingsDrawingIdStatsRoute: ApiDrawingsDrawingIdStatsRoute,
 }
