@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import type { ParticipantStatus } from '@/lib/participants'
 import { Card } from '@/components/ui/card'
+import { AlertCircleIcon } from 'lucide-react'
 
 export const Route = createFileRoute('/drawings/$drawingId/m/$participant')({
   component: RouteComponent,
@@ -68,6 +69,8 @@ function RouteComponent() {
         ? 'rejected'
         : 'pending'
 
+  const isStatusLocked = currentStatus === 'rejected'
+
   const handleStatusChange = async () => {
     setIsSubmitting(true)
     try {
@@ -103,12 +106,14 @@ function RouteComponent() {
   }
 
   const participantNumbers = () => {
-
     if (participant.numbers?.length > 0) {
       return participant.numbers
     } else if (participant.logNumbers && participant.logNumbers.length > 0) {
       return participant.logNumbers
-    } else if (currentStatus === 'rejected' && (participant.logNumbers || [])?.length > 0) {
+    } else if (
+      currentStatus === 'rejected' &&
+      (participant.logNumbers || [])?.length > 0
+    ) {
       return participant.logNumbers || []
     } else {
       return []
@@ -136,12 +141,13 @@ function RouteComponent() {
             <div>
               <span className="font-semibold">Current Status:</span>{' '}
               <span
-                className={`inline-block px-2 py-1 rounded text-sm ${currentStatus === 'approved'
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                  : currentStatus === 'rejected'
-                    ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
-                  }`}
+                className={`inline-block px-2 py-1 rounded text-sm ${
+                  currentStatus === 'approved'
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+                    : currentStatus === 'rejected'
+                      ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+                      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
+                }`}
               >
                 {currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}
               </span>
@@ -151,13 +157,13 @@ function RouteComponent() {
               <section className="flex gap-2">
                 {participantNumbers().length > 0
                   ? participantNumbers().map((num) => (
-                    <div
-                      key={num}
-                      className="py-0.5 px-1 rounded-sm border border-neutral-300 dark:border-neutral-600"
-                    >
-                      {num}
-                    </div>
-                  ))
+                      <div
+                        key={num}
+                        className="py-0.5 px-1 rounded-sm border border-neutral-300 dark:border-neutral-600"
+                      >
+                        {num}
+                      </div>
+                    ))
                   : 'No numbers selected'}
               </section>
             </div>
@@ -173,34 +179,57 @@ function RouteComponent() {
               <label className="block text-sm font-medium mb-2">
                 Select New Status
               </label>
+              {isStatusLocked && (
+                <div className="mb-2">
+                  <div className="flex gap-2 items-center">
+                    <AlertCircleIcon className="text-red-500" />
+                    <p className="text-sm text-red-500">
+                      This participant was rejected and their status can no
+                      longer be changed.
+                    </p>
+                  </div>
+                  <div className="ml-8 mt-2">
+                    <p className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
+                      Re-assigning numbers will be available soon. You can
+                      select the numbers again
+                    </p>
+                  </div>
+                </div>
+              )}
               <div className="inline-flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden w-full">
                 <button
                   type="button"
                   onClick={() => setSelectedStatus('pending')}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${selectedStatus === 'pending'
-                    ? 'bg-neutral-200 text-gray-900 dark:bg-gray-700 dark:text-white'
-                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
-                    }`}
+                  disabled={isStatusLocked}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    selectedStatus === 'pending'
+                      ? 'bg-neutral-200 text-gray-900 dark:bg-gray-700 dark:text-white'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                  } ${isStatusLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Pending
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedStatus('rejected')}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors border-x border-gray-300 dark:border-gray-600 ${selectedStatus === 'rejected'
-                    ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                    : 'bg-gray-50 text-gray-700 hover:bg-red-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-900/20'
-                    }`}
+                  disabled={isStatusLocked}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors border-x border-gray-300 dark:border-gray-600 ${
+                    selectedStatus === 'rejected'
+                      ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                      : 'bg-gray-50 text-gray-700 hover:bg-red-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-900/20'
+                  } ${isStatusLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Reject
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedStatus('approved')}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${selectedStatus === 'approved'
-                    ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                    : 'bg-gray-50 text-gray-700 hover:bg-green-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-green-900/20'
-                    }`}
+                  disabled={isStatusLocked}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    selectedStatus === 'approved'
+                      ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      : 'bg-gray-50 text-gray-700 hover:bg-green-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-green-900/20'
+                  } ${isStatusLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   Approved
                 </button>
@@ -208,7 +237,11 @@ function RouteComponent() {
             </div>
             <Button
               onClick={handleStatusChange}
-              disabled={isSubmitting || selectedStatus === currentStatus}
+              disabled={
+                isStatusLocked ||
+                isSubmitting ||
+                selectedStatus === currentStatus
+              }
               className="w-full"
             >
               {isSubmitting ? 'Updating...' : 'Update Status'}
