@@ -235,7 +235,7 @@ function CreateDrawing() {
                     if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                       e.preventDefault()
                       addGuideline()
-                        ; (e.target as HTMLTextAreaElement).style.height = 'auto'
+                      ;(e.target as HTMLTextAreaElement).style.height = 'auto'
                     }
                   }}
                   placeholder="Enter guideline text..."
@@ -383,12 +383,12 @@ function CreateDrawing() {
                   })
                 }}
                 onInvalid={(e) => {
-                  ; (e.target as HTMLInputElement).setCustomValidity(
+                  ;(e.target as HTMLInputElement).setCustomValidity(
                     'Please enter a number greater than 0',
                   )
                 }}
                 onInput={(e) => {
-                  ; (e.target as HTMLInputElement).setCustomValidity('')
+                  ;(e.target as HTMLInputElement).setCustomValidity('')
                 }}
                 required
               />
@@ -723,7 +723,7 @@ function CreateDrawing() {
                 disabled={isSubmitting}
                 variant="primary"
 
-              // className="bg-cyan-600 hover:bg-cyan-700"
+                // className="bg-cyan-600 hover:bg-cyan-700"
               >
                 {isSubmitting ? 'Creating...' : 'Create Drawing'}
               </Button>

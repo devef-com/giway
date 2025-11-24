@@ -1,8 +1,5 @@
 import { Participant } from '@/db/schema'
-import {
-  createFileRoute,
-  useNavigate,
-} from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -19,7 +16,8 @@ function RouteComponent() {
   const { participant: participantId, drawingId } = Route.useParams()
   const navigate = useNavigate()
   const [participant, setParticipant] = useState<Participant | null>(null)
-  const [selectedStatus, setSelectedStatus] = useState<ParticipantStatus>('pending')
+  const [selectedStatus, setSelectedStatus] =
+    useState<ParticipantStatus>('pending')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -64,8 +62,11 @@ function RouteComponent() {
   }
 
   const currentStatus: ParticipantStatus =
-    participant.isEligible === true ? 'approved' :
-      participant.isEligible === false ? 'rejected' : 'pending'
+    participant.isEligible === true
+      ? 'approved'
+      : participant.isEligible === false
+        ? 'rejected'
+        : 'pending'
 
   const handleStatusChange = async () => {
     setIsSubmitting(true)
@@ -122,12 +123,13 @@ function RouteComponent() {
             <div>
               <span className="font-semibold">Current Status:</span>{' '}
               <span
-                className={`inline-block px-2 py-1 rounded text-sm ${currentStatus === 'approved'
-                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                  : currentStatus === 'rejected'
-                    ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
-                  }`}
+                className={`inline-block px-2 py-1 rounded text-sm ${
+                  currentStatus === 'approved'
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+                    : currentStatus === 'rejected'
+                      ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+                      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
+                }`}
               >
                 {currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}
               </span>
@@ -148,30 +150,33 @@ function RouteComponent() {
                 <button
                   type="button"
                   onClick={() => setSelectedStatus('pending')}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${selectedStatus === 'pending'
-                    ? 'bg-neutral-200 text-gray-900 dark:bg-gray-700 dark:text-white'
-                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
-                    }`}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    selectedStatus === 'pending'
+                      ? 'bg-neutral-200 text-gray-900 dark:bg-gray-700 dark:text-white'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                  }`}
                 >
                   Pending
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedStatus('rejected')}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors border-x border-gray-300 dark:border-gray-600 ${selectedStatus === 'rejected'
-                    ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                    : 'bg-gray-50 text-gray-700 hover:bg-red-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-900/20'
-                    }`}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors border-x border-gray-300 dark:border-gray-600 ${
+                    selectedStatus === 'rejected'
+                      ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                      : 'bg-gray-50 text-gray-700 hover:bg-red-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-900/20'
+                  }`}
                 >
                   Reject
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedStatus('approved')}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${selectedStatus === 'approved'
-                    ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                    : 'bg-gray-50 text-gray-700 hover:bg-green-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-green-900/20'
-                    }`}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                    selectedStatus === 'approved'
+                      ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      : 'bg-gray-50 text-gray-700 hover:bg-green-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-green-900/20'
+                  }`}
                 >
                   Approved
                 </button>

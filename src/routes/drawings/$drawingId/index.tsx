@@ -138,13 +138,20 @@ function DrawingDetail() {
                     <tr
                       key={participant.id}
                       className="border-b border-slate-700 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800"
-                      //@ts-ignore
-                      onClick={() => navigate({ to: `/drawings/${drawingId}/m/${participant.id}`, state: participant })}
+                      onClick={() =>
+                        navigate({
+                          to: `/drawings/${drawingId}/m/${participant.id}`,
+                          //@ts-ignore
+                          state: participant,
+                        })
+                      }
                     >
                       <td className="p-2 text-sm">
-                        {isMobile ? participant.name.trim().length > 7
-                          ? participant.name.substring(0, 7) + '...'
-                          : participant.name : participant.name}
+                        {isMobile
+                          ? participant.name.trim().length > 7
+                            ? participant.name.substring(0, 7) + '...'
+                            : participant.name
+                          : participant.name}
                       </td>
                       {/* <td className="p-2">{participant.phone}</td> */}
                       {drawing.winnerSelection === 'number' && (
