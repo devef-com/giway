@@ -102,6 +102,19 @@ function RouteComponent() {
     }
   }
 
+  const participantNumbers = () => {
+
+    if (participant.numbers?.length > 0) {
+      return participant.numbers
+    } else if (participant.logNumbers && participant.logNumbers.length > 0) {
+      return participant.logNumbers
+    } else if (currentStatus === 'rejected' && (participant.logNumbers || [])?.length > 0) {
+      return participant.logNumbers || []
+    } else {
+      return []
+    }
+  }
+
   return (
     <div className="container mx-auto p-4">
       <div className="max-w-2xl mx-auto">
@@ -123,13 +136,12 @@ function RouteComponent() {
             <div>
               <span className="font-semibold">Current Status:</span>{' '}
               <span
-                className={`inline-block px-2 py-1 rounded text-sm ${
-                  currentStatus === 'approved'
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                    : currentStatus === 'rejected'
-                      ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-                      : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
-                }`}
+                className={`inline-block px-2 py-1 rounded text-sm ${currentStatus === 'approved'
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+                  : currentStatus === 'rejected'
+                    ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
+                  }`}
               >
                 {currentStatus.charAt(0).toUpperCase() + currentStatus.slice(1)}
               </span>
@@ -137,15 +149,15 @@ function RouteComponent() {
             <div className="flex flex-wrap gap-2 items-center">
               <span className="font-semibold">Selected Numbers:</span>{' '}
               <section className="flex gap-2">
-                {participant.numbers?.length > 0
-                  ? participant.numbers.map((num) => (
-                      <div
-                        key={num}
-                        className="py-0.5 px-1 rounded-sm border border-neutral-300 dark:border-neutral-600"
-                      >
-                        {num}
-                      </div>
-                    ))
+                {participantNumbers().length > 0
+                  ? participantNumbers().map((num) => (
+                    <div
+                      key={num}
+                      className="py-0.5 px-1 rounded-sm border border-neutral-300 dark:border-neutral-600"
+                    >
+                      {num}
+                    </div>
+                  ))
                   : 'No numbers selected'}
               </section>
             </div>
@@ -165,33 +177,30 @@ function RouteComponent() {
                 <button
                   type="button"
                   onClick={() => setSelectedStatus('pending')}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                    selectedStatus === 'pending'
-                      ? 'bg-neutral-200 text-gray-900 dark:bg-gray-700 dark:text-white'
-                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
-                  }`}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${selectedStatus === 'pending'
+                    ? 'bg-neutral-200 text-gray-900 dark:bg-gray-700 dark:text-white'
+                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                    }`}
                 >
                   Pending
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedStatus('rejected')}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors border-x border-gray-300 dark:border-gray-600 ${
-                    selectedStatus === 'rejected'
-                      ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                      : 'bg-gray-50 text-gray-700 hover:bg-red-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-900/20'
-                  }`}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors border-x border-gray-300 dark:border-gray-600 ${selectedStatus === 'rejected'
+                    ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                    : 'bg-gray-50 text-gray-700 hover:bg-red-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-900/20'
+                    }`}
                 >
                   Reject
                 </button>
                 <button
                   type="button"
                   onClick={() => setSelectedStatus('approved')}
-                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                    selectedStatus === 'approved'
-                      ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                      : 'bg-gray-50 text-gray-700 hover:bg-green-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-green-900/20'
-                  }`}
+                  className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${selectedStatus === 'approved'
+                    ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                    : 'bg-gray-50 text-gray-700 hover:bg-green-50 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-green-900/20'
+                    }`}
                 >
                   Approved
                 </button>
