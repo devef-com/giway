@@ -209,28 +209,31 @@ export const Route = createFileRoute('/api/participant/$participantId')({
 
           // Handle rejection: store numbers before releasing slots
           if (body.status === 'rejected') {
-            // Get all numbers assigned to this participant
-            const participantSlots = await db
-              .select({ number: numberSlots.number })
-              .from(numberSlots)
-              .where(eq(numberSlots.participantId, participantId))
-              .orderBy(numberSlots.number)
+            // Use a transaction to prevent race conditions
+            await db.transaction(async (tx) => {
+              // Get all numbers assigned to this participant
+              const participantSlots = await tx
+                .select({ number: numberSlots.number })
+                .from(numberSlots)
+                .where(eq(numberSlots.participantId, participantId))
+                .orderBy(numberSlots.number)
 
-            const numbers = participantSlots.map((slot) => slot.number)
+              const numbers = participantSlots.map((slot) => slot.number)
 
-            // Store the numbers in logNumbers before releasing
-            if (numbers.length > 0) {
-              await db
-                .update(participants)
-                .set({ logNumbers: numbers })
-                .where(eq(participants.id, participantId))
-            }
+              // Store the numbers in logNumbers before releasing
+              if (numbers.length > 0) {
+                await tx
+                  .update(participants)
+                  .set({ logNumbers: numbers })
+                  .where(eq(participants.id, participantId))
+              }
 
-            // Release number slots
-            await db
-              .update(numberSlots)
-              .set({ participantId: null, status: 'available' })
-              .where(eq(numberSlots.participantId, participantId))
+              // Release number slots
+              await tx
+                .update(numberSlots)
+                .set({ participantId: null, status: 'available' })
+                .where(eq(numberSlots.participantId, participantId))
+            })
           }
 
           // Update participant status
