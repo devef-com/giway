@@ -273,9 +273,12 @@ export async function selectNumberWinners(
  * Validates drawing state, determines selection method,
  * and delegates to appropriate selection function.
  *
+ * Hosts can re-run winner selection multiple times.
+ * Previous winners will be cleared before selecting new ones.
+ *
  * @param drawingId - ID of the drawing to select winners for
  * @returns Complete winner selection result
- * @throws Error if drawing not found, hasn't ended, or already has winners
+ * @throws Error if drawing not found or hasn't ended
  */
 export async function selectWinners(
   drawingId: string,
@@ -296,15 +299,16 @@ export async function selectWinners(
   // Validate drawing has ended
   validateDrawingEnded(drawingData.endAt)
 
-  // Check if winners already selected
+  // Clear existing winners if any (allow re-running selection)
   const existingWinners = await db
     .select()
     .from(drawingWinners)
     .where(eq(drawingWinners.drawingId, drawingId))
-    .limit(1)
 
   if (existingWinners.length > 0) {
-    throw new Error('Winners have already been selected for this drawing')
+    await db
+      .delete(drawingWinners)
+      .where(eq(drawingWinners.drawingId, drawingId))
   }
 
   // Select winners based on method

@@ -16,10 +16,13 @@ export const Route = createFileRoute('/api/drawings/$drawingId/select-winners')(
          * Requirements:
          * - User must be authenticated and be the drawing owner
          * - Drawing must have ended (endAt < now)
-         * - Winners must not have been selected previously
+         *
+         * Hosts can re-run winner selection multiple times.
+         * Previous winners will be cleared before selecting new ones.
          *
          * Process:
          * - Validates ownership and drawing state
+         * - Clears any existing winners
          * - Calls selectWinners() which handles random or number-based selection
          * - Returns winner information
          */

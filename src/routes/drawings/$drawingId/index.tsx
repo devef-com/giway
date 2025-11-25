@@ -1,9 +1,23 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { EllipsisVerticalIcon, TrophyIcon } from 'lucide-react'
+import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
 import { useDrawing } from '@/querys/useDrawing'
 import { useParticipants } from '@/querys/useParticipants'
 import useMobile from '@/hooks/useMobile'
+import { Button } from '@/components/ui/button'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { toast } from 'sonner'
+import {
+  Expandable,
+  ExpandableTitle,
+  ExpandableContent,
+} from '@/components/ui/expandable'
 
 export const Route = createFileRoute('/drawings/$drawingId/')({
   component: DrawingDetail,
@@ -17,6 +31,9 @@ function DrawingDetail() {
 
   const isMobile = useMobile()
 
+  const [isPopoverOpen, setIsPopoverOpen] = useState(false)
+  const [isSelectingWinners, setIsSelectingWinners] = useState(false)
+
   const { data: drawing, isLoading: drawingLoading } = useDrawing(
     drawingId,
     !!session.data,
@@ -24,6 +41,40 @@ function DrawingDetail() {
 
   const { data: participants, isLoading: participantsLoading } =
     useParticipants(drawingId, !!session.data)
+
+  const handleSelectWinners = async () => {
+    setIsSelectingWinners(true)
+    try {
+      const response = await fetch(
+        `/api/drawings/${drawingId}/select-winners`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to select winners')
+      }
+
+      toast.success(
+        data.message || `Successfully selected ${data.data.winners.length} winner(s)`,
+      )
+
+      // Optionally navigate to winners view or refresh data
+      // navigate({ to: `/drawings/${drawingId}/winners` })
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to select winners',
+      )
+    } finally {
+      setIsSelectingWinners(false)
+    }
+  }
 
   if (!session.data) {
     return (
@@ -72,46 +123,117 @@ function DrawingDetail() {
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-6xl mx-auto">
-        <Card className="p-6 border-slate-700 mb-6">
-          <h1 className="text-xl font-bold">{drawing.title}</h1>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <p className="mb-2 text-sm">
-                <strong>Type:</strong>{' '}
-                {drawing.isPaid && drawing.price
-                  ? `Paid ($${(drawing.price / 100).toFixed(2)})`
-                  : 'Free'}
-              </p>
-              <p className="mb-2  text-sm">
-                <strong>Selection Method:</strong>{' '}
-                {drawing.winnerSelection === 'random' ? 'Random' : 'By Number'}
-              </p>
-              {drawing.winnerSelection === 'number' && (
-                <p className="mb-2 text-sm">
-                  <strong>Total Numbers:</strong> {drawing.quantityOfNumbers}
-                </p>
-              )}
-              <p className="mb-2 text-sm">
-                <strong>End Date:</strong>{' '}
-                {new Date(drawing.endAt).toLocaleString()}
-              </p>
-            </div>
-            <div>
-              {drawing.guidelines && drawing.guidelines.length > 0 && (
-                <div>
-                  <strong className="">Guidelines:</strong>
-                  <ul className="list-disc list-inside text-sm mt-2">
-                    {drawing.guidelines.map(
-                      (guideline: string, index: number) => (
-                        <li key={index}>{guideline}</li>
-                      ),
-                    )}
-                  </ul>
-                </div>
-              )}
+        <Card className="p-4 border-slate-700 mb-6 gap-2">
+          <div className="grid grid-cols-[1fr_auto]">
+            <h1 className="text-md font-bold">{drawing.title}</h1>
+            <div className="self-end">
+              <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <EllipsisVerticalIcon />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-2" align="end">
+                  <button
+                    onClick={() => {
+                      setIsPopoverOpen(false)
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-sm"
+                  >
+                    <TrophyIcon className="w-4 h-4" />
+                    More Options
+                  </button>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
+
+          <Expandable>
+            <ExpandableTitle>Basic Info</ExpandableTitle>
+            <ExpandableContent>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <p className="mb-2 text-sm">
+                    <strong>Type:</strong>{' '}
+                    {drawing.isPaid && drawing.price
+                      ? `Paid ($${(drawing.price / 100).toFixed(2)})`
+                      : 'Free'}
+                  </p>
+                  <p className="mb-2  text-sm">
+                    <strong>Selection Method:</strong>{' '}
+                    {drawing.winnerSelection === 'random' ? 'Random' : 'By Number'}
+                  </p>
+                  {drawing.winnerSelection === 'number' && (
+                    <p className="mb-2 text-sm">
+                      <strong>Total Numbers:</strong> {drawing.quantityOfNumbers}
+                    </p>
+                  )}
+                  <p className="mb-2 text-sm">
+                    <strong>End Date:</strong>{' '}
+                    {new Date(drawing.endAt).toLocaleString()}
+                  </p>
+                </div>
+                <div>
+                  {drawing.guidelines && drawing.guidelines.length > 0 && (
+                    <div>
+                      <strong className="">Guidelines:</strong>
+                      <ul className="list-disc list-inside text-sm mt-2">
+                        {drawing.guidelines.map(
+                          (guideline: string, index: number) => (
+                            <li key={index}>{guideline}</li>
+                          ),
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </ExpandableContent>
+          </Expandable>
+
+          <Expandable>
+            <ExpandableTitle>Winner Selection</ExpandableTitle>
+            <ExpandableContent>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <p className="text-sm">
+                    <strong>Selection Method:</strong>{' '}
+                    {drawing.winnerSelection === 'random' ? 'Random' : 'By Number'}
+                  </p>
+                  <p className="text-sm">
+                    <strong>Winners to Select:</strong> {drawing.winnersAmount}
+                  </p>
+                  <p className="text-sm">
+                    <strong>Eligible Participants:</strong>{' '}
+                    {participants?.filter((p) => p.isEligible === true).length || 0}
+                  </p>
+                  {drawing.winnerSelection === 'number' && (
+                    <p className="text-sm">
+                      <strong>Winner Numbers:</strong>{' '}
+                      {drawing.isWinnerNumberRandom
+                        ? 'Random (will be generated)'
+                        : drawing.winnerNumbers?.join(', ') || 'Not set'}
+                    </p>
+                  )}
+                </div>
+
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3">
+                  <p className="text-xs text-yellow-800 dark:text-yellow-200">
+                    <strong>Note:</strong> This will select winners based on your
+                    drawing configuration. You can re-run the selection if needed.
+                  </p>
+                </div>
+
+                <Button
+                  onClick={handleSelectWinners}
+                  disabled={isSelectingWinners}
+                  className="w-full"
+                >
+                  {isSelectingWinners ? 'Selecting Winners...' : 'Select Winners'}
+                </Button>
+              </div>
+            </ExpandableContent>
+          </Expandable>
         </Card>
 
         <Card className="p-6 border-slate-700">
