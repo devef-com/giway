@@ -5,14 +5,25 @@ import {
   GripIcon,
   CopyIcon,
   Share2Icon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  RotateCcwIcon,
+  SearchIcon,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
+import { Participant } from '@/db/schema'
 import { useDrawing } from '@/querys/useDrawing'
-import { useParticipants } from '@/querys/useParticipants'
+import {
+  useParticipants,
+  type StatusFilter,
+  type SortField,
+  type SortOrder,
+} from '@/querys/useParticipants'
 import useMobile from '@/hooks/useMobile'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Popover,
   PopoverContent,
@@ -40,13 +51,101 @@ function DrawingDetail() {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [isSelectingWinners, setIsSelectingWinners] = useState(false)
 
+  // Filter and sorting state
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+  const [nameSearch, setNameSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [sortBy, setSortBy] = useState<SortField>('createdAt')
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
+  const [page, setPage] = useState(1)
+  const limit = 100
+
   const { data: drawing, isLoading: drawingLoading } = useDrawing(
     drawingId,
     !!session.data,
   )
 
-  const { data: participants, isLoading: participantsLoading } =
-    useParticipants(drawingId, !!session.data)
+  const { data: participantsData, isLoading: participantsLoading } =
+    useParticipants(drawingId, !!session.data, {
+      status: statusFilter,
+      name: nameSearch,
+      page,
+      limit,
+      sortBy,
+      sortOrder,
+    })
+
+  // Accumulate participants for \"show more\" pagination
+  const [accumulatedParticipants, setAccumulatedParticipants] = useState<
+    (Participant & { numbers: number[] })[]
+  >([])
+
+  // Update accumulated participants when data changes
+  useMemo(() => {
+    if (participantsData?.data) {
+      if (page === 1) {
+        setAccumulatedParticipants(participantsData.data)
+      } else {
+        setAccumulatedParticipants((prev) => {
+          const existingIds = new Set(prev.map((p) => p.id))
+          const newParticipants = participantsData.data.filter(
+            (p) => !existingIds.has(p.id),
+          )
+          return [...prev, ...newParticipants]
+        })
+      }
+    }
+  }, [participantsData?.data, page])
+
+  const participants = accumulatedParticipants
+  const pagination = participantsData?.pagination
+
+  // Handle sorting
+  const handleSort = (field: SortField) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortBy(field)
+      setSortOrder('desc')
+    }
+    setPage(1)
+    setAccumulatedParticipants([])
+  }
+
+  // Handle filter changes
+  const handleStatusFilterChange = (status: StatusFilter) => {
+    setStatusFilter(status)
+    setPage(1)
+    setAccumulatedParticipants([])
+  }
+
+  const handleSearch = () => {
+    setNameSearch(searchInput)
+    setPage(1)
+    setAccumulatedParticipants([])
+  }
+
+  const handleResetFilters = () => {
+    setStatusFilter('all')
+    setNameSearch('')
+    setSearchInput('')
+    setPage(1)
+    setAccumulatedParticipants([])
+  }
+
+  const handleShowMore = () => {
+    setPage((prev) => prev + 1)
+  }
+
+  // Sort indicator component
+  const SortIndicator = ({ field }: { field: SortField }) => {
+    if (sortBy !== field) return null
+    return sortOrder === 'asc' ? (
+      <ChevronUpIcon className="w-3 h-3 inline ml-1" />
+    ) : (
+      <ChevronDownIcon className="w-3 h-3 inline ml-1" />
+    )
+  }
 
   const handleSelectWinners = async () => {
     setIsSelectingWinners(true)
@@ -305,21 +404,92 @@ function DrawingDetail() {
 
         <Card className="p-6 border-slate-700">
           <h2 className="text-xl font-bold">
-            Participants ({participants?.length || 0})
+            Participants ({pagination?.total || participants?.length || 0})
           </h2>
+
+          {/* Filters Expandable */}
+          <Expandable defaultOpen>
+            <ExpandableTitle>filters</ExpandableTitle>
+            <ExpandableContent>
+              <div className="space-y-4">
+                {/* Status Filter Tabs */}
+                <div className="flex flex-wrap gap-2">
+                  {(
+                    ['all', 'pending', 'rejected', 'approved'] as StatusFilter[]
+                  ).map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => handleStatusFilterChange(status)}
+                      className={`px-3 py-1 text-sm rounded-md transition-colors capitalize ${
+                        statusFilter === status
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-accent'
+                      }`}
+                    >
+                      {status === 'all' && '• '}
+                      {status.charAt(0).toUpperCase() + status.slice(1)}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Name Search */}
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Search by name"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSearch()
+                    }}
+                    className="flex-1"
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleResetFilters}
+                    title="Reset filters"
+                  >
+                    <RotateCcwIcon className="w-4 h-4" />
+                  </Button>
+                  <Button onClick={handleSearch} size="icon">
+                    <SearchIcon className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </ExpandableContent>
+          </Expandable>
 
           {participants && participants.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full ">
                 <thead>
                   <tr className="border-b border-slate-700">
-                    <th className="text-left p-2">Name</th>
+                    <th
+                      className="text-left p-2 cursor-pointer hover:bg-accent/50 select-none"
+                      onClick={() => handleSort('name')}
+                    >
+                      Name
+                      <SortIndicator field="name" />
+                    </th>
                     {/* <th className="text-left p-2">Phone</th> */}
                     {drawing.winnerSelection === 'number' && (
                       <th className="text-left p-2">#</th>
                     )}
-                    <th className="text-left p-2">Status</th>
-                    <th className="text-left p-2">Date</th>
+                    <th
+                      className="text-left p-2 cursor-pointer hover:bg-accent/50 select-none"
+                      onClick={() => handleSort('status')}
+                    >
+                      Status
+                      <SortIndicator field="status" />
+                    </th>
+                    <th
+                      className="text-left p-2 cursor-pointer hover:bg-accent/50 select-none"
+                      onClick={() => handleSort('createdAt')}
+                    >
+                      Date
+                      <SortIndicator field="createdAt" />
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -414,6 +584,23 @@ function DrawingDetail() {
                   ))}
                 </tbody>
               </table>
+
+              {/* Pagination Info & Show More */}
+              <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-700">
+                <span className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
+                  {participants.length} of{' '}
+                  {pagination?.total || participants.length}
+                </span>
+                {pagination?.hasMore && (
+                  <button
+                    onClick={handleShowMore}
+                    disabled={participantsLoading}
+                    className="text-sm text-blue-400 hover:text-blue-300 disabled:opacity-50"
+                  >
+                    {participantsLoading ? 'Loading...' : 'show more'}
+                  </button>
+                )}
+              </div>
             </div>
           ) : (
             <p className="text-secondary text-center">No participants yet</p>
