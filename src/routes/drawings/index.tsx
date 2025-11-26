@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
 import { useDrawings } from '@/querys/useDrawings'
+import { getTimeRemainingText } from '@/lib/utils'
 
 export const Route = createFileRoute('/drawings/')({
   component: DrawingsList,
@@ -84,7 +85,7 @@ function DrawingsList() {
                         : 'Free'}
                     </p>
                     <p className="text-md text-text-light-secondary dark:text-text-dark-secondary">
-                      End Date: {new Date(drawing.endAt).toLocaleString()}
+                      End Date: {getTimeRemainingText(drawing.endAt)}
                     </p>
                   </div>
                   <div className="flex gap-2 self-end mt-2">

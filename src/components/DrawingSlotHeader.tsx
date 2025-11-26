@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Drawing } from '@/db/schema'
 import { Clock, HandCoins } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, getTimeRemainingText } from '@/lib/utils'
 
 interface DrawingSlotHeaderProps {
   drawing: Drawing
@@ -18,23 +18,6 @@ function DrawingSlotHeader({
   hasEnded,
 }: DrawingSlotHeaderProps) {
   const [isTitleExpanded, setIsTitleExpanded] = useState(false)
-
-  // Calculate time remaining
-  const getTimeRemaining = (endDate: string) => {
-    const end = new Date(endDate)
-    const now = new Date()
-    const diff = end.getTime() - now.getTime()
-
-    if (diff <= 0) return 'Ended'
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-
-    if (days > 0) {
-      return `${days}d ${hours}H`
-    }
-    return `${hours}H`
-  }
 
   return (
     <div>
@@ -76,7 +59,7 @@ function DrawingSlotHeader({
             <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             <span className="text-sm font-semibold text-blue-600 dark:text-blue-300">
               {drawing.endAt &&
-                getTimeRemaining(drawing.endAt as unknown as string)}
+                getTimeRemainingText(drawing.endAt as unknown as string)}
             </span>
           </div>
         </div>

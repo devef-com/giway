@@ -371,12 +371,44 @@ function DrawingDetail() {
                         )}
                       </td>
                       <td className="p-2 text-xs text-text-light-secondary dark:text-text-dark-secondary">
-                        {new Intl.DateTimeFormat(navigator.language, {
-                          month: 'short',
-                          day: '2-digit',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        }).format(new Date(participant.createdAt))}
+                        {(() => {
+                          // Parse the UTC timestamp and display in UTC to match stored time
+                          const date = new Date(participant.createdAt)
+                          const now = new Date()
+
+                          // Compare dates in UTC
+                          const todayUTC = Date.UTC(
+                            now.getUTCFullYear(),
+                            now.getUTCMonth(),
+                            now.getUTCDate(),
+                          )
+                          const yesterdayUTC = todayUTC - 86400000 // 24 hours in ms
+                          const participantDayUTC = Date.UTC(
+                            date.getUTCFullYear(),
+                            date.getUTCMonth(),
+                            date.getUTCDate(),
+                          )
+
+                          const time = date.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: true,
+                            timeZone: 'UTC',
+                          })
+
+                          if (participantDayUTC === todayUTC) {
+                            return `Today ${time}`
+                          } else if (participantDayUTC === yesterdayUTC) {
+                            return `Yesterday ${time}`
+                          } else {
+                            const monthDay = date.toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: '2-digit',
+                              timeZone: 'UTC',
+                            })
+                            return `${monthDay} ${time}`
+                          }
+                        })()}
                       </td>
                     </tr>
                   ))}
