@@ -229,8 +229,36 @@ export async function selectNumberWinners(
         winningNumber: winnerNumber,
       })
       participantIdsUsed.add(slot.participantId)
+    } else if (winnerSelectionIsManually) {
+      // For manually entered numbers, we should NOT reassign to random participants
+      // Instead, throw an error explaining why the number is invalid
+      if (!slot || slot.status === 'available') {
+        throw new Error(
+          `Number ${winnerNumber} has not been taken by any participant`,
+        )
+      } else if (slot.isEligible === false) {
+        throw new Error(
+          `Number ${winnerNumber} belongs to a rejected participant (${slot.participantName})`,
+        )
+      } else if (slot.isEligible === null) {
+        throw new Error(
+          `Number ${winnerNumber} belongs to a pending participant (${slot.participantName}) - please approve or reject them first`,
+        )
+      } else if (slot.status === 'reserved') {
+        throw new Error(
+          `Number ${winnerNumber} is only reserved, not confirmed`,
+        )
+      } else if (participantIdsUsed.has(slot.participantId!)) {
+        throw new Error(
+          `Number ${winnerNumber} belongs to ${slot.participantName} who is already a winner with another number`,
+        )
+      } else {
+        throw new Error(
+          `Number ${winnerNumber} is not valid for winner selection`,
+        )
+      }
     } else {
-      // Option 1: Number is available/rejected - assign to random eligible participant
+      // System generated mode: Number is available/rejected - assign to random eligible participant
       // Find next eligible participant who hasn't won yet
       while (
         eligibleIndex < shuffledEligible.length &&

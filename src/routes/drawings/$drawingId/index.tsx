@@ -139,25 +139,31 @@ function DrawingDetail() {
     )
   }
 
-  const handleSelectWinners = async (event?: FormEvent<HTMLFormElement> | any) => {
-    let numbersToSubmit: number[] = [];
+  const handleSelectWinners = async (
+    event?: FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    let numbersToSubmit: number[] = []
 
-    event && 'preventDefault' in event ? event?.preventDefault() : void 0;
+    // Check if this is a form submission (has preventDefault and target is a form)
+    if (event && 'preventDefault' in event) {
+      event.preventDefault()
 
-    if (event && 'target' in event) {
-      // const _event: FormEvent<HTMLFormElement> = event;
-      const formData = new FormData(event.target as HTMLFormElement);
-      const winnerNumbers: number[] = []
-      for (let i = 0; i < drawing!.winnersAmount; i++) {
-        const numberStr = formData.get(`number_${i + 1}`)?.toString() || ''
-        const number = parseInt(numberStr, 10)
-        if (isNaN(number)) {
-          toast.error(`Please enter a valid number for winner #${i + 1}`)
-          return
+      // Only try to get form data if the target is actually a form element
+      const target = event.target as HTMLElement
+      if (target.tagName === 'FORM') {
+        const formData = new FormData(target as HTMLFormElement)
+        const winnerNumbers: number[] = []
+        for (let i = 0; i < drawing!.winnersAmount; i++) {
+          const numberStr = formData.get(`number_${i + 1}`)?.toString() || ''
+          const number = parseInt(numberStr, 10)
+          if (isNaN(number)) {
+            toast.error(`Please enter a valid number for winner #${i + 1}`)
+            return
+          }
+          winnerNumbers.push(number)
         }
-        winnerNumbers.push(number)
+        numbersToSubmit = winnerNumbers
       }
-      numbersToSubmit = winnerNumbers
     }
     console.log('Selecting winners with numbers:', numbersToSubmit)
 
@@ -172,7 +178,8 @@ function DrawingDetail() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            winnerNumbers: numbersToSubmit.length > 0 ? numbersToSubmit : undefined,
+            winnerNumbers:
+              numbersToSubmit.length > 0 ? numbersToSubmit : undefined,
           }),
         },
       )
@@ -185,7 +192,7 @@ function DrawingDetail() {
 
       toast.success(
         data.message ||
-        `Successfully selected ${data.data.winners.length} winner(s)`,
+          `Successfully selected ${data.data.winners.length} winner(s)`,
       )
       queryClient.invalidateQueries({ queryKey: ['drawing', drawingId] })
 
@@ -436,24 +443,34 @@ function DrawingDetail() {
                 )}
 
                 {drawing.winnerSelection === 'manually' && (
-                  <form className='flex flex-wrap gap-2' onSubmit={handleSelectWinners}>
-                    {Array.from({ length: drawing.winnersAmount }).map((_, index) => (
-                      <Input
-                        min={0}
-                        key={index}
-                        type="number"
-                        required
-                        id={index.toString()}
-                        name={`number_${index + 1}`}
-                        className="border border-slate-700 rounded-md p-2 w-24 mr-2 mb-2"
-                        placeholder={`#${index + 1} Winner Number`}
-                      />
-                    ))}
-                    <Button type='submit'>Save</Button>
+                  <form
+                    className="flex flex-wrap gap-2"
+                    onSubmit={handleSelectWinners}
+                  >
+                    {Array.from({ length: drawing.winnersAmount }).map(
+                      (_, index) => (
+                        <Input
+                          min={0}
+                          key={index}
+                          type="number"
+                          required
+                          id={index.toString()}
+                          name={`number_${index + 1}`}
+                          className="border border-slate-700 rounded-md p-2 w-24 mr-2 mb-2"
+                          placeholder={`#${index + 1} Winner Number`}
+                        />
+                      ),
+                    )}
+                    <Button type="submit">Save</Button>
                   </form>
                 )}
 
-                <div className={cn("bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3", drawing.winnerSelection === 'manually' ? 'hidden' : '')}>
+                <div
+                  className={cn(
+                    'bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3',
+                    drawing.winnerSelection === 'manually' ? 'hidden' : '',
+                  )}
+                >
                   <p className="text-xs text-yellow-800 dark:text-yellow-200">
                     <strong>Note:</strong> This will select winners based on
                     your drawing configuration. You can re-run the selection if
@@ -461,7 +478,12 @@ function DrawingDetail() {
                   </p>
                 </div>
 
-                <div className={cn("flex justify-center md:justify-end w-full", drawing.winnerSelection === 'manually' ? 'hidden' : '')}>
+                <div
+                  className={cn(
+                    'flex justify-center md:justify-end w-full',
+                    drawing.winnerSelection === 'manually' ? 'hidden' : '',
+                  )}
+                >
                   <Button
                     onClick={handleSelectWinners}
                     disabled={isSelectingWinners}
@@ -495,10 +517,11 @@ function DrawingDetail() {
                     <button
                       key={status}
                       onClick={() => handleStatusFilterChange(status)}
-                      className={`px-3 py-1 text-sm rounded-md transition-colors capitalize ${statusFilter === status
-                        ? 'bg-primary text-primary-foreground'
-                        : 'hover:bg-accent'
-                        }`}
+                      className={`px-3 py-1 text-sm rounded-md transition-colors capitalize ${
+                        statusFilter === status
+                          ? 'bg-primary text-primary-foreground'
+                          : 'hover:bg-accent'
+                      }`}
                     >
                       {/* {status === 'all' && '• '} */}
                       {status.charAt(0).toUpperCase() + status.slice(1)}
