@@ -13,7 +13,6 @@ import {
 import { useState, useMemo } from 'react'
 import { Card } from '@/components/ui/card'
 import { authClient } from '@/lib/auth-client'
-import { Participant } from '@/db/schema'
 import { useDrawing } from '@/querys/useDrawing'
 import {
   useParticipants,
@@ -58,7 +57,6 @@ function DrawingDetail() {
   const [searchInput, setSearchInput] = useState('')
   const [sortBy, setSortBy] = useState<SortField>('createdAt')
   const [sortOrder, setSortOrder] = useState<SortOrder>('desc')
-  const [page, setPage] = useState(1)
   const limit = 100
 
   const { data: drawing, isLoading: drawingLoading } = useDrawing(
@@ -66,40 +64,28 @@ function DrawingDetail() {
     !!session.data,
   )
 
-  const { data: participantsData, isLoading: participantsLoading } =
-    useParticipants(drawingId, !!session.data, {
-      status: statusFilter,
-      name: nameSearch,
-      page,
-      limit,
-      sortBy,
-      sortOrder,
-    })
+  const {
+    data: participantsData,
+    isLoading: participantsLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useParticipants(drawingId, !!session.data, {
+    status: statusFilter,
+    name: nameSearch,
+    limit,
+    sortBy,
+    sortOrder,
+  })
 
-  // Accumulate participants for \"show more\" pagination
-  const [accumulatedParticipants, setAccumulatedParticipants] = useState<
-    (Participant & { numbers: number[] })[]
-  >([])
+  // Flatten all pages into a single array
+  const participants = useMemo(() => {
+    return participantsData?.pages.flatMap((page) => page.data) ?? []
+  }, [participantsData?.pages])
 
-  // Update accumulated participants when data changes
-  useMemo(() => {
-    if (participantsData?.data) {
-      if (page === 1) {
-        setAccumulatedParticipants(participantsData.data)
-      } else {
-        setAccumulatedParticipants((prev) => {
-          const existingIds = new Set(prev.map((p) => p.id))
-          const newParticipants = participantsData.data.filter(
-            (p) => !existingIds.has(p.id),
-          )
-          return [...prev, ...newParticipants]
-        })
-      }
-    }
-  }, [participantsData?.data, page])
-
-  const participants = accumulatedParticipants
-  const pagination = participantsData?.pagination
+  // Get pagination info from the last page
+  const pagination =
+    participantsData?.pages[participantsData.pages.length - 1]?.pagination
 
   // Handle sorting
   const handleSort = (field: SortField) => {
@@ -109,34 +95,28 @@ function DrawingDetail() {
       setSortBy(field)
       setSortOrder('desc')
     }
-    setPage(1)
-    setAccumulatedParticipants([])
   }
 
   // Handle filter changes
   const handleStatusFilterChange = (status: StatusFilter) => {
     setStatusFilter(status)
-    setPage(1)
-    setAccumulatedParticipants([])
   }
 
   const handleSearch = () => {
     if (searchInput.trim() === nameSearch) return
     setNameSearch(searchInput)
-    setPage(1)
-    setAccumulatedParticipants([])
   }
 
   const handleResetFilters = () => {
+    if (statusFilter === 'all' && nameSearch === '' && searchInput === '')
+      return
     setStatusFilter('all')
     setNameSearch('')
     setSearchInput('')
-    setPage(1)
-    setAccumulatedParticipants([])
   }
 
   const handleShowMore = () => {
-    setPage((prev) => prev + 1)
+    fetchNextPage()
   }
 
   // Sort indicator component
@@ -404,7 +384,7 @@ function DrawingDetail() {
           </Expandable>
         </Card>
 
-        <Card className="p-6 border-slate-700">
+        <Card className="p-4 border-slate-700">
           <h2 className="text-xl font-bold">
             Participants ({pagination?.total || participants?.length || 0})
           </h2>
@@ -626,13 +606,13 @@ function DrawingDetail() {
                 {participants.length} of{' '}
                 {pagination?.total || participants.length}
               </span>
-              {pagination?.hasMore && (
+              {hasNextPage && (
                 <button
                   onClick={handleShowMore}
-                  disabled={participantsLoading}
+                  disabled={isFetchingNextPage}
                   className="text-sm text-blue-400 hover:text-blue-300 disabled:opacity-50"
                 >
-                  {participantsLoading ? 'Loading...' : 'show more'}
+                  {isFetchingNextPage ? 'Loading...' : 'show more'}
                 </button>
               )}
             </div>

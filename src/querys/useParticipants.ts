@@ -1,5 +1,5 @@
 import { Participant } from '@/db/schema'
-import { useQuery } from '@tanstack/react-query'
+import { useInfiniteQuery } from '@tanstack/react-query'
 
 export type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected'
 export type SortField = 'name' | 'createdAt' | 'number' | 'status'
@@ -8,7 +8,6 @@ export type SortOrder = 'asc' | 'desc'
 export interface ParticipantsFilters {
   status?: StatusFilter
   name?: string
-  page?: number
   limit?: number
   sortBy?: SortField
   sortOrder?: SortOrder
@@ -34,23 +33,22 @@ export function useParticipants(
   const {
     status = 'all',
     name = '',
-    page = 1,
     limit = 100,
     sortBy = 'createdAt',
     sortOrder = 'desc',
   } = filters
 
-  return useQuery<ParticipantsResponse>({
+  return useInfiniteQuery<ParticipantsResponse>({
     queryKey: [
       'participants',
       drawingId,
-      { status, name, page, limit, sortBy, sortOrder },
+      { status, name, limit, sortBy, sortOrder },
     ],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 1 }) => {
       const params = new URLSearchParams({
         status,
         name,
-        page: String(page),
+        page: String(pageParam),
         limit: String(limit),
         sortBy,
         sortOrder,
@@ -62,6 +60,9 @@ export function useParticipants(
       if (!response.ok) throw new Error('Failed to fetch participants')
       return response.json()
     },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage) =>
+      lastPage.pagination.hasMore ? lastPage.pagination.page + 1 : undefined,
     enabled,
   })
 }
