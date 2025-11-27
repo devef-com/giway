@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
+import { Switch } from '@/components/ui/switch'
 import {
   Select,
   SelectContent,
@@ -49,9 +50,9 @@ function CreateDrawing() {
     guidelines: [] as string[],
     isPaid: false,
     price: 0,
-    winnerSelection: 'random' as 'random' | 'number',
+    winnerSelection: 'system' as 'manually' | 'system',
     quantityOfNumbers: 100,
-    isWinnerNumberRandom: true,
+    playWithNumbers: false,
     winnersAmount: 1,
     winnerNumbers: [] as number[],
     endAt: '',
@@ -308,17 +309,18 @@ function CreateDrawing() {
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
+            {/* Paid Event Switch */}
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <Label htmlFor="isPaid" className="flex-1">
+                Pago
+              </Label>
+              <Switch
                 id="isPaid"
                 checked={formData.isPaid}
-                onChange={(e) =>
-                  setFormData({ ...formData, isPaid: e.target.checked })
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, isPaid: checked })
                 }
-                className="w-4 h-4"
               />
-              <Label htmlFor="isPaid">Paid Event</Label>
             </div>
 
             {formData.isPaid && (
@@ -330,7 +332,6 @@ function CreateDrawing() {
                   id="price"
                   type="number"
                   min="1"
-                  // step="0.01"
                   value={formData.price}
                   onChange={(e) =>
                     setFormData({
@@ -343,6 +344,67 @@ function CreateDrawing() {
               </div>
             )}
 
+            {/* Play with Numbers Switch */}
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <Label htmlFor="playWithNumbers" className="flex-1">
+                Play with numbers
+              </Label>
+              <Switch
+                id="playWithNumbers"
+                checked={formData.playWithNumbers}
+                onCheckedChange={(checked) =>
+                  setFormData({
+                    ...formData,
+                    playWithNumbers: checked,
+                    // When not playing with numbers, force system selection
+                    winnerSelection: checked
+                      ? formData.winnerSelection
+                      : 'system',
+                  })
+                }
+              />
+            </div>
+
+            {formData.playWithNumbers ? (
+              <p className="text-xs text-muted-foreground -mt-4">
+                {formData.isPaid
+                  ? 'Participants can choose multiple numbers.'
+                  : 'Participants can choose a single number. Max participants: ' +
+                    formData.quantityOfNumbers}
+              </p>
+            ) : (
+              <p className="text-xs text-muted-foreground -mt-4">
+                The System will choose the winners amount the participants
+              </p>
+            )}
+
+            {/* Quantity of Numbers - only when playWithNumbers is true */}
+            {formData.playWithNumbers && (
+              <div>
+                <Label htmlFor="quantityOfNumbers" className="mb-1">
+                  Quantity of Numbers
+                </Label>
+                <Input
+                  id="quantityOfNumbers"
+                  type="number"
+                  min="50"
+                  max="500"
+                  value={formData.quantityOfNumbers}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      quantityOfNumbers: parseInt(e.target.value) || 100,
+                    })
+                  }
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  System will generate {formData.quantityOfNumbers} numbers to
+                  play.
+                </p>
+              </div>
+            )}
+
+            {/* Winner Selection Method */}
             <div>
               <Label htmlFor="winnerSelection" className="mb-1">
                 Winner Selection Method
@@ -352,23 +414,42 @@ function CreateDrawing() {
                 onValueChange={(value) =>
                   setFormData({
                     ...formData,
-                    winnerSelection: value as 'random' | 'number',
+                    winnerSelection: value as 'manually' | 'system',
                   })
                 }
+                disabled={!formData.playWithNumbers}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select winner selection method" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="random">Random Selection</SelectItem>
-                  <SelectItem value="number">Number Selection</SelectItem>
+                  <SelectItem value="manually">
+                    Enter number manually
+                  </SelectItem>
+                  <SelectItem value="system">System generated</SelectItem>
                 </SelectContent>
               </Select>
+              {formData.winnerSelection === 'manually' ? (
+                <p className="text-xs text-muted-foreground mt-1">
+                  User must enter the winner numbers once the giway ends.
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground mt-1">
+                  The system will choose randomly the eligible winners. You can
+                  re-run this to select them again.
+                </p>
+              )}
+              {!formData.playWithNumbers && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Not allowed to change for this giway.
+                </p>
+              )}
             </div>
 
+            {/* Number of Winners */}
             <div>
               <Label htmlFor="winnersAmount" className="mb-1">
-                Number of Winners
+                Numbers of winners
               </Label>
               <Input
                 id="winnersAmount"
@@ -393,55 +474,6 @@ function CreateDrawing() {
                 required
               />
             </div>
-
-            {formData.winnerSelection === 'number' && (
-              <>
-                <div>
-                  <Label htmlFor="quantityOfNumbers" className="mb-1">
-                    Quantity of Numbers
-                  </Label>
-                  <Select
-                    value={formData.quantityOfNumbers.toString()}
-                    onValueChange={(value) =>
-                      setFormData({
-                        ...formData,
-                        quantityOfNumbers: parseInt(value),
-                      })
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select quantity" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="100">100</SelectItem>
-                      <SelectItem value="500">500</SelectItem>
-                      <SelectItem value="1000">1000</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="isWinnerNumberRandom"
-                    checked={formData.isWinnerNumberRandom}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        isWinnerNumberRandom: e.target.checked,
-                        winnerNumbers: e.target.checked
-                          ? []
-                          : formData.winnerNumbers,
-                      })
-                    }
-                    className="w-4 h-4"
-                  />
-                  <Label htmlFor="isWinnerNumberRandom">
-                    Random Winner Numbers (system generated)
-                  </Label>
-                </div>
-              </>
-            )}
 
             <div id="endAt-section">
               <Label className="mb-1">End Date & Time</Label>

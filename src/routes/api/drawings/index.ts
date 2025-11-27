@@ -62,12 +62,12 @@ export const Route = createFileRoute('/api/drawings/')({
               price: body.price || 0,
               winnerSelection: body.winnerSelection,
               quantityOfNumbers: body.quantityOfNumbers || 0,
-              isWinnerNumberRandom: body.isWinnerNumberRandom ?? true,
+              playWithNumbers: body.playWithNumbers ?? false,
               endAt: new Date(body.endAt),
               winnersAmount: body.winnersAmount || 1,
             })
             .returning()
-          if (newDrawing[0].winnerSelection === 'number') {
+          if (newDrawing[0].playWithNumbers) {
             await initializeNumberSlots(
               newDrawing[0].id,
               newDrawing[0].quantityOfNumbers,

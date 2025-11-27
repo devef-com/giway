@@ -159,14 +159,15 @@ async function generateParticipants(drawingId: string, amount: number) {
 
   console.log(`📋 Drawing: "${drawing.title}"`)
   console.log(`   Winner Selection: ${drawing.winnerSelection}`)
-  if (drawing.winnerSelection === 'number') {
+  console.log(`   Play with Numbers: ${drawing.playWithNumbers}`)
+  if (drawing.playWithNumbers) {
     console.log(`   Total Numbers: ${drawing.quantityOfNumbers}`)
   }
   console.log('')
 
-  // For number-based drawings, get available number slots
+  // For drawings with numbers, get available number slots
   let availableSlots: { id: number; number: number }[] = []
-  if (drawing.winnerSelection === 'number') {
+  if (drawing.playWithNumbers) {
     availableSlots = await db.query.numberSlots.findMany({
       where: and(
         eq(schema.numberSlots.drawingId, drawingId),
@@ -194,8 +195,9 @@ async function generateParticipants(drawingId: string, amount: number) {
   for (let i = 0; i < amount; i++) {
     const name = generateRandomName()
     const isEligible = getRandomEligibility()
-    const selectedNumber =
-      drawing.winnerSelection === 'number' ? availableSlots[i]?.number : null
+    const selectedNumber = drawing.playWithNumbers
+      ? availableSlots[i]?.number
+      : null
 
     // Insert participant
     const [participant] = await db
@@ -210,8 +212,8 @@ async function generateParticipants(drawingId: string, amount: number) {
       })
       .returning({ id: schema.participants.id })
 
-    // Update number slot if number-based drawing
-    if (drawing.winnerSelection === 'number' && availableSlots[i]) {
+    // Update number slot if drawing uses numbers
+    if (drawing.playWithNumbers && availableSlots[i]) {
       await db
         .update(schema.numberSlots)
         .set({

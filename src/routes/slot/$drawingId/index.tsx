@@ -139,7 +139,7 @@ function SlotDrawingParticipation() {
   // Fetch drawing statistics
   const { data: stats } = useDrawingStats(
     drawingId,
-    !!drawing && drawing.winnerSelection === 'number',
+    !!drawing && !!drawing.playWithNumbers,
     10000,
   )
 
@@ -177,7 +177,7 @@ function SlotDrawingParticipation() {
   const { data: slotsData } = useNumberSlots(
     drawingId,
     numbersToFetch,
-    !!drawing && drawing.winnerSelection === 'number' && !hasDrawingEnded,
+    !!drawing && !!drawing.playWithNumbers && !hasDrawingEnded,
     {
       staleTime: 30000,
       refetchOnWindowFocus: true,
@@ -362,8 +362,7 @@ function SlotDrawingParticipation() {
 
     const registrationData = {
       ...formData,
-      selectedNumbers:
-        drawing?.winnerSelection === 'number' ? selectedNumbers : undefined,
+      selectedNumbers: drawing?.playWithNumbers ? selectedNumbers : undefined,
     }
 
     participateMutation.mutate(registrationData)
@@ -495,8 +494,8 @@ function SlotDrawingParticipation() {
           </Card>
         )}
 
-        {/* Number Selection Grid (only for number-based drawings that haven't ended) */}
-        {drawing.winnerSelection === 'number' && !hasDrawingEnded && (
+        {/* Number Selection Grid (only for drawings with numbers that haven't ended) */}
+        {drawing.playWithNumbers && !hasDrawingEnded && (
           <div className="relative">
             <div
               ref={scrollContainerRef}
@@ -647,8 +646,8 @@ function SlotDrawingParticipation() {
         )}
       </div>
 
-      {/* Registration Form for Random Drawing - Drawer */}
-      {drawing.winnerSelection === 'random' && (
+      {/* Registration Form for Drawing without numbers - Drawer */}
+      {!drawing.playWithNumbers && (
         <div>
           <form
             onSubmit={handleSubmit}
@@ -688,7 +687,7 @@ function SlotDrawingParticipation() {
             </p>
           </div>
           <ul className="space-y-1 ml-4 text-sm text-gray-600 dark:text-gray-400">
-            {drawing.winnerSelection === 'number' ? (
+            {drawing.playWithNumbers ? (
               <>
                 <li>
                   • Select {drawing.isPaid ? 'one or more numbers' : 'a number'}{' '}

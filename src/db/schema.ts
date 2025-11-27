@@ -12,8 +12,8 @@ import { relations } from 'drizzle-orm'
 
 // Enums
 export const winnerSelectionEnum = pgEnum('winner_selection', [
-  'random',
-  'number',
+  'manually',
+  'system',
 ])
 
 // Assets table (polymorphic)
@@ -83,7 +83,7 @@ export const drawings = pgTable('drawings', {
   price: integer('price').default(0),
   winnerSelection: winnerSelectionEnum('winner_selection').notNull(),
   quantityOfNumbers: integer('quantity_of_numbers').notNull().default(0),
-  isWinnerNumberRandom: boolean('is_winner_number_random').default(true),
+  playWithNumbers: boolean('play_with_numbers').default(false),
   winnersAmount: integer('winners_amount').notNull().default(1), // how many winners to select
   winnerNumbers: integer('winner_numbers').array(), // Array of winning numbers(enter by user or randomly selected)
   endAt: timestamp('end_at').notNull(),

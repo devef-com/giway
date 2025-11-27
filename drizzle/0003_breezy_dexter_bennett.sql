@@ -1,1 +1,0 @@
-ALTER TABLE "participants" ADD COLUMN "log_numbers" integer[];

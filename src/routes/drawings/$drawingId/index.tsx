@@ -300,11 +300,15 @@ function DrawingDetail() {
                   </p>
                   <p className="mb-2  text-sm">
                     <strong>Selection Method:</strong>{' '}
-                    {drawing.winnerSelection === 'random'
-                      ? 'Random'
-                      : 'By Number'}
+                    {drawing.winnerSelection === 'manually'
+                      ? 'Enter number manually'
+                      : 'System generated'}
                   </p>
-                  {drawing.winnerSelection === 'number' && (
+                  <p className="mb-2 text-sm">
+                    <strong>Play with Numbers:</strong>{' '}
+                    {drawing.playWithNumbers ? 'Yes' : 'No'}
+                  </p>
+                  {drawing.playWithNumbers && (
                     <p className="mb-2 text-sm">
                       <strong>Total Numbers:</strong>{' '}
                       {drawing.quantityOfNumbers}
@@ -338,9 +342,9 @@ function DrawingDetail() {
                 <div className="space-y-2">
                   <p className="text-sm">
                     <strong>Selection Method:</strong>{' '}
-                    {drawing.winnerSelection === 'random'
-                      ? 'Random'
-                      : 'By Number'}
+                    {drawing.winnerSelection === 'manually'
+                      ? 'Enter number manually'
+                      : 'System generated'}
                   </p>
                   <p className="text-sm">
                     <strong>Winners to Select:</strong> {drawing.winnersAmount}
@@ -350,14 +354,13 @@ function DrawingDetail() {
                     {participants?.filter((p) => p.isEligible === true)
                       .length || 0}
                   </p>
-                  {drawing.winnerSelection === 'number' && (
-                    <p className="text-sm">
-                      <strong>Winner Numbers:</strong>{' '}
-                      {drawing.isWinnerNumberRandom
-                        ? 'Random (will be generated)'
-                        : drawing.winnerNumbers?.join(', ') || 'Not set'}
-                    </p>
-                  )}
+                  {drawing.playWithNumbers &&
+                    drawing.winnerSelection === 'manually' && (
+                      <p className="text-sm">
+                        <strong>Winner Numbers:</strong>{' '}
+                        {drawing.winnerNumbers?.join(', ') || 'Not set'}
+                      </p>
+                    )}
                 </div>
 
                 <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md p-3">
@@ -454,7 +457,7 @@ function DrawingDetail() {
                     <SortIndicator field="name" />
                   </th>
                   {/* <th className="text-left p-2">Phone</th> */}
-                  {drawing.winnerSelection === 'number' && (
+                  {drawing.playWithNumbers && (
                     <th className="text-left p-2">#</th>
                   )}
                   <th
@@ -484,7 +487,7 @@ function DrawingDetail() {
                       <td className="p-2">
                         <Skeleton className="h-4 w-24" />
                       </td>
-                      {drawing.winnerSelection === 'number' && (
+                      {drawing.playWithNumbers && (
                         <td className="p-2">
                           <Skeleton className="h-4 w-8" />
                         </td>
@@ -518,7 +521,7 @@ function DrawingDetail() {
                           : participant.name}
                       </td>
                       {/* <td className="p-2">{participant.phone}</td> */}
-                      {drawing.winnerSelection === 'number' && (
+                      {drawing.playWithNumbers && (
                         <td className="p-2 text-sm">
                           {participant.numbers?.length > 0 ? (
                             isMobile && participant.numbers.length > 2 ? (
@@ -590,7 +593,7 @@ function DrawingDetail() {
                 ) : (
                   <tr>
                     <td
-                      colSpan={drawing.winnerSelection === 'number' ? 4 : 3}
+                      colSpan={drawing.playWithNumbers ? 4 : 3}
                       className="p-4 text-center text-secondary"
                     >
                       No participants yet

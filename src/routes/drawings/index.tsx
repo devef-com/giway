@@ -69,11 +69,11 @@ function DrawingsList() {
                     </h2>
                     <p className="text-md text-text-light-secondary dark:text-text-dark-secondary mb-2">
                       Selection:{' '}
-                      {drawing.winnerSelection === 'random'
-                        ? 'Random'
-                        : 'By Number'}
+                      {drawing.winnerSelection === 'manually'
+                        ? 'Enter number manually'
+                        : 'System generated'}
                     </p>
-                    {drawing.winnerSelection === 'number' && (
+                    {drawing.playWithNumbers && (
                       <p className="text-md text-text-light-secondary dark:text-text-dark-secondary mb-2">
                         Numbers: {drawing.quantityOfNumbers}
                       </p>

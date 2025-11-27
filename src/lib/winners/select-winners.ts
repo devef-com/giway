@@ -45,7 +45,7 @@ export interface SelectNumberWinnersParams {
   drawingId: string
   winnersAmount: number
   quantityOfNumbers: number
-  isWinnerNumberRandom: boolean
+  winnerSelectionIsManually: boolean
   existingWinnerNumbers?: number[] | null
 }
 
@@ -137,24 +137,24 @@ export async function selectNumberWinners(
     drawingId,
     winnersAmount,
     quantityOfNumbers,
-    isWinnerNumberRandom,
+    winnerSelectionIsManually,
     existingWinnerNumbers,
   } = params
 
   // Step 1: Determine winning numbers
   let winnerNumbers: number[]
 
-  if (isWinnerNumberRandom) {
-    // Generate random winning numbers
+  if (!winnerSelectionIsManually) {
+    // Generate random winning numbers (system generated)
     winnerNumbers = generateUniqueRandomNumbers(
       1,
       quantityOfNumbers,
       winnersAmount,
     )
   } else {
-    // Use pre-defined winner numbers
+    // Use pre-defined winner numbers (manually entered)
     if (!existingWinnerNumbers || existingWinnerNumbers.length === 0) {
-      throw new Error('Winner numbers not defined for non-random selection')
+      throw new Error('Winner numbers not defined for manual selection')
     }
     winnerNumbers = existingWinnerNumbers.slice(0, winnersAmount)
   }
@@ -315,8 +315,10 @@ export async function selectWinners(
   const timestamp = new Date()
   let result: WinnerSelectionResult
 
-  if (drawingData.winnerSelection === 'random') {
-    // Random participant selection
+  // Check if this drawing uses number slots (playWithNumbers)
+  // If not using numbers, always select randomly from participants
+  if (!drawingData.playWithNumbers) {
+    // Random participant selection (no number slots)
     const winners = await selectRandomWinners({
       drawingId,
       winnersAmount: drawingData.winnersAmount,
@@ -329,17 +331,19 @@ export async function selectWinners(
       timestamp,
     }
   } else {
-    // Number-based selection
+    // Number-based selection (playWithNumbers = true)
+    const isSystemGenerated = drawingData.winnerSelection === 'system'
+
     const { winners, winnerNumbers } = await selectNumberWinners({
       drawingId,
       winnersAmount: drawingData.winnersAmount,
       quantityOfNumbers: drawingData.quantityOfNumbers,
-      isWinnerNumberRandom: drawingData.isWinnerNumberRandom ?? true,
+      winnerSelectionIsManually: !isSystemGenerated,
       existingWinnerNumbers: drawingData.winnerNumbers,
     })
 
-    // Update drawing with winner numbers if they were generated
-    if (drawingData.isWinnerNumberRandom) {
+    // Update drawing with winner numbers if they were system generated
+    if (isSystemGenerated) {
       await db
         .update(drawings)
         .set({ winnerNumbers })

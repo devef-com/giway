@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1761941508948,
-      "tag": "0000_misty_firelord",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1761974835769,
-      "tag": "0001_clumsy_landau",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1763842993235,
-      "tag": "0002_wet_madame_masque",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1763958973347,
-      "tag": "0003_breezy_dexter_bennett",
+      "when": 1764271856266,
+      "tag": "0000_amusing_piledriver",
       "breakpoints": true
     }
   ]

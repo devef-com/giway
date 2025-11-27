@@ -40,12 +40,25 @@ export const Route = createFileRoute('/api/drawings/$drawingId/participate')({
             )
           }
 
-          // Handle number-based drawings
-          if (drawing[0].winnerSelection === 'number') {
+          // Handle drawings with number slots (playWithNumbers = true)
+          if (drawing[0].playWithNumbers) {
             // Validate that numbers were provided
             if (!body.selectedNumbers || body.selectedNumbers.length === 0) {
               return new Response(
                 JSON.stringify({ error: 'Please select at least one number' }),
+                {
+                  status: 400,
+                  headers: { 'Content-Type': 'application/json' },
+                },
+              )
+            }
+
+            // For free events, only allow a single number
+            if (!drawing[0].isPaid && body.selectedNumbers.length > 1) {
+              return new Response(
+                JSON.stringify({
+                  error: 'Free events only allow selecting one number',
+                }),
                 {
                   status: 400,
                   headers: { 'Content-Type': 'application/json' },
@@ -98,44 +111,34 @@ export const Route = createFileRoute('/api/drawings/$drawingId/participate')({
             })
           }
 
-          // Handle random selection drawings
-          if (drawing[0].winnerSelection === 'random') {
-            const maxSelectedNumber = await db
-              .select({
-                value: max(participants.selectedNumber),
-              })
-              .from(participants)
-              .where(eq(participants.drawingId, params.drawingId))
-
-            const selectedNumber = (maxSelectedNumber[0]?.value ?? 0) + 1
-
-            // Create participant
-            const newParticipant = await db
-              .insert(participants)
-              .values({
-                drawingId: params.drawingId,
-                name: body.name,
-                email: body.email || null,
-                phone: body.phone,
-                selectedNumber,
-                isEligible: drawing[0].isPaid ? null : true, // Pending if paid, auto-approve if free
-              })
-              .returning()
-
-            return new Response(JSON.stringify(newParticipant[0]), {
-              status: 201,
-              headers: { 'Content-Type': 'application/json' },
+          // Handle drawings without number slots (playWithNumbers = false)
+          // Auto-increment selectedNumber for each participant
+          const maxSelectedNumber = await db
+            .select({
+              value: max(participants.selectedNumber),
             })
-          }
+            .from(participants)
+            .where(eq(participants.drawingId, params.drawingId))
 
-          // Fallback error if no valid winner selection type
-          return new Response(
-            JSON.stringify({ error: 'Invalid drawing configuration' }),
-            {
-              status: 400,
-              headers: { 'Content-Type': 'application/json' },
-            },
-          )
+          const selectedNumber = (maxSelectedNumber[0]?.value ?? 0) + 1
+
+          // Create participant
+          const newParticipant = await db
+            .insert(participants)
+            .values({
+              drawingId: params.drawingId,
+              name: body.name,
+              email: body.email || null,
+              phone: body.phone,
+              selectedNumber,
+              isEligible: drawing[0].isPaid ? null : true, // Pending if paid, auto-approve if free
+            })
+            .returning()
+
+          return new Response(JSON.stringify(newParticipant[0]), {
+            status: 201,
+            headers: { 'Content-Type': 'application/json' },
+          })
         } catch (error) {
           console.error('Error creating participant:', error)
           return new Response(

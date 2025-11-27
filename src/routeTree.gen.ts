@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DrawingsIndexRouteImport } from './routes/drawings/index'
 import { Route as AuthenticationIndexRouteImport } from './routes/authentication/index'
-import { Route as JoinDrawingIdRouteImport } from './routes/join/$drawingId'
 import { Route as DrawingsCreateRouteImport } from './routes/drawings/create'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoNeonRouteImport } from './routes/demo/neon'
@@ -58,11 +57,6 @@ const DrawingsIndexRoute = DrawingsIndexRouteImport.update({
 const AuthenticationIndexRoute = AuthenticationIndexRouteImport.update({
   id: '/authentication/',
   path: '/authentication/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const JoinDrawingIdRoute = JoinDrawingIdRouteImport.update({
-  id: '/join/$drawingId',
-  path: '/join/$drawingId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DrawingsCreateRoute = DrawingsCreateRouteImport.update({
@@ -241,7 +235,6 @@ export interface FileRoutesByFullPath {
   '/demo/neon': typeof DemoNeonRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/drawings/create': typeof DrawingsCreateRoute
-  '/join/$drawingId': typeof JoinDrawingIdRoute
   '/authentication': typeof AuthenticationIndexRoute
   '/drawings': typeof DrawingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -278,7 +271,6 @@ export interface FileRoutesByTo {
   '/demo/neon': typeof DemoNeonRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/drawings/create': typeof DrawingsCreateRoute
-  '/join/$drawingId': typeof JoinDrawingIdRoute
   '/authentication': typeof AuthenticationIndexRoute
   '/drawings': typeof DrawingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -316,7 +308,6 @@ export interface FileRoutesById {
   '/demo/neon': typeof DemoNeonRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/drawings/create': typeof DrawingsCreateRoute
-  '/join/$drawingId': typeof JoinDrawingIdRoute
   '/authentication/': typeof AuthenticationIndexRoute
   '/drawings/': typeof DrawingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -355,7 +346,6 @@ export interface FileRouteTypes {
     | '/demo/neon'
     | '/demo/tanstack-query'
     | '/drawings/create'
-    | '/join/$drawingId'
     | '/authentication'
     | '/drawings'
     | '/api/auth/$'
@@ -392,7 +382,6 @@ export interface FileRouteTypes {
     | '/demo/neon'
     | '/demo/tanstack-query'
     | '/drawings/create'
-    | '/join/$drawingId'
     | '/authentication'
     | '/drawings'
     | '/api/auth/$'
@@ -429,7 +418,6 @@ export interface FileRouteTypes {
     | '/demo/neon'
     | '/demo/tanstack-query'
     | '/drawings/create'
-    | '/join/$drawingId'
     | '/authentication/'
     | '/drawings/'
     | '/api/auth/$'
@@ -467,7 +455,6 @@ export interface RootRouteChildren {
   DemoNeonRoute: typeof DemoNeonRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DrawingsCreateRoute: typeof DrawingsCreateRoute
-  JoinDrawingIdRoute: typeof JoinDrawingIdRoute
   AuthenticationIndexRoute: typeof AuthenticationIndexRoute
   DrawingsIndexRoute: typeof DrawingsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -511,13 +498,6 @@ declare module '@tanstack/react-router' {
       path: '/authentication'
       fullPath: '/authentication'
       preLoaderRoute: typeof AuthenticationIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/join/$drawingId': {
-      id: '/join/$drawingId'
-      path: '/join/$drawingId'
-      fullPath: '/join/$drawingId'
-      preLoaderRoute: typeof JoinDrawingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/drawings/create': {
@@ -773,7 +753,6 @@ const rootRouteChildren: RootRouteChildren = {
   DemoNeonRoute: DemoNeonRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DrawingsCreateRoute: DrawingsCreateRoute,
-  JoinDrawingIdRoute: JoinDrawingIdRoute,
   AuthenticationIndexRoute: AuthenticationIndexRoute,
   DrawingsIndexRoute: DrawingsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
