@@ -3,7 +3,7 @@ import type { Drawing } from '@/db/schema'
 
 export function useDrawing(drawingId: string, enabled = true) {
   return useQuery<Drawing>({
-    queryKey: ['public-drawing', drawingId],
+    queryKey: ['drawing', drawingId],
     queryFn: async () => {
       const response = await fetch(`/api/drawings/${drawingId}`)
       if (!response.ok) throw new Error('Failed to fetch drawing')

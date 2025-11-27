@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import {
   EllipsisVerticalIcon,
-  TrophyIcon,
+  // TrophyIcon,
   GripIcon,
   CopyIcon,
   Share2Icon,
@@ -9,6 +9,7 @@ import {
   ChevronDownIcon,
   RotateCcwIcon,
   SearchIcon,
+  PencilIcon,
 } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { Card } from '@/components/ui/card'
@@ -166,12 +167,20 @@ function DrawingDetail() {
 
   const ACTIONS = [
     {
-      label: 'More Options',
-      icon: TrophyIcon,
+      label: 'Edit',
+      icon: PencilIcon,
       onClick: () => {
+        navigate({ to: `/drawings/${drawingId}/edit` })
         setIsPopoverOpen(false)
       },
     },
+    // {
+    //   label: 'More Options',
+    //   icon: TrophyIcon,
+    //   onClick: () => {
+    //     setIsPopoverOpen(false)
+    //   },
+    // },
     {
       label: 'Numbers',
       icon: GripIcon,

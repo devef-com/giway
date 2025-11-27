@@ -22,6 +22,7 @@ import { Route as SlotDrawingIdIndexRouteImport } from './routes/slot/$drawingId
 import { Route as DrawingsDrawingIdIndexRouteImport } from './routes/drawings/$drawingId/index'
 import { Route as ApiDrawingsIndexRouteImport } from './routes/api/drawings/index'
 import { Route as SlotDrawingIdNumberToReserveRouteImport } from './routes/slot/$drawingId/$numberToReserve'
+import { Route as DrawingsDrawingIdEditRouteImport } from './routes/drawings/$drawingId/edit'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
@@ -110,6 +111,11 @@ const SlotDrawingIdNumberToReserveRoute =
     path: '/slot/$drawingId/$numberToReserve',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DrawingsDrawingIdEditRoute = DrawingsDrawingIdEditRouteImport.update({
+  id: '/drawings/$drawingId/edit',
+  path: '/drawings/$drawingId/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
   id: '/demo/start/server-funcs',
   path: '/demo/start/server-funcs',
@@ -245,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/drawings/$drawingId/edit': typeof DrawingsDrawingIdEditRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
   '/api/drawings': typeof ApiDrawingsIndexRoute
   '/drawings/$drawingId': typeof DrawingsDrawingIdIndexRoute
@@ -281,6 +288,7 @@ export interface FileRoutesByTo {
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/drawings/$drawingId/edit': typeof DrawingsDrawingIdEditRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
   '/api/drawings': typeof ApiDrawingsIndexRoute
   '/drawings/$drawingId': typeof DrawingsDrawingIdIndexRoute
@@ -318,6 +326,7 @@ export interface FileRoutesById {
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/drawings/$drawingId/edit': typeof DrawingsDrawingIdEditRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
   '/api/drawings/': typeof ApiDrawingsIndexRoute
   '/drawings/$drawingId/': typeof DrawingsDrawingIdIndexRoute
@@ -356,6 +365,7 @@ export interface FileRouteTypes {
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/drawings/$drawingId/edit'
     | '/slot/$drawingId/$numberToReserve'
     | '/api/drawings'
     | '/drawings/$drawingId'
@@ -392,6 +402,7 @@ export interface FileRouteTypes {
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/drawings/$drawingId/edit'
     | '/slot/$drawingId/$numberToReserve'
     | '/api/drawings'
     | '/drawings/$drawingId'
@@ -428,6 +439,7 @@ export interface FileRouteTypes {
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/drawings/$drawingId/edit'
     | '/slot/$drawingId/$numberToReserve'
     | '/api/drawings/'
     | '/drawings/$drawingId/'
@@ -465,6 +477,7 @@ export interface RootRouteChildren {
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  DrawingsDrawingIdEditRoute: typeof DrawingsDrawingIdEditRoute
   SlotDrawingIdNumberToReserveRoute: typeof SlotDrawingIdNumberToReserveRoute
   ApiDrawingsIndexRoute: typeof ApiDrawingsIndexRoute
   DrawingsDrawingIdIndexRoute: typeof DrawingsDrawingIdIndexRoute
@@ -568,6 +581,13 @@ declare module '@tanstack/react-router' {
       path: '/slot/$drawingId/$numberToReserve'
       fullPath: '/slot/$drawingId/$numberToReserve'
       preLoaderRoute: typeof SlotDrawingIdNumberToReserveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drawings/$drawingId/edit': {
+      id: '/drawings/$drawingId/edit'
+      path: '/drawings/$drawingId/edit'
+      fullPath: '/drawings/$drawingId/edit'
+      preLoaderRoute: typeof DrawingsDrawingIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/server-funcs': {
@@ -763,6 +783,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  DrawingsDrawingIdEditRoute: DrawingsDrawingIdEditRoute,
   SlotDrawingIdNumberToReserveRoute: SlotDrawingIdNumberToReserveRoute,
   ApiDrawingsIndexRoute: ApiDrawingsIndexRoute,
   DrawingsDrawingIdIndexRoute: DrawingsDrawingIdIndexRoute,
