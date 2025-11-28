@@ -11,6 +11,7 @@ import {
   RotateCcwIcon,
   SearchIcon,
   PencilIcon,
+  XIcon,
 } from 'lucide-react'
 import { useState, useMemo, FormEvent } from 'react'
 import { Card } from '@/components/ui/card'
@@ -56,6 +57,8 @@ function DrawingDetail() {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false)
   const [isSelectingWinners, setIsSelectingWinners] = useState(false)
   const [loadWinners, setLoadWinners] = useState(false)
+
+  const [openRunWinners, setOpenRunWinners] = useState(false)
 
   // Filter and sorting state
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
@@ -194,7 +197,11 @@ function DrawingDetail() {
         data.message ||
           `Successfully selected ${data.data.winners.length} winner(s)`,
       )
+      setOpenRunWinners(false)
       queryClient.invalidateQueries({ queryKey: ['drawing', drawingId] })
+      queryClient.invalidateQueries({
+        queryKey: ['drawing-winners', drawingId],
+      })
 
       // Optionally navigate to winners view or refresh data
       // navigate({ to: `/drawings/${drawingId}/winners` })
@@ -340,7 +347,7 @@ function DrawingDetail() {
 
           <Expandable>
             <ExpandableTitle>Basic Info</ExpandableTitle>
-            <ExpandableContent>
+            <ExpandableContent className="border-b border-slate-700">
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <p className="mb-2 text-sm">
@@ -414,9 +421,12 @@ function DrawingDetail() {
                     )}
                 </div>
                 {drawing.winnerNumbers && drawing.winnerNumbers.length > 0 && (
-                  <Expandable onClick={() => setLoadWinners(true)}>
+                  <Expandable
+                    className="mb-2"
+                    onClick={() => setLoadWinners(true)}
+                  >
                     <ExpandableTitle>
-                      Winners ({drawing.winnerNumbers.join(', ')})
+                      Winners #({drawing.winnerNumbers.join(', ')})
                     </ExpandableTitle>
                     <ExpandableContent>
                       {loadingWinners && <span>...</span>}
@@ -441,12 +451,36 @@ function DrawingDetail() {
                     </ExpandableContent>
                   </Expandable>
                 )}
-
+                <div
+                  className={cn(
+                    'flex justify-center md:justify-end w-full',
+                    openRunWinners || drawing.winnerSelection != 'manually'
+                      ? 'hidden'
+                      : '',
+                  )}
+                >
+                  <Button
+                    size="sm"
+                    variant="primary"
+                    onClick={() => setOpenRunWinners(true)}
+                  >
+                    Run Winner Selection
+                  </Button>
+                </div>
                 {drawing.winnerSelection === 'manually' && (
                   <form
-                    className="flex flex-wrap gap-2"
+                    className={cn(
+                      'flex flex-wrap gap-2 place-content-end',
+                      openRunWinners ? '' : 'hidden',
+                    )}
                     onSubmit={handleSelectWinners}
                   >
+                    <Button
+                      variant="outline"
+                      onClick={() => setOpenRunWinners(false)}
+                    >
+                      <XIcon />
+                    </Button>
                     {Array.from({ length: drawing.winnersAmount }).map(
                       (_, index) => (
                         <Input
@@ -456,8 +490,8 @@ function DrawingDetail() {
                           required
                           id={index.toString()}
                           name={`number_${index + 1}`}
-                          className="border border-slate-700 rounded-md p-2 w-24 mr-2 mb-2"
-                          placeholder={`#${index + 1} Winner Number`}
+                          className="border border-slate-700 text-sm rounded-md p-2 w-24 mr-2 mb-2"
+                          placeholder={`#${index + 1} Winner`}
                         />
                       ),
                     )}
@@ -671,9 +705,9 @@ function DrawingDetail() {
                   <tr>
                     <td
                       colSpan={drawing.playWithNumbers ? 4 : 3}
-                      className="p-4 text-center text-secondary"
+                      className="p-4 text-center text-text-light-secondary dark:text-text-dark-secondary"
                     >
-                      No participants yet
+                      No participants found
                     </td>
                   </tr>
                 )}

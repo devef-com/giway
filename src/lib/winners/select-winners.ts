@@ -56,7 +56,7 @@ export interface SelectNumberWinnersParams {
 
 /**
  * Select winners randomly from eligible participants
- * Used when drawing.winnerSelection = 'random'
+ * Used when drawing.winnerSelection = 'system'
  *
  * Process:
  * 1. Fetch all eligible participants (isEligible = true)
