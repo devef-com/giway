@@ -30,8 +30,17 @@ export default function Header() {
           >
             <Menu size={24} />
           </button>
-          <h1 className="ml-4 text-xl text-primary dark:text-white font-black">
-            <Link to="/">Giway</Link>
+          <h1 className="ml-2 text-xl text-primary dark:text-white font-black">
+            <Link to="/" className="inline-flex items-center gap-4">
+              <figure className="max-w-8 ml-4">
+                <img
+                  src="/logo192.png"
+                  alt="Giway logo"
+                  className="inline-block w-full h-full"
+                />
+              </figure>
+              Giway
+            </Link>
           </h1>
         </div>
         <ThemeSwitcher />

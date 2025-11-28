@@ -33,11 +33,63 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       {
         title: 'Giway',
       },
+      {
+        name: 'description',
+        content: 'Giway - The easiest way to manage drawings and giveaways.',
+      },
+      {
+        name: 'keywords',
+        content: 'giveaway, drawing, contest, winners, participants',
+      },
+      {
+        name: 'author',
+        content: 'Giway',
+      },
+      {
+        name: 'theme-color',
+        content: '#ffffff',
+      },
+      {
+        property: 'og:title',
+        content: 'Giway',
+      },
+      {
+        property: 'og:description',
+        content: 'Giway - The easiest way to manage drawings and giveaways.',
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+      {
+        name: 'twitter:title',
+        content: 'Giway',
+      },
+      {
+        name: 'twitter:description',
+        content: 'Giway - The easiest way to manage drawings and giveaways.',
+      },
     ],
     links: [
       {
         rel: 'stylesheet',
         href: appCss,
+      },
+      {
+        rel: 'manifest',
+        href: '/manifest.json',
+      },
+      {
+        rel: 'icon',
+        href: '/favicon.ico',
+      },
+      {
+        rel: 'apple-touch-icon',
+        href: '/logo192.png',
       },
     ],
   }),
