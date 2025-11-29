@@ -38,7 +38,7 @@ cp .env.example .env
 
 ```env
 # Database - use the Docker Compose PostgreSQL or external database
-DATABASE_URL=postgresql://drawing:drawing_password@db:5432/drawing_giveaway
+DATABASE_URL=postgresql://your_user:your_password@db:5432/drawing_giveaway
 
 # Better Auth configuration (required)
 BETTER_AUTH_SECRET=your-secure-secret-key
@@ -52,9 +52,9 @@ R2_SECRET_ACCESS_KEY=
 R2_BUCKET_NAME=
 R2_PUBLIC_DOMAIN=
 
-# Optional: PostgreSQL credentials for docker-compose
-POSTGRES_USER=drawing
-POSTGRES_PASSWORD=drawing_password
+# Required: PostgreSQL credentials for docker-compose (use strong values!)
+POSTGRES_USER=your_db_user
+POSTGRES_PASSWORD=your_secure_password
 POSTGRES_DB=drawing_giveaway
 ```
 
