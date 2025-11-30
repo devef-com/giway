@@ -34,6 +34,23 @@ export const assets = pgTable('assets', {
   modelType: varchar('model_type', { length: 50 }).notNull(), // 'drawing' or 'participant'
   modelId: varchar('model_id', { length: 255 }).notNull(), // drawing.id or participant.id
   url: text('url').notNull(),
+  mimeType: varchar('mime_type', { length: 100 }), // e.g., 'image/jpeg', 'image/png'
+  size: integer('size'), // File size in bytes
+  s3Key: varchar('s3_key', { length: 500 }), // S3/R2 storage key
+  ownerId: text('owner_id').references(() => user.id, { onDelete: 'set null' }), // Owner of the asset
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+// Drawing Assets junction table (for multiple images per drawing)
+export const drawingAssets = pgTable('drawing_assets', {
+  id: serial('id').primaryKey(),
+  drawingId: varchar('drawing_id', { length: 255 })
+    .notNull()
+    .references(() => drawings.id, { onDelete: 'cascade' }),
+  assetId: integer('asset_id')
+    .notNull()
+    .references(() => assets.id, { onDelete: 'cascade' }),
+  sortOrder: integer('sort_order').default(0), // For ordering images
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 
@@ -245,7 +262,8 @@ export const drawingsRelations = relations(drawings, ({ one, many }) => ({
     references: [user.id],
   }),
   participants: many(participants),
-  winners: many(drawingWinners), // Add this relation
+  winners: many(drawingWinners),
+  drawingAssets: many(drawingAssets),
 }))
 
 export const participantsRelations = relations(
@@ -260,7 +278,7 @@ export const participantsRelations = relations(
       references: [assets.id],
     }),
     numberSlots: many(numberSlots),
-    wonDrawings: many(drawingWinners), // Add this relation
+    wonDrawings: many(drawingWinners),
   }),
 )
 
@@ -275,6 +293,28 @@ export const drawingWinnersRelations = relations(drawingWinners, ({ one }) => ({
   }),
 }))
 
+// Drawing Assets relations
+export const drawingAssetsRelations = relations(drawingAssets, ({ one }) => ({
+  drawing: one(drawings, {
+    fields: [drawingAssets.drawingId],
+    references: [drawings.id],
+  }),
+  asset: one(assets, {
+    fields: [drawingAssets.assetId],
+    references: [assets.id],
+  }),
+}))
+
+// Assets relations
+export const assetsRelations = relations(assets, ({ one, many }) => ({
+  owner: one(user, {
+    fields: [assets.ownerId],
+    references: [user.id],
+  }),
+  drawingAssets: many(drawingAssets),
+}))
+
+// User balance relations
 export const userBalancesRelations = relations(userBalances, ({ one }) => ({
   user: one(user, {
     fields: [userBalances.userId],
@@ -319,6 +359,8 @@ export type Asset = typeof assets.$inferSelect
 export type NewAsset = typeof assets.$inferInsert
 export type DrawingWinner = typeof drawingWinners.$inferSelect
 export type NewDrawingWinner = typeof drawingWinners.$inferInsert
+export type DrawingAsset = typeof drawingAssets.$inferSelect
+export type NewDrawingAsset = typeof drawingAssets.$inferInsert
 export type Pack = typeof packs.$inferSelect
 export type NewPack = typeof packs.$inferInsert
 export type UserBalance = typeof userBalances.$inferSelect
