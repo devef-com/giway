@@ -195,7 +195,9 @@ function CreateDrawing() {
               )
 
               if (!uploadUrlResponse.ok) {
-                const errorData = await uploadUrlResponse.json().catch(() => ({}))
+                const errorData = await uploadUrlResponse
+                  .json()
+                  .catch(() => ({}))
                 console.error(
                   `Failed to get upload URL: ${uploadUrlResponse.status}`,
                   errorData,

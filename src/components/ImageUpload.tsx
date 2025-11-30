@@ -37,7 +37,9 @@ export function ImageUpload({
 }: ImageUploadProps) {
   const [images, setImages] = useState<Array<UploadedImage>>([])
   const [isCompressing, setIsCompressing] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const dragCounterRef = useRef(0)
 
   // Cleanup preview URLs on unmount
   useEffect(() => {
@@ -51,13 +53,25 @@ export function ImageUpload({
       const files = event.target.files
       if (!files || files.length === 0) return
 
+      await processFiles(Array.from(files))
+
+      // Reset input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    },
+    [images, maxImages, onImagesChange],
+  )
+
+  const processFiles = useCallback(
+    async (files: File[]) => {
       const remainingSlots = maxImages - images.length
       if (remainingSlots <= 0) {
         toast.error(`Maximum ${maxImages} images allowed`)
         return
       }
 
-      const filesToProcess = Array.from(files).slice(0, remainingSlots)
+      const filesToProcess = files.slice(0, remainingSlots)
 
       // Validate file types
       const validFiles = filesToProcess.filter((file) => {
@@ -104,13 +118,58 @@ export function ImageUpload({
         }
       } finally {
         setIsCompressing(false)
-        // Reset input
-        if (fileInputRef.current) {
-          fileInputRef.current.value = ''
-        }
       }
     },
     [images, maxImages, onImagesChange],
+  )
+
+  const handleDragEnter = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault()
+      event.stopPropagation()
+      dragCounterRef.current++
+      if (event.dataTransfer.items && event.dataTransfer.items.length > 0) {
+        setIsDragging(true)
+      }
+    },
+    [],
+  )
+
+  const handleDragLeave = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault()
+      event.stopPropagation()
+      dragCounterRef.current--
+      if (dragCounterRef.current === 0) {
+        setIsDragging(false)
+      }
+    },
+    [],
+  )
+
+  const handleDragOver = useCallback(
+    (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault()
+      event.stopPropagation()
+    },
+    [],
+  )
+
+  const handleDrop = useCallback(
+    async (event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault()
+      event.stopPropagation()
+      setIsDragging(false)
+      dragCounterRef.current = 0
+
+      if (disabled || isCompressing) return
+
+      const files = Array.from(event.dataTransfer.files)
+      if (files.length > 0) {
+        await processFiles(files)
+      }
+    },
+    [disabled, isCompressing, processFiles],
   )
 
   const removeImage = useCallback(
@@ -306,11 +365,17 @@ export function ImageUpload({
           className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
             disabled || isCompressing
               ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
-              : 'border-gray-300 hover:border-primary cursor-pointer'
+              : isDragging
+                ? 'border-primary bg-primary/10 cursor-pointer'
+                : 'border-gray-300 hover:border-primary cursor-pointer'
           }`}
           onClick={() =>
             !disabled && !isCompressing && fileInputRef.current?.click()
           }
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
         >
           <input
             ref={fileInputRef}

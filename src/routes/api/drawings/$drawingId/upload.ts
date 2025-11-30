@@ -93,7 +93,8 @@ export const Route = createFileRoute('/api/drawings/$drawingId/upload')({
           if (drawing[0].userId !== session.user.id) {
             return new Response(
               JSON.stringify({
-                error: 'You are not authorized to upload images to this drawing',
+                error:
+                  'You are not authorized to upload images to this drawing',
               }),
               { status: 403, headers: { 'Content-Type': 'application/json' } },
             )

@@ -94,12 +94,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -176,12 +172,8 @@
           "name": "assets_owner_id_user_id_fk",
           "tableFrom": "assets",
           "tableTo": "user",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -235,12 +227,8 @@
           "name": "drawing_assets_drawing_id_drawings_id_fk",
           "tableFrom": "drawing_assets",
           "tableTo": "drawings",
-          "columnsFrom": [
-            "drawing_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["drawing_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -248,12 +236,8 @@
           "name": "drawing_assets_asset_id_assets_id_fk",
           "tableFrom": "drawing_assets",
           "tableTo": "assets",
-          "columnsFrom": [
-            "asset_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["asset_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -300,12 +284,8 @@
           "name": "drawing_winners_drawing_id_drawings_id_fk",
           "tableFrom": "drawing_winners",
           "tableTo": "drawings",
-          "columnsFrom": [
-            "drawing_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["drawing_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -313,12 +293,8 @@
           "name": "drawing_winners_participant_id_participants_id_fk",
           "tableFrom": "drawing_winners",
           "tableTo": "participants",
-          "columnsFrom": [
-            "participant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["participant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -425,12 +401,8 @@
           "name": "drawings_user_id_user_id_fk",
           "tableFrom": "drawings",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -509,12 +481,8 @@
           "name": "number_slots_drawing_id_drawings_id_fk",
           "tableFrom": "number_slots",
           "tableTo": "drawings",
-          "columnsFrom": [
-            "drawing_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["drawing_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -522,12 +490,8 @@
           "name": "number_slots_participant_id_participants_id_fk",
           "tableFrom": "number_slots",
           "tableTo": "participants",
-          "columnsFrom": [
-            "participant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["participant_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -610,12 +574,8 @@
           "name": "participants_drawing_id_drawings_id_fk",
           "tableFrom": "participants",
           "tableTo": "drawings",
-          "columnsFrom": [
-            "drawing_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["drawing_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -623,12 +583,8 @@
           "name": "participants_payment_capture_id_assets_id_fk",
           "tableFrom": "participants",
           "tableTo": "assets",
-          "columnsFrom": [
-            "payment_capture_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["payment_capture_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -699,12 +655,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -714,9 +666,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -812,9 +762,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -877,10 +825,7 @@
     "public.winner_selection": {
       "name": "winner_selection",
       "schema": "public",
-      "values": [
-        "manually",
-        "system"
-      ]
+      "values": ["manually", "system"]
     }
   },
   "schemas": {},
