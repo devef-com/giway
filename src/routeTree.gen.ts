@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as StoreRouteImport } from './routes/store'
+import { Route as CoffeeRouteImport } from './routes/coffee'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DrawingsIndexRouteImport } from './routes/drawings/index'
 import { Route as AuthenticationIndexRouteImport } from './routes/authentication/index'
@@ -62,6 +63,11 @@ const SupportRoute = SupportRouteImport.update({
 const StoreRoute = StoreRouteImport.update({
   id: '/store',
   path: '/store',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoffeeRoute = CoffeeRouteImport.update({
+  id: '/coffee',
+  path: '/coffee',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -291,6 +297,7 @@ const ApiDrawingsDrawingIdParticipantIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/coffee': typeof CoffeeRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
   '/api/checkout': typeof ApiCheckoutRoute
@@ -337,6 +344,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/coffee': typeof CoffeeRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
   '/api/checkout': typeof ApiCheckoutRoute
@@ -384,6 +392,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/coffee': typeof CoffeeRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
   '/api/checkout': typeof ApiCheckoutRoute
@@ -432,6 +441,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/coffee'
     | '/store'
     | '/support'
     | '/api/checkout'
@@ -478,6 +488,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/coffee'
     | '/store'
     | '/support'
     | '/api/checkout'
@@ -524,6 +535,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/coffee'
     | '/store'
     | '/support'
     | '/api/checkout'
@@ -571,6 +583,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CoffeeRoute: typeof CoffeeRoute
   StoreRoute: typeof StoreRoute
   SupportRoute: typeof SupportRoute
   ApiCheckoutRoute: typeof ApiCheckoutRoute
@@ -621,6 +634,13 @@ declare module '@tanstack/react-router' {
       path: '/store'
       fullPath: '/store'
       preLoaderRoute: typeof StoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coffee': {
+      id: '/coffee'
+      path: '/coffee'
+      fullPath: '/coffee'
+      preLoaderRoute: typeof CoffeeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -951,6 +971,7 @@ const ApiDrawingsDrawingIdRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CoffeeRoute: CoffeeRoute,
   StoreRoute: StoreRoute,
   SupportRoute: SupportRoute,
   ApiCheckoutRoute: ApiCheckoutRoute,
