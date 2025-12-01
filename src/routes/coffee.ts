@@ -5,6 +5,23 @@ import { createFileRoute } from '@tanstack/react-router'
 export const Route = createFileRoute('/coffee')({
   server: {
     handlers: {
+      GET: async ({ request }) => {
+        // GET handler - Buy Me a Coffee sends data as query parameters
+        const url = new URL(request.url)
+        const params = Object.fromEntries(url.searchParams.entries())
+
+        console.log('=== Buy Me a Coffee Webhook Received (GET) ===')
+        console.log('Headers:', Object.fromEntries(request.headers.entries()))
+        console.log('Query Params:', JSON.stringify(params, null, 2))
+        console.log('==============================================')
+
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      },
       POST: async ({ request }) => {
         try {
           // Get the raw body for logging
