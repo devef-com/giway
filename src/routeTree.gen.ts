@@ -20,6 +20,7 @@ import { Route as DemoNeonRouteImport } from './routes/demo/neon'
 import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
 import { Route as AuthenticationSignupRouteImport } from './routes/authentication/signup'
 import { Route as AuthenticationLoginRouteImport } from './routes/authentication/login'
+import { Route as ApiCheckoutRouteImport } from './routes/api/checkout'
 import { Route as SlotDrawingIdIndexRouteImport } from './routes/slot/$drawingId/index'
 import { Route as DrawingsDrawingIdIndexRouteImport } from './routes/drawings/$drawingId/index'
 import { Route as ApiPacksIndexRouteImport } from './routes/api/packs/index'
@@ -30,8 +31,10 @@ import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.se
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
+import { Route as ApiWebhookPolarRouteImport } from './routes/api/webhook.polar'
 import { Route as ApiUserBalanceRouteImport } from './routes/api/user/balance'
 import { Route as ApiParticipantParticipantIdRouteImport } from './routes/api/participant.$participantId'
+import { Route as ApiPacksPurchaseRouteImport } from './routes/api/packs/purchase'
 import { Route as ApiDrawingsReservationTimeRouteImport } from './routes/api/drawings/reservation-time'
 import { Route as ApiDrawingsDrawingIdRouteImport } from './routes/api/drawings/$drawingId'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -106,6 +109,11 @@ const AuthenticationLoginRoute = AuthenticationLoginRouteImport.update({
   path: '/authentication/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCheckoutRoute = ApiCheckoutRouteImport.update({
+  id: '/api/checkout',
+  path: '/api/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlotDrawingIdIndexRoute = SlotDrawingIdIndexRouteImport.update({
   id: '/slot/$drawingId/',
   path: '/slot/$drawingId/',
@@ -157,6 +165,11 @@ const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
   path: '/demo/api/names',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhookPolarRoute = ApiWebhookPolarRouteImport.update({
+  id: '/api/webhook/polar',
+  path: '/api/webhook/polar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiUserBalanceRoute = ApiUserBalanceRouteImport.update({
   id: '/api/user/balance',
   path: '/api/user/balance',
@@ -168,6 +181,11 @@ const ApiParticipantParticipantIdRoute =
     path: '/api/participant/$participantId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPacksPurchaseRoute = ApiPacksPurchaseRouteImport.update({
+  id: '/api/packs/purchase',
+  path: '/api/packs/purchase',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiDrawingsReservationTimeRoute =
   ApiDrawingsReservationTimeRouteImport.update({
     id: '/api/drawings/reservation-time',
@@ -275,6 +293,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
+  '/api/checkout': typeof ApiCheckoutRoute
   '/authentication/login': typeof AuthenticationLoginRoute
   '/authentication/signup': typeof AuthenticationSignupRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
@@ -286,8 +305,10 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
+  '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
+  '/api/webhook/polar': typeof ApiWebhookPolarRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -318,6 +339,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
+  '/api/checkout': typeof ApiCheckoutRoute
   '/authentication/login': typeof AuthenticationLoginRoute
   '/authentication/signup': typeof AuthenticationSignupRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
@@ -329,8 +351,10 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
+  '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
+  '/api/webhook/polar': typeof ApiWebhookPolarRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -362,6 +386,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
+  '/api/checkout': typeof ApiCheckoutRoute
   '/authentication/login': typeof AuthenticationLoginRoute
   '/authentication/signup': typeof AuthenticationSignupRoute
   '/demo/drizzle': typeof DemoDrizzleRoute
@@ -373,8 +398,10 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
+  '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
+  '/api/webhook/polar': typeof ApiWebhookPolarRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
@@ -407,6 +434,7 @@ export interface FileRouteTypes {
     | '/'
     | '/store'
     | '/support'
+    | '/api/checkout'
     | '/authentication/login'
     | '/authentication/signup'
     | '/demo/drizzle'
@@ -418,8 +446,10 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/drawings/$drawingId'
     | '/api/drawings/reservation-time'
+    | '/api/packs/purchase'
     | '/api/participant/$participantId'
     | '/api/user/balance'
+    | '/api/webhook/polar'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -450,6 +480,7 @@ export interface FileRouteTypes {
     | '/'
     | '/store'
     | '/support'
+    | '/api/checkout'
     | '/authentication/login'
     | '/authentication/signup'
     | '/demo/drizzle'
@@ -461,8 +492,10 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/drawings/$drawingId'
     | '/api/drawings/reservation-time'
+    | '/api/packs/purchase'
     | '/api/participant/$participantId'
     | '/api/user/balance'
+    | '/api/webhook/polar'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -493,6 +526,7 @@ export interface FileRouteTypes {
     | '/'
     | '/store'
     | '/support'
+    | '/api/checkout'
     | '/authentication/login'
     | '/authentication/signup'
     | '/demo/drizzle'
@@ -504,8 +538,10 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/drawings/$drawingId'
     | '/api/drawings/reservation-time'
+    | '/api/packs/purchase'
     | '/api/participant/$participantId'
     | '/api/user/balance'
+    | '/api/webhook/polar'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
     | '/demo/start/api-request'
@@ -537,6 +573,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   StoreRoute: typeof StoreRoute
   SupportRoute: typeof SupportRoute
+  ApiCheckoutRoute: typeof ApiCheckoutRoute
   AuthenticationLoginRoute: typeof AuthenticationLoginRoute
   AuthenticationSignupRoute: typeof AuthenticationSignupRoute
   DemoDrizzleRoute: typeof DemoDrizzleRoute
@@ -548,8 +585,10 @@ export interface RootRouteChildren {
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiDrawingsDrawingIdRoute: typeof ApiDrawingsDrawingIdRouteWithChildren
   ApiDrawingsReservationTimeRoute: typeof ApiDrawingsReservationTimeRoute
+  ApiPacksPurchaseRoute: typeof ApiPacksPurchaseRoute
   ApiParticipantParticipantIdRoute: typeof ApiParticipantParticipantIdRoute
   ApiUserBalanceRoute: typeof ApiUserBalanceRoute
+  ApiWebhookPolarRoute: typeof ApiWebhookPolarRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
@@ -647,6 +686,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticationLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/checkout': {
+      id: '/api/checkout'
+      path: '/api/checkout'
+      fullPath: '/api/checkout'
+      preLoaderRoute: typeof ApiCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/slot/$drawingId/': {
       id: '/slot/$drawingId/'
       path: '/slot/$drawingId'
@@ -717,6 +763,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoApiNamesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/webhook/polar': {
+      id: '/api/webhook/polar'
+      path: '/api/webhook/polar'
+      fullPath: '/api/webhook/polar'
+      preLoaderRoute: typeof ApiWebhookPolarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/user/balance': {
       id: '/api/user/balance'
       path: '/api/user/balance'
@@ -729,6 +782,13 @@ declare module '@tanstack/react-router' {
       path: '/api/participant/$participantId'
       fullPath: '/api/participant/$participantId'
       preLoaderRoute: typeof ApiParticipantParticipantIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/packs/purchase': {
+      id: '/api/packs/purchase'
+      path: '/api/packs/purchase'
+      fullPath: '/api/packs/purchase'
+      preLoaderRoute: typeof ApiPacksPurchaseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/drawings/reservation-time': {
@@ -893,6 +953,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   StoreRoute: StoreRoute,
   SupportRoute: SupportRoute,
+  ApiCheckoutRoute: ApiCheckoutRoute,
   AuthenticationLoginRoute: AuthenticationLoginRoute,
   AuthenticationSignupRoute: AuthenticationSignupRoute,
   DemoDrizzleRoute: DemoDrizzleRoute,
@@ -904,8 +965,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiDrawingsDrawingIdRoute: ApiDrawingsDrawingIdRouteWithChildren,
   ApiDrawingsReservationTimeRoute: ApiDrawingsReservationTimeRoute,
+  ApiPacksPurchaseRoute: ApiPacksPurchaseRoute,
   ApiParticipantParticipantIdRoute: ApiParticipantParticipantIdRoute,
   ApiUserBalanceRoute: ApiUserBalanceRoute,
+  ApiWebhookPolarRoute: ApiWebhookPolarRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,

@@ -1,4 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 import { Image, Mail, Package, Sparkles, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -9,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { PolarCheckoutButton } from '@/components/PolarCheckoutButton'
 import { usePacks } from '@/querys/usePacks'
 import { useUserBalance } from '@/querys/useUserBalance'
 import { authClient } from '@/lib/auth-client'
@@ -23,6 +25,7 @@ function StorePage() {
   const { data: balance, isLoading: isBalanceLoading } = useUserBalance(
     !!session.data,
   )
+  const [selectedPackId, setSelectedPackId] = useState<number | null>(null)
 
   // Group packs by type
   const rafflesPacks =
@@ -164,11 +167,40 @@ function StorePage() {
                         </ul>
                       </CardContent>
                       <CardFooter>
-                        <div className="w-full flex items-center justify-between">
-                          <span className="text-2xl font-bold">
-                            {formatPrice(pack.price)}
-                          </span>
-                          <Button>Buy Pack</Button>
+                        <div className="w-full space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-2xl font-bold">
+                              {formatPrice(pack.price)}
+                            </span>
+                            <Button
+                              variant="outline"
+                              onClick={() =>
+                                setSelectedPackId(
+                                  selectedPackId === pack.id ? null : pack.id,
+                                )
+                              }
+                              disabled
+                            >
+                              {selectedPackId === pack.id
+                                ? 'Cancel'
+                                : 'Buy Pack'}
+                            </Button>
+                          </div>
+                          {selectedPackId === pack.id &&
+                            session.data?.user &&
+                            (pack.polarId ? (
+                              <PolarCheckoutButton
+                                productId={pack.polarId}
+                                userId={session.data.user.id}
+                                customerEmail={session.data.user.email}
+                                customerName={session.data.user.name}
+                                className="w-full"
+                              />
+                            ) : (
+                              <p className="text-sm text-muted-foreground text-center py-2">
+                                Polar product not configured for this pack.
+                              </p>
+                            ))}
                         </div>
                       </CardFooter>
                     </Card>
@@ -216,11 +248,40 @@ function StorePage() {
                         </ul>
                       </CardContent>
                       <CardFooter>
-                        <div className="w-full flex items-center justify-between">
-                          <span className="text-2xl font-bold">
-                            {formatPrice(pack.price)}
-                          </span>
-                          <Button>Buy Pack</Button>
+                        <div className="w-full space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-2xl font-bold">
+                              {formatPrice(pack.price)}
+                            </span>
+                            <Button
+                              variant="outline"
+                              disabled
+                              onClick={() =>
+                                setSelectedPackId(
+                                  selectedPackId === pack.id ? null : pack.id,
+                                )
+                              }
+                            >
+                              {selectedPackId === pack.id
+                                ? 'Cancel'
+                                : 'Buy Pack'}
+                            </Button>
+                          </div>
+                          {selectedPackId === pack.id &&
+                            session.data?.user &&
+                            (pack.polarId ? (
+                              <PolarCheckoutButton
+                                productId={pack.polarId}
+                                userId={session.data.user.id}
+                                customerEmail={session.data.user.email}
+                                customerName={session.data.user.name}
+                                className="w-full"
+                              />
+                            ) : (
+                              <p className="text-sm text-muted-foreground text-center py-2">
+                                Polar product not configured for this pack.
+                              </p>
+                            ))}
                         </div>
                       </CardFooter>
                     </Card>

@@ -16,9 +16,7 @@ function SupportPage() {
       <main className="container mx-auto py-10 px-4 max-w-3xl">
         <div className="space-y-8">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight">
-              Support & FAQ
-            </h1>
+            <h1 className="text-4xl font-bold tracking-tight">Support & FAQ</h1>
             <p className="text-muted-foreground text-lg">
               Find answers to common questions about Giway.
             </p>

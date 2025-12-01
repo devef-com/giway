@@ -43,9 +43,7 @@ export default function Header() {
             </Link>
           </h1>
         </div>
-        {process.env.NODE_ENV === 'development' && (
-          <ThemeSwitcher />
-        )}
+        {process.env.NODE_ENV === 'development' && <ThemeSwitcher />}
       </header>
 
       <aside

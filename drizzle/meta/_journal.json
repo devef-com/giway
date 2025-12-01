@@ -15,6 +15,13 @@
       "when": 1764437861190,
       "tag": "0001_huge_agent_zero",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1764563024299,
+      "tag": "0002_slippery_wilson_fisk",
+      "breakpoints": true
     }
   ]
 }

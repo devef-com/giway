@@ -138,6 +138,7 @@ export const packs = pgTable('packs', {
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  polarId: varchar('polar_id', { length: 250 }).unique(), // Polar product ID for subscriptions
 })
 
 // User balances table - tracks current available balance for users
