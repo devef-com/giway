@@ -91,7 +91,7 @@ export const Route = createFileRoute('/slot/$drawingId/')({
         ...(firstImage
           ? [
               { property: 'og:image', content: firstImage },
-              { property: 'og:image:width', content: '1200' },
+              { property: 'og:image:width', content: '1200' }, // 1.91:1 aspect ratio - width should be 1.9 X the height
               { property: 'og:image:height', content: '630' },
             ]
           : []),
@@ -460,7 +460,7 @@ function SlotDrawingParticipation() {
   // Drawing not found
   if (!drawing) {
     return (
-      <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 p-6">
+      <div className="min-h-screenp-6">
         <div className="max-w-7xl mx-auto">
           <Card className="p-6 bg-slate-800/50 border-slate-700">
             <p className="text-white text-center text-xl">Drawing not found</p>

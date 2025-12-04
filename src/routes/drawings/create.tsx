@@ -40,20 +40,24 @@ import {
   DrawerTrigger,
 } from '@/components/ui/drawer'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { authClient } from '@/lib/auth-client'
+// import { authClient } from '@/lib/auth-client'
 import useMobile from '@/hooks/useMobile'
 import { useUserBalance } from '@/querys/useUserBalance'
+import getSession from '@/server-fn/get-session'
 
 export const Route = createFileRoute('/drawings/create')({
   component: CreateDrawing,
+  loader: async () => {
+    const session = await getSession()
+    return { session }
+  },
 })
 
 function CreateDrawing() {
   const navigate = useNavigate()
-  const session = authClient.useSession()
-  const { data: balance, isLoading: isBalanceLoading } = useUserBalance(
-    !!session.data,
-  )
+  const { session } = Route.useLoaderData()
+  const { data: balance, isLoading: isBalanceLoading } =
+    useUserBalance(!!session)
   const [formData, setFormData] = useState({
     title: '',
     guidelines: [] as Array<string>,
@@ -293,26 +297,6 @@ function CreateDrawing() {
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  if (!session.data) {
-    return (
-      <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 p-6">
-        <div className="max-w-2xl mx-auto">
-          <Card className="p-6 bg-slate-800/50 border-slate-700">
-            <p className="text-white text-center">
-              Please log in to create a drawing.{' '}
-              <a
-                href="/authentication/login"
-                className="text-cyan-400 hover:text-cyan-300"
-              >
-                Login
-              </a>
-            </p>
-          </Card>
-        </div>
-      </div>
-    )
   }
 
   return (
