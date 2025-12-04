@@ -3,7 +3,15 @@ import { createServerFn } from '@tanstack/react-start'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { CircleAlert, Image, InfoIcon, Trophy } from 'lucide-react'
+import {
+  CircleAlert,
+  ImageIcon,
+  InfoIcon,
+  Trophy,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -82,13 +90,16 @@ export const Route = createFileRoute('/slot/$drawingId/')({
         { property: 'og:type', content: 'website' },
         ...(firstImage
           ? [
-            { property: 'og:image', content: firstImage },
-            { property: 'og:image:width', content: '1200' },
-            { property: 'og:image:height', content: '630' },
-          ]
+              { property: 'og:image', content: firstImage },
+              { property: 'og:image:width', content: '1200' },
+              { property: 'og:image:height', content: '630' },
+            ]
           : []),
         // Twitter Card tags
-        { name: 'twitter:card', content: firstImage ? 'summary_large_image' : 'summary' },
+        {
+          name: 'twitter:card',
+          content: firstImage ? 'summary_large_image' : 'summary',
+        },
         { name: 'twitter:title', content: title },
         { name: 'twitter:description', content: description },
         ...(firstImage ? [{ name: 'twitter:image', content: firstImage }] : []),
@@ -192,6 +203,8 @@ function SlotDrawingParticipation() {
     email: '',
     phone: '',
   })
+  const [galleryOpen, setGalleryOpen] = useState(false)
+  const [galleryIndex, setGalleryIndex] = useState(0)
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const floatingControlsRef = useRef<HTMLDivElement>(null)
@@ -444,7 +457,6 @@ function SlotDrawingParticipation() {
     participateMutation.mutate(registrationData)
   }
 
-
   // Drawing not found
   if (!drawing) {
     return (
@@ -479,7 +491,34 @@ function SlotDrawingParticipation() {
           hasEnded={hasDrawingEnded}
         />
         <div className="grid grid-cols-[max-content_1fr] items-center gap-4 mb-4">
-          <Image size={120} strokeWidth={0.7} />
+          {drawing.assets && drawing.assets.length > 0 ? (
+            <div
+              className="relative w-[120px] h-[120px] rounded-lg overflow-hidden cursor-pointer group"
+              onClick={() => {
+                setGalleryIndex(0)
+                setGalleryOpen(true)
+              }}
+            >
+              <img
+                src={drawing.assets[0].url}
+                alt={drawing.title}
+                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+              />
+              {drawing.assets.length > 1 && (
+                <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+                  +{drawing.assets.length - 1}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="w-[120px] h-[120px] rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+              <ImageIcon
+                size={48}
+                strokeWidth={0.7}
+                className="text-gray-400"
+              />
+            </div>
+          )}
           {drawing.guidelines && drawing.guidelines.length > 0 && (
             <div>
               <h2 className="font-regular mb-2 text-text-light-primary dark:text-text-dark-primary">
@@ -613,13 +652,14 @@ function SlotDrawingParticipation() {
                               className={`
                                 aspect-square w-full px-0 py-0 rounded-lg flex items-center justify-center 
                                 text-xl font-normal transition-colors duration-200 cursor-pointer
-                                border ${isSelected
-                                  ? 'bg-[#14b8a6] border-[#14b8a6] text-white'
-                                  : isTaken
-                                    ? 'bg-red-500/20 border-red-500/50 text-red-300 cursor-not-allowed'
-                                    : isReserved
-                                      ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300 cursor-not-allowed'
-                                      : 'border-border-light dark:border-border-dark text-text-light-primary dark:text-text-dark-primary bg-background-light dark:bg-background-dark hover:bg-[#14b8a6]/10'
+                                border ${
+                                  isSelected
+                                    ? 'bg-[#14b8a6] border-[#14b8a6] text-white'
+                                    : isTaken
+                                      ? 'bg-red-500/20 border-red-500/50 text-red-300 cursor-not-allowed'
+                                      : isReserved
+                                        ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300 cursor-not-allowed'
+                                        : 'border-border-light dark:border-border-dark text-text-light-primary dark:text-text-dark-primary bg-background-light dark:bg-background-dark hover:bg-[#14b8a6]/10'
                                 }
                               `}
                               style={{
@@ -690,10 +730,11 @@ function SlotDrawingParticipation() {
                     <button
                       key={i}
                       onClick={() => goToPage(i)}
-                      className={`rounded-full transition-all duration-200 cursor-pointer hover:opacity-80 ${i === currentPage
-                        ? 'w-3 h-3 bg-[#14b8a6]'
-                        : 'w-2.5 h-2.5 bg-border-light dark:bg-border-dark'
-                        }`}
+                      className={`rounded-full transition-all duration-200 cursor-pointer hover:opacity-80 ${
+                        i === currentPage
+                          ? 'w-3 h-3 bg-[#14b8a6]'
+                          : 'w-2.5 h-2.5 bg-border-light dark:bg-border-dark'
+                      }`}
                     />
                   ))}
                 </div>
@@ -788,6 +829,96 @@ function SlotDrawingParticipation() {
           display: none;
         }
       `}</style>
+
+      {/* Image Gallery Modal */}
+      {galleryOpen && drawing.assets && drawing.assets.length > 0 && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+          onClick={() => setGalleryOpen(false)}
+        >
+          {/* Close button */}
+          <button
+            className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
+            onClick={() => setGalleryOpen(false)}
+          >
+            <X size={32} />
+          </button>
+
+          {/* Image counter */}
+          <div className="absolute top-4 left-4 text-white text-sm">
+            {galleryIndex + 1} / {drawing.assets.length}
+          </div>
+
+          {/* Previous button */}
+          {drawing.assets.length > 1 && (
+            <button
+              className="absolute left-4 text-white hover:text-gray-300 p-2 disabled:opacity-30"
+              onClick={(e) => {
+                e.stopPropagation()
+                setGalleryIndex((prev) =>
+                  prev > 0 ? prev - 1 : drawing.assets.length - 1,
+                )
+              }}
+            >
+              <ChevronLeft size={40} />
+            </button>
+          )}
+
+          {/* Main image */}
+          <div
+            className="max-w-[90vw] max-h-[85vh] flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={drawing.assets[galleryIndex].url}
+              alt={`${drawing.title} - Image ${galleryIndex + 1}`}
+              className="max-w-full max-h-[85vh] object-contain rounded-lg"
+            />
+          </div>
+
+          {/* Next button */}
+          {drawing.assets.length > 1 && (
+            <button
+              className="absolute right-4 text-white hover:text-gray-300 p-2 disabled:opacity-30"
+              onClick={(e) => {
+                e.stopPropagation()
+                setGalleryIndex((prev) =>
+                  prev < drawing.assets.length - 1 ? prev + 1 : 0,
+                )
+              }}
+            >
+              <ChevronRight size={40} />
+            </button>
+          )}
+
+          {/* Thumbnail strip */}
+          {drawing.assets.length > 1 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 p-2 bg-black/50 rounded-lg">
+              {drawing.assets.map((asset, index) => (
+                <button
+                  key={asset.id}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setGalleryIndex(index)
+                  }}
+                  className={cn(
+                    'w-12 h-12 rounded overflow-hidden border-2 transition-all',
+                    index === galleryIndex
+                      ? 'border-white scale-110'
+                      : 'border-transparent opacity-60 hover:opacity-100',
+                  )}
+                >
+                  <img
+                    src={asset.url}
+                    alt={`Thumbnail ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
