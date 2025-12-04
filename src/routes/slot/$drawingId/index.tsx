@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -10,16 +11,73 @@ import { Card } from '@/components/ui/card'
 
 import { cn } from '@/lib/utils'
 import DrawingSlotHeader from '@/components/DrawingSlotHeader'
-import { useDrawing } from '@/querys/useDrawing'
 import { useDrawingStats } from '@/querys/useDrawingStats'
 import { useNumberSlots } from '@/querys/useNumberSlots'
 import { useReservationTime } from '@/querys/useReservationTime'
 import { useParticipate } from '@/querys/useParticipate'
 import { useDrawingWinners } from '@/querys/useDrawingWinners'
-import { Drawing } from '@/db/schema'
+import { Drawing, drawings, drawingAssets, assets } from '@/db/schema'
+import { db } from '@/db/index'
+import { eq } from 'drizzle-orm'
+
+const getDrawing = createServerFn({
+  method: 'GET',
+})
+  .inputValidator((drawingId: string) => drawingId)
+  .handler(async ({ data: drawingId }) => {
+    const result = await db
+      .select({
+        drawing: drawings,
+        asset: assets,
+      })
+      .from(drawings)
+      .leftJoin(drawingAssets, eq(drawingAssets.drawingId, drawings.id))
+      .leftJoin(assets, eq(assets.id, drawingAssets.assetId))
+      .where(eq(drawings.id, drawingId))
+
+    if (result.length === 0) {
+      return null
+    }
+
+    // Get the drawing data from the first result
+    const drawingData = result[0].drawing
+
+    // Collect all assets (filter out nulls from left join)
+    const drawingAssetsList = result
+      .map((r) => r.asset)
+      .filter((a): a is NonNullable<typeof a> => a !== null)
+
+    return { ...drawingData, assets: drawingAssetsList }
+  })
+
+type Asset = typeof assets.$inferSelect
 
 export const Route = createFileRoute('/slot/$drawingId/')({
   component: SlotDrawingParticipation,
+  loader: async ({ params }): Promise<Drawing & { assets: Asset[] }> => {
+    if (!params.drawingId) {
+      throw new Response('Drawing ID is required', { status: 400 })
+    }
+
+    const drawing = await getDrawing({ data: params.drawingId })
+
+    if (!drawing) {
+      throw new Response('Drawing not found', { status: 404 })
+    }
+
+    return drawing
+  },
+  head: (ctx) => ({
+    meta: [
+      {
+        title: `Join Giway - ${ctx.loaderData?.title || ''}`,
+      },
+      {
+        name: 'description',
+        content: `Join the giway for ${ctx.loaderData?.title || 'this event'}. ${ctx.loaderData?.playWithNumbers ? 'Reserve your number(s) and participate now!' : 'Participate now'}`,
+      },
+    ],
+  }),
 })
 
 interface FormProps {
@@ -105,6 +163,7 @@ const Form: React.FC<FormProps> = ({ formData, setFormData, drawing }) => {
 }
 
 function SlotDrawingParticipation() {
+  const drawing = Route.useLoaderData()
   const { drawingId } = Route.useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -125,7 +184,7 @@ function SlotDrawingParticipation() {
   const { data: reservationTimeData } = useReservationTime()
 
   // Fetch drawing details
-  const { data: drawing, isLoading: drawingLoading } = useDrawing(drawingId)
+  // const { data: drawing, isLoading: drawingLoading } = useDrawing(drawingId)
 
   // Check if drawing has ended
   const hasDrawingEnded = drawing ? new Date(drawing.endAt) < new Date() : false
@@ -368,21 +427,6 @@ function SlotDrawingParticipation() {
     participateMutation.mutate(registrationData)
   }
 
-  // Loading state
-  if (drawingLoading) {
-    return (
-      <div className="min-h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 p-6">
-        <div className="max-w-7xl mx-auto">
-          <Card className="p-6 bg-slate-800/50 border-slate-700">
-            <div className="flex items-center justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cyan-500"></div>
-              <p className="text-white ml-4">Loading drawing...</p>
-            </div>
-          </Card>
-        </div>
-      </div>
-    )
-  }
 
   // Drawing not found
   if (!drawing) {
@@ -407,6 +451,9 @@ function SlotDrawingParticipation() {
 
   return (
     <div className="relative bg-background-light dark:bg-background-dark font-display min-h-screen">
+      {/* <pre>
+        {JSON.stringify(drawing, null, 2)}
+      </pre> */}
       <div className="flex w-full flex-col p-4 sm:max-w-[600px] sm:mx-auto">
         {/* Drawing Details Card */}
         <DrawingSlotHeader
@@ -549,14 +596,13 @@ function SlotDrawingParticipation() {
                               className={`
                                 aspect-square w-full px-0 py-0 rounded-lg flex items-center justify-center 
                                 text-xl font-normal transition-colors duration-200 cursor-pointer
-                                border ${
-                                  isSelected
-                                    ? 'bg-[#14b8a6] border-[#14b8a6] text-white'
-                                    : isTaken
-                                      ? 'bg-red-500/20 border-red-500/50 text-red-300 cursor-not-allowed'
-                                      : isReserved
-                                        ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300 cursor-not-allowed'
-                                        : 'border-border-light dark:border-border-dark text-text-light-primary dark:text-text-dark-primary bg-background-light dark:bg-background-dark hover:bg-[#14b8a6]/10'
+                                border ${isSelected
+                                  ? 'bg-[#14b8a6] border-[#14b8a6] text-white'
+                                  : isTaken
+                                    ? 'bg-red-500/20 border-red-500/50 text-red-300 cursor-not-allowed'
+                                    : isReserved
+                                      ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300 cursor-not-allowed'
+                                      : 'border-border-light dark:border-border-dark text-text-light-primary dark:text-text-dark-primary bg-background-light dark:bg-background-dark hover:bg-[#14b8a6]/10'
                                 }
                               `}
                               style={{
@@ -627,11 +673,10 @@ function SlotDrawingParticipation() {
                     <button
                       key={i}
                       onClick={() => goToPage(i)}
-                      className={`rounded-full transition-all duration-200 cursor-pointer hover:opacity-80 ${
-                        i === currentPage
-                          ? 'w-3 h-3 bg-[#14b8a6]'
-                          : 'w-2.5 h-2.5 bg-border-light dark:bg-border-dark'
-                      }`}
+                      className={`rounded-full transition-all duration-200 cursor-pointer hover:opacity-80 ${i === currentPage
+                        ? 'w-3 h-3 bg-[#14b8a6]'
+                        : 'w-2.5 h-2.5 bg-border-light dark:bg-border-dark'
+                        }`}
                     />
                   ))}
                 </div>
