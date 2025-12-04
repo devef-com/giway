@@ -67,17 +67,34 @@ export const Route = createFileRoute('/slot/$drawingId/')({
 
     return drawing
   },
-  head: (ctx) => ({
-    meta: [
-      {
-        title: `Join Giway - ${ctx.loaderData?.title || ''}`,
-      },
-      {
-        name: 'description',
-        content: `Join the giway for ${ctx.loaderData?.title || 'this event'}. ${ctx.loaderData?.playWithNumbers ? 'Reserve your number(s) and participate now!' : 'Participate now'}`,
-      },
-    ],
-  }),
+  head: (ctx) => {
+    const title = `Join Giway - ${ctx.loaderData?.title || ''}`
+    const description = `Join the giway for ${ctx.loaderData?.title || 'this event'}. ${ctx.loaderData?.playWithNumbers ? 'Reserve your number(s) and participate now!' : 'Participate now'}`
+    const firstImage = ctx.loaderData?.assets?.[0]?.url
+
+    return {
+      meta: [
+        { title },
+        { name: 'description', content: description },
+        // Open Graph tags for social sharing (WhatsApp, Facebook, etc.)
+        { property: 'og:title', content: title },
+        { property: 'og:description', content: description },
+        { property: 'og:type', content: 'website' },
+        ...(firstImage
+          ? [
+            { property: 'og:image', content: firstImage },
+            { property: 'og:image:width', content: '1200' },
+            { property: 'og:image:height', content: '630' },
+          ]
+          : []),
+        // Twitter Card tags
+        { name: 'twitter:card', content: firstImage ? 'summary_large_image' : 'summary' },
+        { name: 'twitter:title', content: title },
+        { name: 'twitter:description', content: description },
+        ...(firstImage ? [{ name: 'twitter:image', content: firstImage }] : []),
+      ],
+    }
+  },
 })
 
 interface FormProps {
