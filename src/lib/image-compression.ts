@@ -1,5 +1,3 @@
-import imageCompression from 'browser-image-compression'
-
 // Server URL for image compression (from environment variable)
 const IMAGE_COMPRESS_HOST = import.meta.env.VITE_IMAGE_COMPRESS_HOST || ''
 
@@ -102,6 +100,8 @@ async function compressImageClient(
     ...options,
   }
 
+  // Dynamic import to avoid server-side bundling issues
+  const imageCompression = (await import('browser-image-compression')).default
   const compressedFile = await imageCompression(file, compressionOptions)
   return compressedFile
 }

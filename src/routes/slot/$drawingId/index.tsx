@@ -97,10 +97,10 @@ export const Route = createFileRoute('/slot/$drawingId/')({
         { property: 'og:type', content: 'website' },
         ...(ogImage
           ? [
-              { property: 'og:image', content: ogImage },
-              { property: 'og:image:width', content: '1200' }, // 1.91:1 aspect ratio - width should be 1.9 X the height
-              { property: 'og:image:height', content: '630' },
-            ]
+            { property: 'og:image', content: ogImage },
+            { property: 'og:image:width', content: '1200' }, // 1.91:1 aspect ratio - width should be 1.9 X the height
+            { property: 'og:image:height', content: '630' },
+          ]
           : []),
         // Twitter Card tags
         {
@@ -511,9 +511,9 @@ function SlotDrawingParticipation() {
                 alt={drawing.title}
                 className="w-full h-full object-cover transition-transform group-hover:scale-105"
               />
-              {drawing.assets.length > 1 && (
+              {drawing.assets.length > 2 && (
                 <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
-                  +{drawing.assets.length - 1}
+                  +{drawing.assets.length - 2}
                 </div>
               )}
             </div>
@@ -659,14 +659,13 @@ function SlotDrawingParticipation() {
                               className={`
                                 aspect-square w-full px-0 py-0 rounded-lg flex items-center justify-center 
                                 text-xl font-normal transition-colors duration-200 cursor-pointer
-                                border ${
-                                  isSelected
-                                    ? 'bg-[#14b8a6] border-[#14b8a6] text-white'
-                                    : isTaken
-                                      ? 'bg-red-500/20 border-red-500/50 text-red-300 cursor-not-allowed'
-                                      : isReserved
-                                        ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300 cursor-not-allowed'
-                                        : 'border-border-light dark:border-border-dark text-text-light-primary dark:text-text-dark-primary bg-background-light dark:bg-background-dark hover:bg-[#14b8a6]/10'
+                                border ${isSelected
+                                  ? 'bg-[#14b8a6] border-[#14b8a6] text-white'
+                                  : isTaken
+                                    ? 'bg-red-500/20 border-red-500/50 text-red-300 cursor-not-allowed'
+                                    : isReserved
+                                      ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300 cursor-not-allowed'
+                                      : 'border-border-light dark:border-border-dark text-text-light-primary dark:text-text-dark-primary bg-background-light dark:bg-background-dark hover:bg-[#14b8a6]/10'
                                 }
                               `}
                               style={{
@@ -737,11 +736,10 @@ function SlotDrawingParticipation() {
                     <button
                       key={i}
                       onClick={() => goToPage(i)}
-                      className={`rounded-full transition-all duration-200 cursor-pointer hover:opacity-80 ${
-                        i === currentPage
-                          ? 'w-3 h-3 bg-[#14b8a6]'
-                          : 'w-2.5 h-2.5 bg-border-light dark:bg-border-dark'
-                      }`}
+                      className={`rounded-full transition-all duration-200 cursor-pointer hover:opacity-80 ${i === currentPage
+                        ? 'w-3 h-3 bg-[#14b8a6]'
+                        : 'w-2.5 h-2.5 bg-border-light dark:bg-border-dark'
+                        }`}
                     />
                   ))}
                 </div>
@@ -877,7 +875,7 @@ function SlotDrawingParticipation() {
             onClick={(e) => e.stopPropagation()}
           >
             <img
-              src={drawing.assets[galleryIndex].url}
+              src={drawing.assets.filter((asset) => !asset.isCover)[galleryIndex].url}
               alt={`${drawing.title} - Image ${galleryIndex + 1}`}
               className="max-w-full max-h-[85vh] object-contain rounded-lg"
             />
@@ -901,7 +899,7 @@ function SlotDrawingParticipation() {
           {/* Thumbnail strip */}
           {drawing.assets.length > 1 && (
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 p-2 bg-black/50 rounded-lg">
-              {drawing.assets.map((asset, index) => (
+              {drawing.assets.filter((asset) => !asset.isCover).map((asset, index) => (
                 <button
                   key={asset.id}
                   onClick={(e) => {
