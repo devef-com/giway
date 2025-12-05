@@ -208,62 +208,78 @@ function CreateDrawing() {
 
         // Upload pending images if any (concurrently)
         if (pendingImages.length > 0) {
-          const uploadPromises = pendingImages.map(async (image) => {
-            try {
-              // 1. Get presigned upload URL
-              const uploadUrlResponse = await fetch(
-                `/api/drawings/${data.id}/upload`,
-                {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    mimeType: image.file.type,
-                    size: image.file.size,
-                  }),
-                },
-              )
-
-              if (!uploadUrlResponse.ok) {
-                const errorData = await uploadUrlResponse
-                  .json()
-                  .catch(() => ({}))
-                console.error(
-                  `Failed to get upload URL: ${uploadUrlResponse.status}`,
-                  errorData,
-                )
-                return { success: false, error: 'Failed to get upload URL' }
-              }
-
-              const { uploadUrl, s3Key, publicUrl } =
-                await uploadUrlResponse.json()
-
-              // 2. Upload file to S3/R2
-              const uploadResponse = await fetch(uploadUrl, {
-                method: 'PUT',
-                body: image.file,
-                headers: {
-                  'Content-Type': image.file.type,
-                },
-              })
-
-              if (!uploadResponse.ok) {
-                console.error(
-                  `Failed to upload to storage: ${uploadResponse.status}`,
-                )
-                return { success: false, error: 'Failed to upload to storage' }
-              }
-
-              // 3. Confirm upload and save asset metadata
-              await fetch(`/api/drawings/${data.id}/assets`, {
+          // Helper to upload a single file
+          const uploadSingleFile = async (
+            drawingId: string,
+            file: File,
+            isCover: boolean,
+          ) => {
+            // 1. Get presigned upload URL
+            const uploadUrlResponse = await fetch(
+              `/api/drawings/${drawingId}/upload`,
+              {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                  url: publicUrl,
-                  mimeType: image.file.type,
-                  size: image.file.size,
-                  s3Key,
+                  mimeType: file.type,
+                  size: file.size,
                 }),
-              })
+              },
+            )
+
+            if (!uploadUrlResponse.ok) {
+              const errorData = await uploadUrlResponse.json().catch(() => ({}))
+              console.error(
+                `Failed to get upload URL: ${uploadUrlResponse.status}`,
+                errorData,
+              )
+              throw new Error('Failed to get upload URL')
+            }
+
+            const { uploadUrl, s3Key, publicUrl } =
+              await uploadUrlResponse.json()
+
+            // 2. Upload file to S3/R2
+            const uploadResponse = await fetch(uploadUrl, {
+              method: 'PUT',
+              body: file,
+              headers: {
+                'Content-Type': file.type,
+              },
+            })
+
+            if (!uploadResponse.ok) {
+              console.error(
+                `Failed to upload to storage: ${uploadResponse.status}`,
+              )
+              throw new Error('Failed to upload to storage')
+            }
+
+            // 3. Confirm upload and save asset metadata
+            await fetch(`/api/drawings/${drawingId}/assets`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                url: publicUrl,
+                mimeType: file.type,
+                size: file.size,
+                s3Key,
+                isCover,
+              }),
+            })
+
+            return { publicUrl }
+          }
+
+          const uploadPromises = pendingImages.map(async (image) => {
+            try {
+              // Upload the main image (not cover)
+              await uploadSingleFile(data.id, image.file, false)
+
+              // If this image has a cover file, upload it too
+              if (image.isCover && image.coverFile) {
+                await uploadSingleFile(data.id, image.coverFile, true)
+              }
 
               return { success: true }
             } catch (uploadError) {

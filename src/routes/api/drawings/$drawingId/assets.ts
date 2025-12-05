@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { db } from '@/db/index'
 import { assets, drawingAssets, drawings } from '@/db/schema'
 import { auth } from '@/lib/auth'
-import { eq, and } from 'drizzle-orm'
+import { eq, and, ne } from 'drizzle-orm'
 import { deleteFile } from '@/lib/s3'
 
 export const Route = createFileRoute('/api/drawings/$drawingId/assets')({
@@ -33,9 +33,17 @@ export const Route = createFileRoute('/api/drawings/$drawingId/assets')({
             size: number
             s3Key: string
             sortOrder?: number
+            isCover?: boolean
           }
 
-          const { url, mimeType, size, s3Key, sortOrder = 0 } = body
+          const {
+            url,
+            mimeType,
+            size,
+            s3Key,
+            sortOrder = 0,
+            isCover = false,
+          } = body
 
           // Verify the drawing belongs to the user
           const drawing = await db
@@ -74,6 +82,14 @@ export const Route = createFileRoute('/api/drawings/$drawingId/assets')({
             })
             .returning()
 
+          // If this asset is set as cover, unset any existing cover for this drawing
+          if (isCover) {
+            await db
+              .update(drawingAssets)
+              .set({ isCover: false })
+              .where(eq(drawingAssets.drawingId, params.drawingId))
+          }
+
           // Create the drawing_asset junction record
           const [newDrawingAsset] = await db
             .insert(drawingAssets)
@@ -81,6 +97,7 @@ export const Route = createFileRoute('/api/drawings/$drawingId/assets')({
               drawingId: params.drawingId,
               assetId: newAsset.id,
               sortOrder,
+              isCover,
             })
             .returning()
 
@@ -113,6 +130,7 @@ export const Route = createFileRoute('/api/drawings/$drawingId/assets')({
             .select({
               id: drawingAssets.id,
               sortOrder: drawingAssets.sortOrder,
+              isCover: drawingAssets.isCover,
               createdAt: drawingAssets.createdAt,
               asset: {
                 id: assets.id,
@@ -135,6 +153,102 @@ export const Route = createFileRoute('/api/drawings/$drawingId/assets')({
           console.error('Error fetching assets:', error)
           return new Response(
             JSON.stringify({ error: 'Failed to fetch assets' }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } },
+          )
+        }
+      },
+
+      // Update an asset (set as cover)
+      PATCH: async ({
+        request,
+        params,
+      }: {
+        request: Request
+        params: { drawingId: string }
+      }) => {
+        const session = await auth.api.getSession({ headers: request.headers })
+
+        if (!session) {
+          return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        }
+
+        try {
+          const body = (await request.json()) as {
+            assetId: number
+            isCover?: boolean
+          }
+
+          const { assetId, isCover } = body
+
+          if (!assetId) {
+            return new Response(
+              JSON.stringify({ error: 'Asset ID is required' }),
+              { status: 400, headers: { 'Content-Type': 'application/json' } },
+            )
+          }
+
+          // Verify the drawing belongs to the user
+          const drawing = await db
+            .select()
+            .from(drawings)
+            .where(eq(drawings.id, params.drawingId))
+            .limit(1)
+
+          if (drawing.length === 0) {
+            return new Response(
+              JSON.stringify({ error: 'Drawing not found' }),
+              { status: 404, headers: { 'Content-Type': 'application/json' } },
+            )
+          }
+
+          if (drawing[0].userId !== session.user.id) {
+            return new Response(
+              JSON.stringify({
+                error:
+                  'You are not authorized to update assets for this drawing',
+              }),
+              { status: 403, headers: { 'Content-Type': 'application/json' } },
+            )
+          }
+
+          // If setting as cover, first unset all other covers for this drawing
+          if (isCover) {
+            await db
+              .update(drawingAssets)
+              .set({ isCover: false })
+              .where(eq(drawingAssets.drawingId, params.drawingId))
+          }
+
+          // Update the specific asset
+          const [updatedDrawingAsset] = await db
+            .update(drawingAssets)
+            .set({ isCover: isCover ?? false })
+            .where(
+              and(
+                eq(drawingAssets.drawingId, params.drawingId),
+                eq(drawingAssets.assetId, assetId),
+              ),
+            )
+            .returning()
+
+          if (!updatedDrawingAsset) {
+            return new Response(
+              JSON.stringify({ error: 'Asset not found for this drawing' }),
+              { status: 404, headers: { 'Content-Type': 'application/json' } },
+            )
+          }
+
+          return new Response(
+            JSON.stringify({ drawingAsset: updatedDrawingAsset }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
+          )
+        } catch (error) {
+          console.error('Error updating asset:', error)
+          return new Response(
+            JSON.stringify({ error: 'Failed to update asset' }),
             { status: 500, headers: { 'Content-Type': 'application/json' } },
           )
         }

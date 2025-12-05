@@ -26,7 +26,7 @@ import { useParticipate } from '@/querys/useParticipate'
 import { useDrawingWinners } from '@/querys/useDrawingWinners'
 import { Drawing, drawings, drawingAssets, assets } from '@/db/schema'
 import { db } from '@/db/index'
-import { eq } from 'drizzle-orm'
+import { eq, desc } from 'drizzle-orm'
 
 const getDrawing = createServerFn({
   method: 'GET',
@@ -37,11 +37,13 @@ const getDrawing = createServerFn({
       .select({
         drawing: drawings,
         asset: assets,
+        isCover: drawingAssets.isCover,
       })
       .from(drawings)
       .leftJoin(drawingAssets, eq(drawingAssets.drawingId, drawings.id))
       .leftJoin(assets, eq(assets.id, drawingAssets.assetId))
       .where(eq(drawings.id, drawingId))
+      .orderBy(desc(drawingAssets.isCover)) // Cover image comes first
 
     if (result.length === 0) {
       return null
@@ -50,15 +52,17 @@ const getDrawing = createServerFn({
     // Get the drawing data from the first result
     const drawingData = result[0].drawing
 
-    // Collect all assets (filter out nulls from left join)
+    // Collect all assets with cover info (filter out nulls from left join)
     const drawingAssetsList = result
-      .map((r) => r.asset)
+      .map((r) =>
+        r.asset ? { ...r.asset, isCover: r.isCover ?? false } : null,
+      )
       .filter((a): a is NonNullable<typeof a> => a !== null)
 
     return { ...drawingData, assets: drawingAssetsList }
   })
 
-type Asset = typeof assets.$inferSelect
+type Asset = typeof assets.$inferSelect & { isCover: boolean }
 
 export const Route = createFileRoute('/slot/$drawingId/')({
   component: SlotDrawingParticipation,
@@ -78,7 +82,10 @@ export const Route = createFileRoute('/slot/$drawingId/')({
   head: (ctx) => {
     const title = `Join Giway - ${ctx.loaderData?.title || ''}`
     const description = `Join the giway for ${ctx.loaderData?.title || 'this event'}. ${ctx.loaderData?.playWithNumbers ? 'Reserve your number(s) and participate now!' : 'Participate now'}`
-    const firstImage = ctx.loaderData?.assets?.[0]?.url
+
+    // Prefer cover image, fallback to first image
+    const coverImage = ctx.loaderData?.assets?.find((a) => a.isCover)?.url
+    const ogImage = coverImage || ctx.loaderData?.assets?.[0]?.url
 
     return {
       meta: [
@@ -88,9 +95,9 @@ export const Route = createFileRoute('/slot/$drawingId/')({
         { property: 'og:title', content: title },
         { property: 'og:description', content: description },
         { property: 'og:type', content: 'website' },
-        ...(firstImage
+        ...(ogImage
           ? [
-              { property: 'og:image', content: firstImage },
+              { property: 'og:image', content: ogImage },
               { property: 'og:image:width', content: '1200' }, // 1.91:1 aspect ratio - width should be 1.9 X the height
               { property: 'og:image:height', content: '630' },
             ]
@@ -98,11 +105,11 @@ export const Route = createFileRoute('/slot/$drawingId/')({
         // Twitter Card tags
         {
           name: 'twitter:card',
-          content: firstImage ? 'summary_large_image' : 'summary',
+          content: ogImage ? 'summary_large_image' : 'summary',
         },
         { name: 'twitter:title', content: title },
         { name: 'twitter:description', content: description },
-        ...(firstImage ? [{ name: 'twitter:image', content: firstImage }] : []),
+        ...(ogImage ? [{ name: 'twitter:image', content: ogImage }] : []),
       ],
     }
   },

@@ -54,7 +54,10 @@ export function ImageUpload({
   const [isCompressing, setIsCompressing] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [cropDialogOpen, setCropDialogOpen] = useState(false)
-  const [selectedImageForCrop, setSelectedImageForCrop] = useState<UploadedImage | null>(null)
+  const [selectedImageForCrop, setSelectedImageForCrop] =
+    useState<UploadedImage | null>(null)
+  const [cropDialogInitialMode, setCropDialogInitialMode] =
+    useState<CropMode>('free')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const dragCounterRef = useRef(0)
 
@@ -141,6 +144,19 @@ export function ImageUpload({
           const updatedImages = [...images, ...newImages]
           setImages(updatedImages)
           onImagesChange?.(updatedImages)
+
+          // Check if we need to set a cover
+          const hasCover = updatedImages.some(
+            (img) => img.isCover && img.coverFile,
+          )
+
+          if (!hasCover) {
+            // No cover set yet - open crop dialog for the first new image in cover mode
+            const firstNewImage = newImages[0]
+            setSelectedImageForCrop(firstNewImage)
+            setCropDialogInitialMode('cover')
+            setCropDialogOpen(true)
+          }
         }
       } finally {
         setIsCompressing(false)
@@ -220,10 +236,14 @@ export function ImageUpload({
     [onImagesChange],
   )
 
-  const openCropDialog = useCallback((image: UploadedImage) => {
-    setSelectedImageForCrop(image)
-    setCropDialogOpen(true)
-  }, [])
+  const openCropDialog = useCallback(
+    (image: UploadedImage, mode: CropMode = 'free') => {
+      setSelectedImageForCrop(image)
+      setCropDialogInitialMode(mode)
+      setCropDialogOpen(true)
+    },
+    [],
+  )
 
   const handleCropComplete = useCallback(
     (croppedBlob: Blob, mode: CropMode) => {
@@ -233,11 +253,9 @@ export function ImageUpload({
 
       if (mode === 'cover') {
         // Create cover file (1200x630 for OG meta)
-        const coverFile = new File(
-          [croppedBlob],
-          `cover-${timestamp}.webp`,
-          { type: 'image/webp' },
-        )
+        const coverFile = new File([croppedBlob], `cover-${timestamp}.webp`, {
+          type: 'image/webp',
+        })
         const coverPreviewUrl = createImagePreview(coverFile)
 
         setImages((prev) => {
@@ -272,11 +290,9 @@ export function ImageUpload({
         toast.success('Cover image set successfully!')
       } else {
         // Free crop - update the file to be uploaded
-        const editedFile = new File(
-          [croppedBlob],
-          `edited-${timestamp}.webp`,
-          { type: 'image/webp' },
-        )
+        const editedFile = new File([croppedBlob], `edited-${timestamp}.webp`, {
+          type: 'image/webp',
+        })
         const editedPreviewUrl = createImagePreview(editedFile)
 
         setImages((prev) => {
@@ -321,60 +337,73 @@ export function ImageUpload({
           ),
         )
 
-        // 1. Get presigned upload URL
-        const uploadUrlResponse = await fetch(
-          `/api/drawings/${drawingId}/upload`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              mimeType: image.file.type,
-              size: image.file.size,
-            }),
-          },
-        )
+        // Helper function to upload a single file
+        const uploadSingleFile = async (file: File, isCover: boolean) => {
+          // 1. Get presigned upload URL
+          const uploadUrlResponse = await fetch(
+            `/api/drawings/${drawingId}/upload`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                mimeType: file.type,
+                size: file.size,
+              }),
+            },
+          )
 
-        if (!uploadUrlResponse.ok) {
-          const error = await uploadUrlResponse.json()
-          throw new Error(error.error || 'Failed to get upload URL')
+          if (!uploadUrlResponse.ok) {
+            const error = await uploadUrlResponse.json()
+            throw new Error(error.error || 'Failed to get upload URL')
+          }
+
+          const { uploadUrl, s3Key, publicUrl } = await uploadUrlResponse.json()
+
+          // 2. Upload file to S3/R2
+          const uploadResponse = await fetch(uploadUrl, {
+            method: 'PUT',
+            body: file,
+            headers: {
+              'Content-Type': file.type,
+            },
+          })
+
+          if (!uploadResponse.ok) {
+            throw new Error('Failed to upload file to storage')
+          }
+
+          // 3. Confirm upload and save asset metadata
+          const confirmResponse = await fetch(
+            `/api/drawings/${drawingId}/assets`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                url: publicUrl,
+                mimeType: file.type,
+                size: file.size,
+                s3Key,
+                isCover,
+              }),
+            },
+          )
+
+          if (!confirmResponse.ok) {
+            const error = await confirmResponse.json()
+            throw new Error(error.error || 'Failed to save asset')
+          }
+
+          const { asset } = await confirmResponse.json()
+          return { asset, publicUrl }
         }
 
-        const { uploadUrl, s3Key, publicUrl } = await uploadUrlResponse.json()
+        // Upload the main image (not cover)
+        const { asset, publicUrl } = await uploadSingleFile(image.file, false)
 
-        // 2. Upload file to S3/R2
-        const uploadResponse = await fetch(uploadUrl, {
-          method: 'PUT',
-          body: image.file,
-          headers: {
-            'Content-Type': image.file.type,
-          },
-        })
-
-        if (!uploadResponse.ok) {
-          throw new Error('Failed to upload file to storage')
+        // If this image has a cover file, upload it too
+        if (image.isCover && image.coverFile) {
+          await uploadSingleFile(image.coverFile, true)
         }
-
-        // 3. Confirm upload and save asset metadata
-        const confirmResponse = await fetch(
-          `/api/drawings/${drawingId}/assets`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              url: publicUrl,
-              mimeType: image.file.type,
-              size: image.file.size,
-              s3Key,
-            }),
-          },
-        )
-
-        if (!confirmResponse.ok) {
-          const error = await confirmResponse.json()
-          throw new Error(error.error || 'Failed to save asset')
-        }
-
-        const { asset } = await confirmResponse.json()
 
         const uploadedImage: UploadedImage = {
           ...image,
@@ -405,6 +434,18 @@ export function ImageUpload({
 
   const uploadAllImages = useCallback(async () => {
     const pendingImages = images.filter((img) => img.status === 'pending')
+
+    // Check if a cover is set
+    const hasCover = images.some((img) => img.isCover && img.coverFile)
+    if (!hasCover && pendingImages.length > 0) {
+      toast.error('Please set a cover image before uploading')
+      // Open crop dialog for first pending image in cover mode
+      const firstPending = pendingImages[0]
+      setSelectedImageForCrop(firstPending)
+      setCropDialogInitialMode('cover')
+      setCropDialogOpen(true)
+      return
+    }
 
     const results = await Promise.allSettled(
       pendingImages.map((image) => uploadImage(image)),
@@ -445,14 +486,18 @@ export function ImageUpload({
       {images.length > 0 && (
         <>
           <p className="text-xs text-muted-foreground">
-            Click the crop icon to edit an image.{images.length > 1 ? ' You can also set one as cover for social sharing.' : ''}
+            Click the crop icon to edit an image.
+            {images.length > 1
+              ? ' You can also set one as cover for social sharing.'
+              : ''}
           </p>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
             {images.map((image) => (
               <Card
                 key={image.id}
-                className={`group relative aspect-square overflow-hidden p-0 ${image.isCover ? 'ring-2 ring-primary ring-offset-2' : ''
-                  }`}
+                className={`group relative aspect-square overflow-hidden p-0 ${
+                  image.isCover ? 'ring-2 ring-primary ring-offset-2' : ''
+                }`}
               >
                 <img
                   src={image.previewUrl}
@@ -512,12 +557,13 @@ export function ImageUpload({
       {/* Upload area */}
       {canAddMore && (
         <div
-          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${disabled || isCompressing
-            ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
-            : isDragging
-              ? 'border-primary bg-primary/10 cursor-pointer'
-              : 'border-gray-300 hover:border-primary cursor-pointer'
-            }`}
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+            disabled || isCompressing
+              ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
+              : isDragging
+                ? 'border-primary bg-primary/10 cursor-pointer'
+                : 'border-gray-300 hover:border-primary cursor-pointer'
+          }`}
           onClick={() =>
             !disabled && !isCompressing && fileInputRef.current?.click()
           }
@@ -556,10 +602,15 @@ export function ImageUpload({
       {selectedImageForCrop && (
         <ImageCropDialog
           open={cropDialogOpen}
-          onOpenChange={setCropDialogOpen}
+          onOpenChange={(open) => {
+            setCropDialogOpen(open)
+            if (!open) {
+              setSelectedImageForCrop(null)
+            }
+          }}
           imageSrc={selectedImageForCrop.originalPreviewUrl}
           onCropComplete={handleCropComplete}
-          initialMode={images.length > 1 ? 'free' : 'free'}
+          initialMode={cropDialogInitialMode}
         />
       )}
     </div>

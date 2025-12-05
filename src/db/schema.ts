@@ -51,6 +51,7 @@ export const drawingAssets = pgTable('drawing_assets', {
     .notNull()
     .references(() => assets.id, { onDelete: 'cascade' }),
   sortOrder: integer('sort_order').default(0), // For ordering images
+  isCover: boolean('is_cover').default(false), // Only one per drawing, used for OG meta image
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 

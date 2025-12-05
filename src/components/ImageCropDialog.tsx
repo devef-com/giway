@@ -109,7 +109,15 @@ export function ImageCropDialog({
     } finally {
       setIsProcessing(false)
     }
-  }, [croppedAreaPixels, rotation, imageSrc, mode, onCropComplete, onOpenChange, initialMode])
+  }, [
+    croppedAreaPixels,
+    rotation,
+    imageSrc,
+    mode,
+    onCropComplete,
+    onOpenChange,
+    initialMode,
+  ])
 
   const handleClose = useCallback(() => {
     onOpenChange(false)
@@ -122,7 +130,10 @@ export function ImageCropDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[95vh] overflow-y-auto" showCloseButton={false}>
+      <DialogContent
+        className="max-w-2xl max-h-[95vh] overflow-y-auto"
+        showCloseButton={false}
+      >
         <DialogHeader>
           <DialogTitle>Edit Image</DialogTitle>
           <DialogDescription>
@@ -153,7 +164,8 @@ export function ImageCropDialog({
 
           {mode === 'cover' && (
             <p className="text-xs text-muted-foreground">
-              Cover images are used for social sharing (Open Graph). Output: 1200×630px
+              Cover images are used for social sharing (Open Graph). Output:
+              1200×630px
             </p>
           )}
 
@@ -245,18 +257,14 @@ export function ImageCropDialog({
                 <RotateCw className="h-4 w-4" />
               </Button>
               <span className="text-sm text-muted-foreground w-10 text-right">
-                {rotation}°
+                {Math.round(rotation)}°
               </span>
             </div>
           </div>
         </div>
 
         <DialogFooter className="gap-2 sm:gap-0">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-          >
+          <Button type="button" variant="outline" onClick={handleClose}>
             Cancel
           </Button>
           <Button
@@ -264,7 +272,11 @@ export function ImageCropDialog({
             onClick={handleSave}
             disabled={isProcessing || !croppedAreaPixels}
           >
-            {isProcessing ? 'Processing...' : mode === 'cover' ? 'Set as Cover' : 'Apply'}
+            {isProcessing
+              ? 'Processing...'
+              : mode === 'cover'
+                ? 'Set as Cover'
+                : 'Apply'}
           </Button>
         </DialogFooter>
       </DialogContent>
