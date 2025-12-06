@@ -1,8 +1,16 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
 import ThemeSwitcher from './ThemeSwitcher'
 import { cn } from '@/lib/utils'
+
+const NOT_VISIBLE_AT = [
+  '/',
+  '/authentication/login',
+  '/authentication/register',
+  '/slot/*',
+  '/s/*',
+]
 
 const Logo = () => (
   <Link to="/" className="inline-flex items-center gap-2">
@@ -48,6 +56,21 @@ const NavLink = ({ to, children, onClick, isMobile = false }: NavLinkProps) => (
 )
 
 export default function Header() {
+  const location = useLocation()
+  const currentPath = location.pathname
+
+  const isNavVisible = () => {
+    const patterns = NOT_VISIBLE_AT.map((path) => {
+      if (path.includes('*')) {
+        const regexStr = path.replace(/\*/g, '.*')
+        return new RegExp(`^${regexStr}$`)
+      } else {
+        return new RegExp(`^${path}$`)
+      }
+    })
+    return !patterns.some((pattern) => pattern.test(currentPath))
+  }
+
   const [isOpen, setIsOpen] = useState(false)
 
   // Close menu on escape key
@@ -77,13 +100,15 @@ export default function Header() {
         <div className="flex h-14 items-center justify-between px-4">
           {/* Mobile: Hamburger + Logo */}
           <div className="flex items-center gap-2 md:hidden">
-            <button
-              onClick={() => setIsOpen(true)}
-              className="p-2 -ml-2 text-foreground hover:bg-muted rounded-lg transition-colors"
-              aria-label="Open menu"
-            >
-              <Menu size={20} />
-            </button>
+            {isNavVisible() && (
+              <button
+                onClick={() => setIsOpen(true)}
+                className="p-2 -ml-2 text-foreground hover:bg-muted rounded-lg transition-colors"
+                aria-label="Open menu"
+              >
+                <Menu size={20} />
+              </button>
+            )}
             <Logo />
           </div>
 
@@ -93,12 +118,14 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex md:items-center md:gap-6">
-            <NavLink to="/">Home</NavLink>
-            <NavLink to="/drawings">Drawings</NavLink>
-            <NavLink to="/store">Store</NavLink>
-            <NavLink to="/account">Account</NavLink>
-          </nav>
+          {isNavVisible() && (
+            <nav className="hidden md:flex md:items-center md:gap-6">
+              <NavLink to="/">Home</NavLink>
+              <NavLink to="/drawings">Drawings</NavLink>
+              <NavLink to="/store">Store</NavLink>
+              <NavLink to="/account">Account</NavLink>
+            </nav>
+          )}
 
           {/* Desktop Theme Switcher (dev only) */}
           {process.env.NODE_ENV === 'production' ? (
@@ -147,20 +174,22 @@ export default function Header() {
         </div>
 
         {/* Navigation Links */}
-        <nav className="flex-1 p-4 overflow-y-auto space-y-1">
-          <NavLink to="/" onClick={() => setIsOpen(false)} isMobile>
-            Home
-          </NavLink>
-          <NavLink to="/drawings" onClick={() => setIsOpen(false)} isMobile>
-            Drawings
-          </NavLink>
-          <NavLink to="/store" onClick={() => setIsOpen(false)} isMobile>
-            Store
-          </NavLink>
-          <NavLink to="/account" onClick={() => setIsOpen(false)} isMobile>
-            Account
-          </NavLink>
-        </nav>
+        {isNavVisible() && (
+          <nav className="flex-1 p-4 overflow-y-auto space-y-1">
+            <NavLink to="/" onClick={() => setIsOpen(false)} isMobile>
+              Home
+            </NavLink>
+            <NavLink to="/drawings" onClick={() => setIsOpen(false)} isMobile>
+              Drawings
+            </NavLink>
+            <NavLink to="/store" onClick={() => setIsOpen(false)} isMobile>
+              Store
+            </NavLink>
+            <NavLink to="/account" onClick={() => setIsOpen(false)} isMobile>
+              Account
+            </NavLink>
+          </nav>
+        )}
 
         {/* Theme Switcher */}
         <div className="p-4 border-t border-border">
