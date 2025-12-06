@@ -15,6 +15,7 @@ import { Route as CoffeeRouteImport } from './routes/coffee'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DrawingsIndexRouteImport } from './routes/drawings/index'
 import { Route as AuthenticationIndexRouteImport } from './routes/authentication/index'
+import { Route as AccountIndexRouteImport } from './routes/account/index'
 import { Route as DrawingsCreateRouteImport } from './routes/drawings/create'
 import { Route as DemoTanstackQueryRouteImport } from './routes/demo/tanstack-query'
 import { Route as DemoNeonRouteImport } from './routes/demo/neon'
@@ -83,6 +84,11 @@ const DrawingsIndexRoute = DrawingsIndexRouteImport.update({
 const AuthenticationIndexRoute = AuthenticationIndexRouteImport.update({
   id: '/authentication/',
   path: '/authentication/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountIndexRoute = AccountIndexRouteImport.update({
+  id: '/account/',
+  path: '/account/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DrawingsCreateRoute = DrawingsCreateRouteImport.update({
@@ -307,6 +313,7 @@ export interface FileRoutesByFullPath {
   '/demo/neon': typeof DemoNeonRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/drawings/create': typeof DrawingsCreateRoute
+  '/account': typeof AccountIndexRoute
   '/authentication': typeof AuthenticationIndexRoute
   '/drawings': typeof DrawingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -354,6 +361,7 @@ export interface FileRoutesByTo {
   '/demo/neon': typeof DemoNeonRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/drawings/create': typeof DrawingsCreateRoute
+  '/account': typeof AccountIndexRoute
   '/authentication': typeof AuthenticationIndexRoute
   '/drawings': typeof DrawingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -402,6 +410,7 @@ export interface FileRoutesById {
   '/demo/neon': typeof DemoNeonRoute
   '/demo/tanstack-query': typeof DemoTanstackQueryRoute
   '/drawings/create': typeof DrawingsCreateRoute
+  '/account/': typeof AccountIndexRoute
   '/authentication/': typeof AuthenticationIndexRoute
   '/drawings/': typeof DrawingsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -451,6 +460,7 @@ export interface FileRouteTypes {
     | '/demo/neon'
     | '/demo/tanstack-query'
     | '/drawings/create'
+    | '/account'
     | '/authentication'
     | '/drawings'
     | '/api/auth/$'
@@ -498,6 +508,7 @@ export interface FileRouteTypes {
     | '/demo/neon'
     | '/demo/tanstack-query'
     | '/drawings/create'
+    | '/account'
     | '/authentication'
     | '/drawings'
     | '/api/auth/$'
@@ -545,6 +556,7 @@ export interface FileRouteTypes {
     | '/demo/neon'
     | '/demo/tanstack-query'
     | '/drawings/create'
+    | '/account/'
     | '/authentication/'
     | '/drawings/'
     | '/api/auth/$'
@@ -593,6 +605,7 @@ export interface RootRouteChildren {
   DemoNeonRoute: typeof DemoNeonRoute
   DemoTanstackQueryRoute: typeof DemoTanstackQueryRoute
   DrawingsCreateRoute: typeof DrawingsCreateRoute
+  AccountIndexRoute: typeof AccountIndexRoute
   AuthenticationIndexRoute: typeof AuthenticationIndexRoute
   DrawingsIndexRoute: typeof DrawingsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -662,6 +675,13 @@ declare module '@tanstack/react-router' {
       path: '/authentication'
       fullPath: '/authentication'
       preLoaderRoute: typeof AuthenticationIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account/': {
+      id: '/account/'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/drawings/create': {
@@ -981,6 +1001,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoNeonRoute: DemoNeonRoute,
   DemoTanstackQueryRoute: DemoTanstackQueryRoute,
   DrawingsCreateRoute: DrawingsCreateRoute,
+  AccountIndexRoute: AccountIndexRoute,
   AuthenticationIndexRoute: AuthenticationIndexRoute,
   DrawingsIndexRoute: DrawingsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

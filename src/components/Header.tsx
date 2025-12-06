@@ -97,6 +97,7 @@ export default function Header() {
             <NavLink to="/">Home</NavLink>
             <NavLink to="/drawings">Drawings</NavLink>
             <NavLink to="/store">Store</NavLink>
+            <NavLink to="/account">Account</NavLink>
           </nav>
 
           {/* Desktop Theme Switcher (dev only) */}
@@ -155,6 +156,9 @@ export default function Header() {
           </NavLink>
           <NavLink to="/store" onClick={() => setIsOpen(false)} isMobile>
             Store
+          </NavLink>
+          <NavLink to="/account" onClick={() => setIsOpen(false)} isMobile>
+            Account
           </NavLink>
         </nav>
 
