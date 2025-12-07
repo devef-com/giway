@@ -5,8 +5,10 @@ import {
   AlertCircle,
   CalendarIcon,
   EraserIcon,
+  Loader2,
   Pencil,
   PlusIcon,
+  Ticket,
   Trash2,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -42,8 +44,14 @@ import {
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 // import { authClient } from '@/lib/auth-client'
 import useMobile from '@/hooks/useMobile'
+import { useRedeemCoupon } from '@/querys/useRedeemCoupon'
 import { useUserBalance } from '@/querys/useUserBalance'
 import getSession from '@/server-fn/get-session'
+import {
+  Expandable,
+  ExpandableContent,
+  ExpandableTitle,
+} from '@/components/ui/expandable'
 
 export const Route = createFileRoute('/drawings/create')({
   component: CreateDrawing,
@@ -65,7 +73,7 @@ function CreateDrawing() {
     price: 0,
     winnerSelection: 'system' as 'manually' | 'system',
     quantityOfNumbers: 100,
-    playWithNumbers: false,
+    playWithNumbers: true,
     winnersAmount: 1,
     winnerNumbers: [] as Array<number>,
     endAt: '',
@@ -83,6 +91,24 @@ function CreateDrawing() {
   const [endAtError, setEndAtError] = useState('')
   const [balanceError, setBalanceError] = useState('')
   const [pendingImages, setPendingImages] = useState<Array<UploadedImage>>([])
+  const [couponCode, setCouponCode] = useState('')
+  const redeemCoupon = useRedeemCoupon()
+
+  const handleRedeemCoupon = async () => {
+    if (!couponCode.trim()) return
+
+    try {
+      const result = await redeemCoupon.mutateAsync({ code: couponCode.trim() })
+      toast.success(result.message, {
+        description: `+${result.rewards.participants} participants, +${result.rewards.images} images`,
+      })
+      setCouponCode('')
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to redeem coupon',
+      )
+    }
+  }
 
   // Calculate max participants available based on play mode
   const maxParticipants = formData.playWithNumbers
@@ -323,7 +349,7 @@ function CreateDrawing() {
 
           {/* Balance Info */}
           {!isBalanceLoading && balance && (
-            <div className="mb-6 p-4 rounded-lg border bg-muted/50">
+            <div className=" p-4 rounded-lg border bg-muted/50">
               <div className="flex justify-between items-center">
                 <div>
                   <p className="text-sm font-medium">Your Balance</p>
@@ -341,6 +367,44 @@ function CreateDrawing() {
               </div>
             </div>
           )}
+
+          {/* Coupon Code Section */}
+          <Expandable title="Have a coupon code?">
+            <ExpandableTitle className="flex">
+              <span className="flex gap-2 items-center">
+                <Ticket className="h-4 w-4" />
+                Have a coupon?
+              </span>
+            </ExpandableTitle>
+            <ExpandableContent>
+              <div className="flex gap-2 mt-2">
+                <Input
+                  placeholder="Enter coupon code"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  className="flex-1"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleRedeemCoupon()
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleRedeemCoupon}
+                  disabled={!couponCode.trim() || redeemCoupon.isPending}
+                >
+                  {redeemCoupon.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Redeem'
+                  )}
+                </Button>
+              </div>
+            </ExpandableContent>
+          </Expandable>
 
           {balanceError && (
             <Alert variant="destructive" className="mb-6">
@@ -469,7 +533,7 @@ function CreateDrawing() {
             {/* Paid Event Switch */}
             <div className="flex items-center justify-between rounded-lg border p-4">
               <Label htmlFor="isPaid" className="flex-1">
-                Pago
+                Paid
               </Label>
               <Switch
                 id="isPaid"
@@ -544,7 +608,7 @@ function CreateDrawing() {
                 <Input
                   id="quantityOfNumbers"
                   type="number"
-                  min="50"
+                  // min="50"
                   max={maxParticipants > 0 ? maxParticipants : 500}
                   value={formData.quantityOfNumbers}
                   onChange={(e) => {

@@ -2,10 +2,10 @@
 // See: https://polar.sh/docs/integrate/sdk/adapters/tanstack-start
 import { Webhooks } from '@polar-sh/tanstack-start'
 import { createFileRoute } from '@tanstack/react-router'
-import { eq, and, sql } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
 import { db } from '@/db/index'
-import { packs, userBalances, packRedemptions } from '@/db/schema'
+import { packs, packRedemptions } from '@/db/schema'
 
 export const Route = createFileRoute('/api/webhook/polar')({
   server: {
@@ -50,7 +50,7 @@ export const Route = createFileRoute('/api/webhook/polar')({
             return
           }
 
-          // Record the pack redemption
+          // Record the pack redemption (balance is calculated from redemptions - consumptions)
           await db.insert(packRedemptions).values({
             userId,
             packId: pack.id,
@@ -61,43 +61,6 @@ export const Route = createFileRoute('/api/webhook/polar')({
             emails: pack.emails,
             amountPaid: pack.price,
           })
-
-          // Update or create user balance
-          const existingBalance = await db
-            .select()
-            .from(userBalances)
-            .where(
-              and(
-                eq(userBalances.userId, userId),
-                eq(userBalances.giwayType, pack.giwayType),
-              ),
-            )
-            .limit(1)
-
-          if (existingBalance.length > 0) {
-            await db
-              .update(userBalances)
-              .set({
-                participants: sql`${userBalances.participants} + ${pack.participants}`,
-                images: sql`${userBalances.images} + ${pack.images}`,
-                emails: sql`${userBalances.emails} + ${pack.emails}`,
-                updatedAt: new Date(),
-              })
-              .where(
-                and(
-                  eq(userBalances.userId, userId),
-                  eq(userBalances.giwayType, pack.giwayType),
-                ),
-              )
-          } else {
-            await db.insert(userBalances).values({
-              userId,
-              giwayType: pack.giwayType,
-              participants: pack.participants,
-              images: pack.images,
-              emails: pack.emails,
-            })
-          }
 
           console.log(`Successfully processed pack purchase for user ${userId}`)
         },

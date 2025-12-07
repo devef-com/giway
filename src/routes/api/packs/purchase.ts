@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { eq, and, sql } from 'drizzle-orm'
+import { eq, and } from 'drizzle-orm'
 
 import { db } from '@/db/index'
-import { packs, userBalances, packRedemptions } from '@/db/schema'
+import { packs, packRedemptions } from '@/db/schema'
 import { auth } from '@/lib/auth'
 
 // Type for Google Pay payment token
@@ -94,7 +94,7 @@ export const Route = createFileRoute('/api/packs/purchase')({
           // Simulate payment processing delay
           await new Promise((resolve) => setTimeout(resolve, 500))
 
-          // Record the pack redemption
+          // Record the pack redemption (balance is calculated from redemptions - consumptions)
           const [redemption] = await db
             .insert(packRedemptions)
             .values({
@@ -108,45 +108,6 @@ export const Route = createFileRoute('/api/packs/purchase')({
               amountPaid: pack.price,
             })
             .returning()
-
-          // Update or create user balance
-          const existingBalance = await db
-            .select()
-            .from(userBalances)
-            .where(
-              and(
-                eq(userBalances.userId, userId),
-                eq(userBalances.giwayType, pack.giwayType),
-              ),
-            )
-            .limit(1)
-
-          if (existingBalance.length > 0) {
-            // Update existing balance
-            await db
-              .update(userBalances)
-              .set({
-                participants: sql`${userBalances.participants} + ${pack.participants}`,
-                images: sql`${userBalances.images} + ${pack.images}`,
-                emails: sql`${userBalances.emails} + ${pack.emails}`,
-                updatedAt: new Date(),
-              })
-              .where(
-                and(
-                  eq(userBalances.userId, userId),
-                  eq(userBalances.giwayType, pack.giwayType),
-                ),
-              )
-          } else {
-            // Create new balance
-            await db.insert(userBalances).values({
-              userId,
-              giwayType: pack.giwayType,
-              participants: pack.participants,
-              images: pack.images,
-              emails: pack.emails,
-            })
-          }
 
           return new Response(
             JSON.stringify({

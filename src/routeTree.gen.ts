@@ -34,12 +34,15 @@ import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
 import { Route as ApiWebhookPolarRouteImport } from './routes/api/webhook.polar'
+import { Route as ApiUserMonthlyAllowanceRouteImport } from './routes/api/user/monthly-allowance'
 import { Route as ApiUserBalanceRouteImport } from './routes/api/user/balance'
 import { Route as ApiParticipantParticipantIdRouteImport } from './routes/api/participant.$participantId'
 import { Route as ApiPacksPurchaseRouteImport } from './routes/api/packs/purchase'
 import { Route as ApiDrawingsReservationTimeRouteImport } from './routes/api/drawings/reservation-time'
 import { Route as ApiDrawingsDrawingIdRouteImport } from './routes/api/drawings/$drawingId'
+import { Route as ApiCouponsRedeemRouteImport } from './routes/api/coupons/redeem'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiAdsRedeemRouteImport } from './routes/api/ads/redeem'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
 import { Route as DrawingsDrawingIdPParticipateIdRouteImport } from './routes/drawings/$drawingId/p.$participateId'
 import { Route as DrawingsDrawingIdMParticipantRouteImport } from './routes/drawings/$drawingId/m.$participant'
@@ -182,6 +185,11 @@ const ApiWebhookPolarRoute = ApiWebhookPolarRouteImport.update({
   path: '/api/webhook/polar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiUserMonthlyAllowanceRoute = ApiUserMonthlyAllowanceRouteImport.update({
+  id: '/api/user/monthly-allowance',
+  path: '/api/user/monthly-allowance',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiUserBalanceRoute = ApiUserBalanceRouteImport.update({
   id: '/api/user/balance',
   path: '/api/user/balance',
@@ -209,9 +217,19 @@ const ApiDrawingsDrawingIdRoute = ApiDrawingsDrawingIdRouteImport.update({
   path: '/api/drawings/$drawingId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCouponsRedeemRoute = ApiCouponsRedeemRouteImport.update({
+  id: '/api/coupons/redeem',
+  path: '/api/coupons/redeem',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdsRedeemRoute = ApiAdsRedeemRouteImport.update({
+  id: '/api/ads/redeem',
+  path: '/api/ads/redeem',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
@@ -316,12 +334,15 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountIndexRoute
   '/authentication': typeof AuthenticationIndexRoute
   '/drawings': typeof DrawingsIndexRoute
+  '/api/ads/redeem': typeof ApiAdsRedeemRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/coupons/redeem': typeof ApiCouponsRedeemRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
   '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
+  '/api/user/monthly-allowance': typeof ApiUserMonthlyAllowanceRoute
   '/api/webhook/polar': typeof ApiWebhookPolarRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -364,12 +385,15 @@ export interface FileRoutesByTo {
   '/account': typeof AccountIndexRoute
   '/authentication': typeof AuthenticationIndexRoute
   '/drawings': typeof DrawingsIndexRoute
+  '/api/ads/redeem': typeof ApiAdsRedeemRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/coupons/redeem': typeof ApiCouponsRedeemRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
   '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
+  '/api/user/monthly-allowance': typeof ApiUserMonthlyAllowanceRoute
   '/api/webhook/polar': typeof ApiWebhookPolarRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -413,12 +437,15 @@ export interface FileRoutesById {
   '/account/': typeof AccountIndexRoute
   '/authentication/': typeof AuthenticationIndexRoute
   '/drawings/': typeof DrawingsIndexRoute
+  '/api/ads/redeem': typeof ApiAdsRedeemRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/coupons/redeem': typeof ApiCouponsRedeemRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
   '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
+  '/api/user/monthly-allowance': typeof ApiUserMonthlyAllowanceRoute
   '/api/webhook/polar': typeof ApiWebhookPolarRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -463,12 +490,15 @@ export interface FileRouteTypes {
     | '/account'
     | '/authentication'
     | '/drawings'
+    | '/api/ads/redeem'
     | '/api/auth/$'
+    | '/api/coupons/redeem'
     | '/api/drawings/$drawingId'
     | '/api/drawings/reservation-time'
     | '/api/packs/purchase'
     | '/api/participant/$participantId'
     | '/api/user/balance'
+    | '/api/user/monthly-allowance'
     | '/api/webhook/polar'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -511,12 +541,15 @@ export interface FileRouteTypes {
     | '/account'
     | '/authentication'
     | '/drawings'
+    | '/api/ads/redeem'
     | '/api/auth/$'
+    | '/api/coupons/redeem'
     | '/api/drawings/$drawingId'
     | '/api/drawings/reservation-time'
     | '/api/packs/purchase'
     | '/api/participant/$participantId'
     | '/api/user/balance'
+    | '/api/user/monthly-allowance'
     | '/api/webhook/polar'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -559,12 +592,15 @@ export interface FileRouteTypes {
     | '/account/'
     | '/authentication/'
     | '/drawings/'
+    | '/api/ads/redeem'
     | '/api/auth/$'
+    | '/api/coupons/redeem'
     | '/api/drawings/$drawingId'
     | '/api/drawings/reservation-time'
     | '/api/packs/purchase'
     | '/api/participant/$participantId'
     | '/api/user/balance'
+    | '/api/user/monthly-allowance'
     | '/api/webhook/polar'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -608,12 +644,15 @@ export interface RootRouteChildren {
   AccountIndexRoute: typeof AccountIndexRoute
   AuthenticationIndexRoute: typeof AuthenticationIndexRoute
   DrawingsIndexRoute: typeof DrawingsIndexRoute
+  ApiAdsRedeemRoute: typeof ApiAdsRedeemRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiCouponsRedeemRoute: typeof ApiCouponsRedeemRoute
   ApiDrawingsDrawingIdRoute: typeof ApiDrawingsDrawingIdRouteWithChildren
   ApiDrawingsReservationTimeRoute: typeof ApiDrawingsReservationTimeRoute
   ApiPacksPurchaseRoute: typeof ApiPacksPurchaseRoute
   ApiParticipantParticipantIdRoute: typeof ApiParticipantParticipantIdRoute
   ApiUserBalanceRoute: typeof ApiUserBalanceRoute
+  ApiUserMonthlyAllowanceRoute: typeof ApiUserMonthlyAllowanceRoute
   ApiWebhookPolarRoute: typeof ApiWebhookPolarRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
@@ -810,6 +849,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWebhookPolarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/user/monthly-allowance': {
+      id: '/api/user/monthly-allowance'
+      path: '/api/user/monthly-allowance'
+      fullPath: '/api/user/monthly-allowance'
+      preLoaderRoute: typeof ApiUserMonthlyAllowanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/user/balance': {
       id: '/api/user/balance'
       path: '/api/user/balance'
@@ -845,11 +891,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDrawingsDrawingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/coupons/redeem': {
+      id: '/api/coupons/redeem'
+      path: '/api/coupons/redeem'
+      fullPath: '/api/coupons/redeem'
+      preLoaderRoute: typeof ApiCouponsRedeemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ads/redeem': {
+      id: '/api/ads/redeem'
+      path: '/api/ads/redeem'
+      fullPath: '/api/ads/redeem'
+      preLoaderRoute: typeof ApiAdsRedeemRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/ssr/': {
@@ -1004,12 +1064,15 @@ const rootRouteChildren: RootRouteChildren = {
   AccountIndexRoute: AccountIndexRoute,
   AuthenticationIndexRoute: AuthenticationIndexRoute,
   DrawingsIndexRoute: DrawingsIndexRoute,
+  ApiAdsRedeemRoute: ApiAdsRedeemRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiCouponsRedeemRoute: ApiCouponsRedeemRoute,
   ApiDrawingsDrawingIdRoute: ApiDrawingsDrawingIdRouteWithChildren,
   ApiDrawingsReservationTimeRoute: ApiDrawingsReservationTimeRoute,
   ApiPacksPurchaseRoute: ApiPacksPurchaseRoute,
   ApiParticipantParticipantIdRoute: ApiParticipantParticipantIdRoute,
   ApiUserBalanceRoute: ApiUserBalanceRoute,
+  ApiUserMonthlyAllowanceRoute: ApiUserMonthlyAllowanceRoute,
   ApiWebhookPolarRoute: ApiWebhookPolarRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,

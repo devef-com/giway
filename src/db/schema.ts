@@ -194,6 +194,22 @@ export const coupons = pgTable('coupons', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })
 
+// Balance consumptions table - tracks what was consumed when creating drawings
+export const balanceConsumptions = pgTable('balance_consumptions', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  drawingId: varchar('drawing_id', { length: 255 })
+    .notNull()
+    .references(() => drawings.id, { onDelete: 'cascade' }),
+  giwayType: giwayTypeEnum('giway_type').notNull(),
+  participants: integer('participants').notNull().default(0), // participants allocated
+  images: integer('images').notNull().default(0), // images used
+  emails: integer('emails').notNull().default(0), // emails allocated
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
 // Better Auth tables
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -260,6 +276,7 @@ export const usersRelations = relations(user, ({ many }) => ({
   drawings: many(drawings),
   balances: many(userBalances),
   packRedemptions: many(packRedemptions),
+  balanceConsumptions: many(balanceConsumptions),
 }))
 
 export const drawingsRelations = relations(drawings, ({ one, many }) => ({
@@ -270,6 +287,10 @@ export const drawingsRelations = relations(drawings, ({ one, many }) => ({
   participants: many(participants),
   winners: many(drawingWinners),
   drawingAssets: many(drawingAssets),
+  balanceConsumption: one(balanceConsumptions, {
+    fields: [drawings.id],
+    references: [balanceConsumptions.drawingId],
+  }),
 }))
 
 export const participantsRelations = relations(
@@ -354,6 +375,20 @@ export const couponsRelations = relations(coupons, ({ many }) => ({
   redemptions: many(packRedemptions),
 }))
 
+export const balanceConsumptionsRelations = relations(
+  balanceConsumptions,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [balanceConsumptions.userId],
+      references: [user.id],
+    }),
+    drawing: one(drawings, {
+      fields: [balanceConsumptions.drawingId],
+      references: [drawings.id],
+    }),
+  }),
+)
+
 // Type exports for TypeScript usage
 export type Drawing = typeof drawings.$inferSelect
 export type NewDrawing = typeof drawings.$inferInsert
@@ -375,3 +410,5 @@ export type PackRedemption = typeof packRedemptions.$inferSelect
 export type NewPackRedemption = typeof packRedemptions.$inferInsert
 export type Coupon = typeof coupons.$inferSelect
 export type NewCoupon = typeof coupons.$inferInsert
+export type BalanceConsumption = typeof balanceConsumptions.$inferSelect
+export type NewBalanceConsumption = typeof balanceConsumptions.$inferInsert
