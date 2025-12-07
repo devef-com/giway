@@ -52,7 +52,7 @@ function SignUp() {
   }
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
+    <div className="flex min-h-[calc(100svh-72px)] w-full bg-background">
       {/* Left Side - Image */}
       <div className="hidden w-1/2 bg-black lg:block relative">
         <img
@@ -63,17 +63,18 @@ function SignUp() {
         <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent" />
         <div className="absolute bottom-10 left-10 right-10 text-white p-8">
           <h2 className="text-3xl font-bold leading-tight">
-            "The best way to predict the future is to create it."
+            "Seamlessly manage participants and number slots for your next big
+            event."
           </h2>
           <div className="mt-6">
-            <p className="text-lg font-semibold">Peter Drucker</p>
-            <p className="text-sm text-gray-300">Management Consultant</p>
+            <p className="text-lg font-semibold">Giway</p>
+            <p className="text-sm text-gray-300">Advanced Raffle System</p>
           </div>
         </div>
         <div className="absolute top-8 left-8 flex items-center gap-2 text-white font-bold text-xl">
           {/* Logo placeholder */}
           <div className="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center">
-            <div className="h-4 w-4 bg-white rounded-full" />
+            <img src="/logo_white.png" alt="Giway Logo" className="h-8/12" />
           </div>
           Giway
         </div>
@@ -147,7 +148,7 @@ function SignUp() {
               {loading ? 'Creating account...' : 'Sign Up'}
             </Button>
 
-            <div className="relative">
+            <div className="hidden relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t" />
               </div>
@@ -161,7 +162,7 @@ function SignUp() {
             <Button
               variant="outline"
               type="button"
-              className="w-full h-11 font-medium"
+              className="hidden w-full h-11 font-medium"
               onClick={handleGoogleSignUp}
               disabled={loading}
             >

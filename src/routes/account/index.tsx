@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { authClient } from '@/lib/auth-client'
 import { useUserBalance } from '@/querys/useUserBalance'
 import {
@@ -9,7 +9,16 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { User, Mail, Calendar, CheckCircle, XCircle, Coins } from 'lucide-react'
+import {
+  User,
+  Mail,
+  Calendar,
+  CheckCircle,
+  XCircle,
+  Coins,
+  LogOut,
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 export const Route = createFileRoute('/account/')({
   component: RouteComponent,
@@ -18,6 +27,13 @@ export const Route = createFileRoute('/account/')({
 function RouteComponent() {
   const session = authClient.useSession()
   const { data: balance, isLoading: balanceLoading } = useUserBalance()
+  const navigate = useNavigate()
+
+  const signOut = () => {
+    authClient.signOut().then(() => {
+      navigate({ to: '/authentication/login' })
+    })
+  }
 
   if (session.isPending) {
     return (
@@ -80,11 +96,16 @@ function RouteComponent() {
   return (
     <div className="min-h-[calc(100svh-128px)] p-6">
       <div className="max-w-2xl mx-auto space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Account</h1>
-          <p className="text-muted-foreground">
-            Manage your account settings and view your information.
-          </p>
+        <div className="flex gap-2 justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Account</h1>
+            <p className="text-muted-foreground">
+              Manage your account settings and view your information.
+            </p>
+          </div>
+          <Button variant="outline" size="icon" onClick={signOut}>
+            <LogOut />
+          </Button>
         </div>
 
         <Card>
