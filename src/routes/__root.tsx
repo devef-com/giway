@@ -2,6 +2,7 @@ import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
+  useRouterState,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
@@ -99,6 +100,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const router = useRouterState()
+  const isAuthRoute = [
+    '/authentication/login',
+    '/authentication/signup',
+  ].includes(router.location.pathname)
+
   return (
     <html lang="en" suppressHydrationWarning className="notranslate">
       <head>
@@ -116,7 +123,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <Header />
+          {!isAuthRoute && <Header />}
           {children}
           <Footer />
           {process.env.NODE_ENV !== 'production' && (
