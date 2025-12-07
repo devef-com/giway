@@ -23,10 +23,12 @@ import { Route as DemoDrizzleRouteImport } from './routes/demo/drizzle'
 import { Route as AuthenticationSignupRouteImport } from './routes/authentication/signup'
 import { Route as AuthenticationLoginRouteImport } from './routes/authentication/login'
 import { Route as ApiCheckoutRouteImport } from './routes/api/checkout'
+import { Route as ACouponsRouteImport } from './routes/a/coupons'
 import { Route as SlotDrawingIdIndexRouteImport } from './routes/slot/$drawingId/index'
 import { Route as DrawingsDrawingIdIndexRouteImport } from './routes/drawings/$drawingId/index'
 import { Route as ApiPacksIndexRouteImport } from './routes/api/packs/index'
 import { Route as ApiDrawingsIndexRouteImport } from './routes/api/drawings/index'
+import { Route as ApiAIndexRouteImport } from './routes/api/a/index'
 import { Route as SlotDrawingIdNumberToReserveRouteImport } from './routes/slot/$drawingId/$numberToReserve'
 import { Route as DrawingsDrawingIdEditRouteImport } from './routes/drawings/$drawingId/edit'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
@@ -43,6 +45,7 @@ import { Route as ApiDrawingsDrawingIdRouteImport } from './routes/api/drawings/
 import { Route as ApiCouponsRedeemRouteImport } from './routes/api/coupons/redeem'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAdsRedeemRouteImport } from './routes/api/ads/redeem'
+import { Route as ApiACouponsRouteImport } from './routes/api/a/coupons'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
 import { Route as DrawingsDrawingIdPParticipateIdRouteImport } from './routes/drawings/$drawingId/p.$participateId'
 import { Route as DrawingsDrawingIdMParticipantRouteImport } from './routes/drawings/$drawingId/m.$participant'
@@ -129,6 +132,11 @@ const ApiCheckoutRoute = ApiCheckoutRouteImport.update({
   path: '/api/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ACouponsRoute = ACouponsRouteImport.update({
+  id: '/a/coupons',
+  path: '/a/coupons',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SlotDrawingIdIndexRoute = SlotDrawingIdIndexRouteImport.update({
   id: '/slot/$drawingId/',
   path: '/slot/$drawingId/',
@@ -147,6 +155,11 @@ const ApiPacksIndexRoute = ApiPacksIndexRouteImport.update({
 const ApiDrawingsIndexRoute = ApiDrawingsIndexRouteImport.update({
   id: '/api/drawings/',
   path: '/api/drawings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAIndexRoute = ApiAIndexRouteImport.update({
+  id: '/api/a/',
+  path: '/api/a/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlotDrawingIdNumberToReserveRoute =
@@ -230,6 +243,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 const ApiAdsRedeemRoute = ApiAdsRedeemRouteImport.update({
   id: '/api/ads/redeem',
   path: '/api/ads/redeem',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiACouponsRoute = ApiACouponsRouteImport.update({
+  id: '/api/a/coupons',
+  path: '/api/a/coupons',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
@@ -324,6 +342,7 @@ export interface FileRoutesByFullPath {
   '/coffee': typeof CoffeeRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
+  '/a/coupons': typeof ACouponsRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/authentication/login': typeof AuthenticationLoginRoute
   '/authentication/signup': typeof AuthenticationSignupRoute
@@ -334,6 +353,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AccountIndexRoute
   '/authentication': typeof AuthenticationIndexRoute
   '/drawings': typeof DrawingsIndexRoute
+  '/api/a/coupons': typeof ApiACouponsRoute
   '/api/ads/redeem': typeof ApiAdsRedeemRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/coupons/redeem': typeof ApiCouponsRedeemRoute
@@ -350,6 +370,7 @@ export interface FileRoutesByFullPath {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/drawings/$drawingId/edit': typeof DrawingsDrawingIdEditRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
+  '/api/a': typeof ApiAIndexRoute
   '/api/drawings': typeof ApiDrawingsIndexRoute
   '/api/packs': typeof ApiPacksIndexRoute
   '/drawings/$drawingId': typeof DrawingsDrawingIdIndexRoute
@@ -375,6 +396,7 @@ export interface FileRoutesByTo {
   '/coffee': typeof CoffeeRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
+  '/a/coupons': typeof ACouponsRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/authentication/login': typeof AuthenticationLoginRoute
   '/authentication/signup': typeof AuthenticationSignupRoute
@@ -385,6 +407,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountIndexRoute
   '/authentication': typeof AuthenticationIndexRoute
   '/drawings': typeof DrawingsIndexRoute
+  '/api/a/coupons': typeof ApiACouponsRoute
   '/api/ads/redeem': typeof ApiAdsRedeemRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/coupons/redeem': typeof ApiCouponsRedeemRoute
@@ -401,6 +424,7 @@ export interface FileRoutesByTo {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/drawings/$drawingId/edit': typeof DrawingsDrawingIdEditRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
+  '/api/a': typeof ApiAIndexRoute
   '/api/drawings': typeof ApiDrawingsIndexRoute
   '/api/packs': typeof ApiPacksIndexRoute
   '/drawings/$drawingId': typeof DrawingsDrawingIdIndexRoute
@@ -427,6 +451,7 @@ export interface FileRoutesById {
   '/coffee': typeof CoffeeRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
+  '/a/coupons': typeof ACouponsRoute
   '/api/checkout': typeof ApiCheckoutRoute
   '/authentication/login': typeof AuthenticationLoginRoute
   '/authentication/signup': typeof AuthenticationSignupRoute
@@ -437,6 +462,7 @@ export interface FileRoutesById {
   '/account/': typeof AccountIndexRoute
   '/authentication/': typeof AuthenticationIndexRoute
   '/drawings/': typeof DrawingsIndexRoute
+  '/api/a/coupons': typeof ApiACouponsRoute
   '/api/ads/redeem': typeof ApiAdsRedeemRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/coupons/redeem': typeof ApiCouponsRedeemRoute
@@ -453,6 +479,7 @@ export interface FileRoutesById {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/drawings/$drawingId/edit': typeof DrawingsDrawingIdEditRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
+  '/api/a/': typeof ApiAIndexRoute
   '/api/drawings/': typeof ApiDrawingsIndexRoute
   '/api/packs/': typeof ApiPacksIndexRoute
   '/drawings/$drawingId/': typeof DrawingsDrawingIdIndexRoute
@@ -480,6 +507,7 @@ export interface FileRouteTypes {
     | '/coffee'
     | '/store'
     | '/support'
+    | '/a/coupons'
     | '/api/checkout'
     | '/authentication/login'
     | '/authentication/signup'
@@ -490,6 +518,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/authentication'
     | '/drawings'
+    | '/api/a/coupons'
     | '/api/ads/redeem'
     | '/api/auth/$'
     | '/api/coupons/redeem'
@@ -506,6 +535,7 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/drawings/$drawingId/edit'
     | '/slot/$drawingId/$numberToReserve'
+    | '/api/a'
     | '/api/drawings'
     | '/api/packs'
     | '/drawings/$drawingId'
@@ -531,6 +561,7 @@ export interface FileRouteTypes {
     | '/coffee'
     | '/store'
     | '/support'
+    | '/a/coupons'
     | '/api/checkout'
     | '/authentication/login'
     | '/authentication/signup'
@@ -541,6 +572,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/authentication'
     | '/drawings'
+    | '/api/a/coupons'
     | '/api/ads/redeem'
     | '/api/auth/$'
     | '/api/coupons/redeem'
@@ -557,6 +589,7 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/drawings/$drawingId/edit'
     | '/slot/$drawingId/$numberToReserve'
+    | '/api/a'
     | '/api/drawings'
     | '/api/packs'
     | '/drawings/$drawingId'
@@ -582,6 +615,7 @@ export interface FileRouteTypes {
     | '/coffee'
     | '/store'
     | '/support'
+    | '/a/coupons'
     | '/api/checkout'
     | '/authentication/login'
     | '/authentication/signup'
@@ -592,6 +626,7 @@ export interface FileRouteTypes {
     | '/account/'
     | '/authentication/'
     | '/drawings/'
+    | '/api/a/coupons'
     | '/api/ads/redeem'
     | '/api/auth/$'
     | '/api/coupons/redeem'
@@ -608,6 +643,7 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/drawings/$drawingId/edit'
     | '/slot/$drawingId/$numberToReserve'
+    | '/api/a/'
     | '/api/drawings/'
     | '/api/packs/'
     | '/drawings/$drawingId/'
@@ -634,6 +670,7 @@ export interface RootRouteChildren {
   CoffeeRoute: typeof CoffeeRoute
   StoreRoute: typeof StoreRoute
   SupportRoute: typeof SupportRoute
+  ACouponsRoute: typeof ACouponsRoute
   ApiCheckoutRoute: typeof ApiCheckoutRoute
   AuthenticationLoginRoute: typeof AuthenticationLoginRoute
   AuthenticationSignupRoute: typeof AuthenticationSignupRoute
@@ -644,6 +681,7 @@ export interface RootRouteChildren {
   AccountIndexRoute: typeof AccountIndexRoute
   AuthenticationIndexRoute: typeof AuthenticationIndexRoute
   DrawingsIndexRoute: typeof DrawingsIndexRoute
+  ApiACouponsRoute: typeof ApiACouponsRoute
   ApiAdsRedeemRoute: typeof ApiAdsRedeemRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiCouponsRedeemRoute: typeof ApiCouponsRedeemRoute
@@ -660,6 +698,7 @@ export interface RootRouteChildren {
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
   DrawingsDrawingIdEditRoute: typeof DrawingsDrawingIdEditRoute
   SlotDrawingIdNumberToReserveRoute: typeof SlotDrawingIdNumberToReserveRoute
+  ApiAIndexRoute: typeof ApiAIndexRoute
   ApiDrawingsIndexRoute: typeof ApiDrawingsIndexRoute
   ApiPacksIndexRoute: typeof ApiPacksIndexRoute
   DrawingsDrawingIdIndexRoute: typeof DrawingsDrawingIdIndexRoute
@@ -772,6 +811,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/a/coupons': {
+      id: '/a/coupons'
+      path: '/a/coupons'
+      fullPath: '/a/coupons'
+      preLoaderRoute: typeof ACouponsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/slot/$drawingId/': {
       id: '/slot/$drawingId/'
       path: '/slot/$drawingId'
@@ -798,6 +844,13 @@ declare module '@tanstack/react-router' {
       path: '/api/drawings'
       fullPath: '/api/drawings'
       preLoaderRoute: typeof ApiDrawingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/a/': {
+      id: '/api/a/'
+      path: '/api/a'
+      fullPath: '/api/a'
+      preLoaderRoute: typeof ApiAIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/slot/$drawingId/$numberToReserve': {
@@ -910,6 +963,13 @@ declare module '@tanstack/react-router' {
       path: '/api/ads/redeem'
       fullPath: '/api/ads/redeem'
       preLoaderRoute: typeof ApiAdsRedeemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/a/coupons': {
+      id: '/api/a/coupons'
+      path: '/api/a/coupons'
+      fullPath: '/api/a/coupons'
+      preLoaderRoute: typeof ApiACouponsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/ssr/': {
@@ -1054,6 +1114,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoffeeRoute: CoffeeRoute,
   StoreRoute: StoreRoute,
   SupportRoute: SupportRoute,
+  ACouponsRoute: ACouponsRoute,
   ApiCheckoutRoute: ApiCheckoutRoute,
   AuthenticationLoginRoute: AuthenticationLoginRoute,
   AuthenticationSignupRoute: AuthenticationSignupRoute,
@@ -1064,6 +1125,7 @@ const rootRouteChildren: RootRouteChildren = {
   AccountIndexRoute: AccountIndexRoute,
   AuthenticationIndexRoute: AuthenticationIndexRoute,
   DrawingsIndexRoute: DrawingsIndexRoute,
+  ApiACouponsRoute: ApiACouponsRoute,
   ApiAdsRedeemRoute: ApiAdsRedeemRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiCouponsRedeemRoute: ApiCouponsRedeemRoute,
@@ -1080,6 +1142,7 @@ const rootRouteChildren: RootRouteChildren = {
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
   DrawingsDrawingIdEditRoute: DrawingsDrawingIdEditRoute,
   SlotDrawingIdNumberToReserveRoute: SlotDrawingIdNumberToReserveRoute,
+  ApiAIndexRoute: ApiAIndexRoute,
   ApiDrawingsIndexRoute: ApiDrawingsIndexRoute,
   ApiPacksIndexRoute: ApiPacksIndexRoute,
   DrawingsDrawingIdIndexRoute: DrawingsDrawingIdIndexRoute,
