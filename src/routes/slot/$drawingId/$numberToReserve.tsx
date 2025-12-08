@@ -1,22 +1,23 @@
 import {
   createFileRoute,
+  useCanGoBack,
   useNavigate,
   useRouter,
-  useCanGoBack,
 } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { toast } from 'sonner'
 import { ArrowLeft, CircleAlert, Clock } from 'lucide-react'
+import { toast } from 'sonner'
 import type { Participant } from '@/db/schema'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card } from '@/components/ui/card'
+import { PayoutProofUpload } from '@/components/PayoutProofUpload'
 import { cn } from '@/lib/utils'
 import { useDrawing } from '@/querys/useDrawing'
-import { useReservationTime } from '@/querys/useReservationTime'
 import { useParticipate } from '@/querys/useParticipate'
+import { useReservationTime } from '@/querys/useReservationTime'
 
 export const Route = createFileRoute('/slot/$drawingId/$numberToReserve')({
   component: ReserveNumberForm,
@@ -34,6 +35,8 @@ function ReserveNumberForm() {
     email: '',
     phone: '',
   })
+  const [payoutProofFile, setPayoutProofFile] = useState<File | null>(null)
+  const [isUploadingProof, setIsUploadingProof] = useState(false)
   const [reservationComplete, setReservationComplete] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null)
   const [reservationTimestamp, setReservationTimestamp] = useState<
@@ -252,12 +255,97 @@ function ReserveNumberForm() {
     navigate({ to: `/drawings/${drawingId}/p/${data.id}`, replace: true })
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // If the drawing is paid and no payout proof is uploaded, show error
+    if (drawing?.isPaid && !payoutProofFile) {
+      toast.error('Please upload payment proof before registering')
+      return
+    }
+
+    let paymentCaptureId: number | undefined
+
+    // Upload payout proof if it exists
+    if (drawing?.isPaid && payoutProofFile) {
+      setIsUploadingProof(true)
+      try {
+        // 1. Get presigned upload URL
+        const uploadUrlResponse = await fetch('/api/participants/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mimeType: payoutProofFile.type,
+            size: payoutProofFile.size,
+            drawingId,
+          }),
+        })
+
+        if (!uploadUrlResponse.ok) {
+          const error = await uploadUrlResponse.json()
+          if (uploadUrlResponse.status === 413 || error.error?.includes('too large')) {
+            throw new Error('File size too large. Maximum allowed: 1MB')
+          } else if (uploadUrlResponse.status === 400) {
+            throw new Error(error.error || 'Invalid file type or size')
+          }
+          throw new Error(error.error || 'Failed to get upload URL')
+        }
+
+        const { uploadUrl, s3Key, publicUrl } = await uploadUrlResponse.json()
+
+        // 2. Upload file to S3/R2
+        const uploadResponse = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: payoutProofFile,
+          headers: {
+            'Content-Type': payoutProofFile.type,
+          },
+        })
+
+        if (!uploadResponse.ok) {
+          if (uploadResponse.status === 403) {
+            throw new Error('Upload URL expired. Please try again')
+          }
+          throw new Error('Failed to upload file. Please try again')
+        }
+
+        // 3. Confirm upload and save asset metadata
+        const confirmResponse = await fetch('/api/participants/assets', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            url: publicUrl,
+            mimeType: payoutProofFile.type,
+            size: payoutProofFile.size,
+            s3Key,
+          }),
+        })
+
+        if (!confirmResponse.ok) {
+          const error = await confirmResponse.json()
+          throw new Error(error.error || 'Failed to save asset')
+        }
+
+        const { asset } = await confirmResponse.json()
+        paymentCaptureId = asset.id
+      } catch (error) {
+        console.error('Error uploading payout proof:', error)
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'Failed to upload payment proof',
+        )
+        setIsUploadingProof(false)
+        return
+      } finally {
+        setIsUploadingProof(false)
+      }
+    }
 
     const registrationData = {
       ...formData,
       selectedNumbers,
+      paymentCaptureId,
     }
 
     participateMutation.mutate(registrationData)
@@ -504,20 +592,35 @@ function ReserveNumberForm() {
             </div>
 
             {drawing.isPaid && (
-              <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg border border-yellow-200 dark:border-yellow-700">
-                <div className="flex items-start gap-3">
-                  <CircleAlert className="w-6 h-6 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-yellow-800 dark:text-yellow-200 font-medium">
-                      Payment Required
-                    </p>
-                    <p className="text-yellow-700 dark:text-yellow-100 text-sm mt-1">
-                      This is a paid event. Attach your payment proof to confirm
-                      your participation.
-                    </p>
+              <>
+                <div className="p-4 bg-yellow-50 dark:bg-yellow-900/30 rounded-lg border border-yellow-200 dark:border-yellow-700">
+                  <div className="flex items-start gap-3">
+                    <CircleAlert className="w-6 h-6 text-yellow-600 dark:text-yellow-400 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-yellow-800 dark:text-yellow-200 font-medium">
+                        Payment Required
+                      </p>
+                      <p className="text-yellow-700 dark:text-yellow-100 text-sm mt-1">
+                        This is a paid event. Please upload your payment proof
+                        to confirm your participation.
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+
+                <div>
+                  <Label
+                    htmlFor="payoutProof"
+                    className="text-text-light-primary dark:text-text-dark-primary mb-2 block"
+                  >
+                    Payment Proof *
+                  </Label>
+                  <PayoutProofUpload
+                    onFileChange={setPayoutProofFile}
+                    disabled={participateMutation.isPending || isUploadingProof}
+                  />
+                </div>
+              </>
             )}
 
             <div className="flex gap-2 pt-4">
@@ -525,20 +628,26 @@ function ReserveNumberForm() {
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                disabled={participateMutation.isPending}
+                disabled={
+                  participateMutation.isPending || isUploadingProof
+                }
                 className="flex-1"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                disabled={participateMutation.isPending || timeRemaining === 0}
+                disabled={
+                  participateMutation.isPending ||
+                  isUploadingProof ||
+                  timeRemaining === 0
+                }
                 className="bg-cyan-600 hover:bg-cyan-700 text-white flex-1"
               >
-                {participateMutation.isPending ? (
+                {participateMutation.isPending || isUploadingProof ? (
                   <span className="flex items-center gap-2">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                    Registering...
+                    {isUploadingProof ? 'Uploading...' : 'Registering...'}
                   </span>
                 ) : (
                   'Register Now'

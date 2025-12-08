@@ -21,6 +21,7 @@ export const Route = createFileRoute('/api/drawings/$drawingId/participate')({
             email?: string
             phone: string
             selectedNumbers?: Array<number>
+            paymentCaptureId?: number
           }
 
           // Verify drawing exists
@@ -76,6 +77,7 @@ export const Route = createFileRoute('/api/drawings/$drawingId/participate')({
                 phone: body.phone,
                 selectedNumber: body.selectedNumbers[0], // Store first selected number as primary
                 isEligible: drawing[0].isPaid ? null : true, // Pending if paid, auto-approve if free
+                paymentCaptureId: body.paymentCaptureId || null,
               })
               .returning()
 
@@ -132,6 +134,7 @@ export const Route = createFileRoute('/api/drawings/$drawingId/participate')({
               phone: body.phone,
               selectedNumber,
               isEligible: drawing[0].isPaid ? null : true, // Pending if paid, auto-approve if free
+              paymentCaptureId: body.paymentCaptureId || null,
             })
             .returning()
 

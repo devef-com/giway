@@ -7,6 +7,7 @@ interface ParticipateData {
   email: string
   phone: string
   selectedNumbers?: Array<number>
+  paymentCaptureId?: number
 }
 
 export function useParticipate(

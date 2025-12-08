@@ -38,6 +38,8 @@ import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
 import { Route as ApiWebhookPolarRouteImport } from './routes/api/webhook.polar'
 import { Route as ApiUserMonthlyAllowanceRouteImport } from './routes/api/user/monthly-allowance'
 import { Route as ApiUserBalanceRouteImport } from './routes/api/user/balance'
+import { Route as ApiParticipantsUploadRouteImport } from './routes/api/participants/upload'
+import { Route as ApiParticipantsAssetsRouteImport } from './routes/api/participants/assets'
 import { Route as ApiParticipantParticipantIdRouteImport } from './routes/api/participant.$participantId'
 import { Route as ApiPacksPurchaseRouteImport } from './routes/api/packs/purchase'
 import { Route as ApiDrawingsReservationTimeRouteImport } from './routes/api/drawings/reservation-time'
@@ -208,6 +210,16 @@ const ApiUserBalanceRoute = ApiUserBalanceRouteImport.update({
   path: '/api/user/balance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiParticipantsUploadRoute = ApiParticipantsUploadRouteImport.update({
+  id: '/api/participants/upload',
+  path: '/api/participants/upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiParticipantsAssetsRoute = ApiParticipantsAssetsRouteImport.update({
+  id: '/api/participants/assets',
+  path: '/api/participants/assets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiParticipantParticipantIdRoute =
   ApiParticipantParticipantIdRouteImport.update({
     id: '/api/participant/$participantId',
@@ -361,6 +373,8 @@ export interface FileRoutesByFullPath {
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
   '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRoute
+  '/api/participants/assets': typeof ApiParticipantsAssetsRoute
+  '/api/participants/upload': typeof ApiParticipantsUploadRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
   '/api/user/monthly-allowance': typeof ApiUserMonthlyAllowanceRoute
   '/api/webhook/polar': typeof ApiWebhookPolarRoute
@@ -415,6 +429,8 @@ export interface FileRoutesByTo {
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
   '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRoute
+  '/api/participants/assets': typeof ApiParticipantsAssetsRoute
+  '/api/participants/upload': typeof ApiParticipantsUploadRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
   '/api/user/monthly-allowance': typeof ApiUserMonthlyAllowanceRoute
   '/api/webhook/polar': typeof ApiWebhookPolarRoute
@@ -470,6 +486,8 @@ export interface FileRoutesById {
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
   '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRoute
+  '/api/participants/assets': typeof ApiParticipantsAssetsRoute
+  '/api/participants/upload': typeof ApiParticipantsUploadRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
   '/api/user/monthly-allowance': typeof ApiUserMonthlyAllowanceRoute
   '/api/webhook/polar': typeof ApiWebhookPolarRoute
@@ -526,6 +544,8 @@ export interface FileRouteTypes {
     | '/api/drawings/reservation-time'
     | '/api/packs/purchase'
     | '/api/participant/$participantId'
+    | '/api/participants/assets'
+    | '/api/participants/upload'
     | '/api/user/balance'
     | '/api/user/monthly-allowance'
     | '/api/webhook/polar'
@@ -580,6 +600,8 @@ export interface FileRouteTypes {
     | '/api/drawings/reservation-time'
     | '/api/packs/purchase'
     | '/api/participant/$participantId'
+    | '/api/participants/assets'
+    | '/api/participants/upload'
     | '/api/user/balance'
     | '/api/user/monthly-allowance'
     | '/api/webhook/polar'
@@ -634,6 +656,8 @@ export interface FileRouteTypes {
     | '/api/drawings/reservation-time'
     | '/api/packs/purchase'
     | '/api/participant/$participantId'
+    | '/api/participants/assets'
+    | '/api/participants/upload'
     | '/api/user/balance'
     | '/api/user/monthly-allowance'
     | '/api/webhook/polar'
@@ -689,6 +713,8 @@ export interface RootRouteChildren {
   ApiDrawingsReservationTimeRoute: typeof ApiDrawingsReservationTimeRoute
   ApiPacksPurchaseRoute: typeof ApiPacksPurchaseRoute
   ApiParticipantParticipantIdRoute: typeof ApiParticipantParticipantIdRoute
+  ApiParticipantsAssetsRoute: typeof ApiParticipantsAssetsRoute
+  ApiParticipantsUploadRoute: typeof ApiParticipantsUploadRoute
   ApiUserBalanceRoute: typeof ApiUserBalanceRoute
   ApiUserMonthlyAllowanceRoute: typeof ApiUserMonthlyAllowanceRoute
   ApiWebhookPolarRoute: typeof ApiWebhookPolarRoute
@@ -916,6 +942,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUserBalanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/participants/upload': {
+      id: '/api/participants/upload'
+      path: '/api/participants/upload'
+      fullPath: '/api/participants/upload'
+      preLoaderRoute: typeof ApiParticipantsUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/participants/assets': {
+      id: '/api/participants/assets'
+      path: '/api/participants/assets'
+      fullPath: '/api/participants/assets'
+      preLoaderRoute: typeof ApiParticipantsAssetsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/participant/$participantId': {
       id: '/api/participant/$participantId'
       path: '/api/participant/$participantId'
@@ -1133,6 +1173,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiDrawingsReservationTimeRoute: ApiDrawingsReservationTimeRoute,
   ApiPacksPurchaseRoute: ApiPacksPurchaseRoute,
   ApiParticipantParticipantIdRoute: ApiParticipantParticipantIdRoute,
+  ApiParticipantsAssetsRoute: ApiParticipantsAssetsRoute,
+  ApiParticipantsUploadRoute: ApiParticipantsUploadRoute,
   ApiUserBalanceRoute: ApiUserBalanceRoute,
   ApiUserMonthlyAllowanceRoute: ApiUserMonthlyAllowanceRoute,
   ApiWebhookPolarRoute: ApiWebhookPolarRoute,
