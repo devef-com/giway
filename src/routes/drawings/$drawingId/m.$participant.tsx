@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import type { ParticipantStatus } from '@/lib/participants'
 import { Card } from '@/components/ui/card'
 import { AlertCircleIcon } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/drawings/$drawingId/m/$participant')({
   component: RouteComponent,
@@ -21,6 +22,20 @@ function RouteComponent() {
     useState<ParticipantStatus>('pending')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+
+  const { data: participantAssets } = useQuery({
+    queryKey: ['participant-proof', participantId],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/participants/assets?participantId=${participantId}`,
+      )
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to fetch participant assets')
+      }
+      return result
+    },
+  })
 
   useEffect(() => {
     const fetchParticipant = async () => {
@@ -122,6 +137,7 @@ function RouteComponent() {
 
   return (
     <div className="container mx-auto p-4">
+      {JSON.stringify(participantAssets, null, 2)}
       <div className="max-w-2xl mx-auto">
         <Card className="rounded-lg p-6">
           <h2 className="text-2xl font-bold mb-4">Participant Information</h2>

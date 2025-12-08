@@ -4,11 +4,16 @@ import {
   useNavigate,
   useRouter,
 } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ArrowLeft, CircleAlert, Clock } from 'lucide-react'
 import { toast } from 'sonner'
+import { eq } from 'drizzle-orm/sql'
+import z from 'zod'
 import type { Participant } from '@/db/schema'
+import { assets } from '@/db/schema'
+import { db } from '@/db/index'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -18,6 +23,27 @@ import { cn } from '@/lib/utils'
 import { useDrawing } from '@/querys/useDrawing'
 import { useParticipate } from '@/querys/useParticipate'
 import { useReservationTime } from '@/querys/useReservationTime'
+
+export const updateAssetModelId = createServerFn({ method: 'POST' })
+  .inputValidator(
+    z.object({
+      assetId: z.union([z.string(), z.number()]),
+      participantId: z.string(),
+    }),
+  )
+  .handler(async ({ data }) => {
+    try {
+      await db
+        .update(assets)
+        .set({ modelId: data.participantId })
+        .where(eq(assets.id, Number(data.assetId)))
+
+      return { success: true }
+    } catch (error) {
+      console.error('Error updating asset modelId:', error)
+      throw new Error('Failed to update asset')
+    }
+  })
 
 export const Route = createFileRoute('/slot/$drawingId/$numberToReserve')({
   component: ReserveNumberForm,
@@ -246,14 +272,32 @@ function ReserveNumberForm() {
   }, []) // Empty deps - only runs on mount/unmount
 
   // Submit registration mutation
-  const participateMutation = useParticipate(drawingId, (data: Participant) => {
-    // Clean up localStorage on successful registration
-    localStorage.removeItem(reservationKey)
+  const participateMutation = useParticipate(
+    drawingId,
+    async (data: Participant) => {
+      // Clean up localStorage on successful registration
+      localStorage.removeItem(reservationKey)
 
-    queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
-    queryClient.invalidateQueries({ queryKey: ['drawing-stats', drawingId] })
-    navigate({ to: `/drawings/${drawingId}/p/${data.id}`, replace: true })
-  })
+      // Update asset modelId if payment proof was uploaded
+      if (data.paymentCaptureId) {
+        try {
+          await updateAssetModelId({
+            data: {
+              assetId: data.paymentCaptureId,
+              participantId: String(data.id),
+            },
+          })
+        } catch (error) {
+          console.error('Failed to update asset modelId:', error)
+          // Don't block navigation, just log the error
+        }
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
+      queryClient.invalidateQueries({ queryKey: ['drawing-stats', drawingId] })
+      navigate({ to: `/drawings/${drawingId}/p/${data.id}`, replace: true })
+    },
+  )
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -283,7 +327,10 @@ function ReserveNumberForm() {
 
         if (!uploadUrlResponse.ok) {
           const error = await uploadUrlResponse.json()
-          if (uploadUrlResponse.status === 413 || error.error?.includes('too large')) {
+          if (
+            uploadUrlResponse.status === 413 ||
+            error.error?.includes('too large')
+          ) {
             throw new Error('File size too large. Maximum allowed: 1MB')
           } else if (uploadUrlResponse.status === 400) {
             throw new Error(error.error || 'Invalid file type or size')
@@ -627,9 +674,7 @@ function ReserveNumberForm() {
                 type="button"
                 variant="outline"
                 onClick={handleCancel}
-                disabled={
-                  participateMutation.isPending || isUploadingProof
-                }
+                disabled={participateMutation.isPending || isUploadingProof}
                 className="flex-1"
               >
                 Cancel
