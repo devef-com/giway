@@ -1,11 +1,51 @@
 import { createFileRoute } from '@tanstack/react-router'
-
+import { and, eq } from 'drizzle-orm/sql'
 import { db } from '@/db/index'
 import { assets } from '@/db/schema'
 
 export const Route = createFileRoute('/api/participants/assets')({
   server: {
     handlers: {
+      GET: async ({ request }) => {
+        try {
+          const url = new URL(request.url)
+          const participantId = url.searchParams.get('participantId')
+
+          if (!participantId) {
+            return new Response(
+              JSON.stringify({ error: 'Missing participantId' }),
+              { status: 400, headers: { 'Content-Type': 'application/json' } },
+            )
+          }
+
+          // Fetch assets for the given participant
+          const participantAssets = await db
+            .select()
+            .from(assets)
+            .where(
+              and(
+                eq(assets.modelType, 'participant'),
+                eq(assets.modelId, participantId),
+              ),
+            )
+          if (!participantAssets.length) {
+            return new Response(
+              JSON.stringify({ error: 'No assets found for this participant' }),
+              { status: 400, headers: { 'Content-Type': 'application/json' } },
+            )
+          }
+          return new Response(JSON.stringify(participantAssets[0]), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+          })
+        } catch (error) {
+          console.error('Error fetching participant assets:', error)
+          return new Response(
+            JSON.stringify({ error: 'Failed to fetch participant assets' }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } },
+          )
+        }
+      },
       // Confirm upload and save asset metadata for participant payout proof
       POST: async ({ request }: { request: Request }) => {
         try {

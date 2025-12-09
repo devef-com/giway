@@ -1,12 +1,13 @@
-import { Participant as BaseParticipant } from '@/db/schema'
+import { Asset, Participant as BaseParticipant } from '@/db/schema'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import type { ParticipantStatus } from '@/lib/participants'
 import { Card } from '@/components/ui/card'
-import { AlertCircleIcon } from 'lucide-react'
-import { ParticipantComments } from '@/components/ParticipantComments'
+import { AlertCircleIcon, ImageIcon } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 export const Route = createFileRoute('/drawings/$drawingId/m/$participant')({
   component: RouteComponent,
@@ -22,6 +23,21 @@ function RouteComponent() {
     useState<ParticipantStatus>('pending')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [showImageModal, setShowImageModal] = useState(false)
+
+  const { data: participantAssets } = useQuery<Asset>({
+    queryKey: ['participant-proof', participantId],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/participants/assets?participantId=${participantId}`,
+      )
+      const result = await response.json()
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to fetch participant assets')
+      }
+      return result
+    },
+  })
 
   useEffect(() => {
     const fetchParticipant = async () => {
@@ -170,6 +186,63 @@ function RouteComponent() {
             </div>
           </div>
         </Card>
+
+        {/* Asset Preview Section */}
+        {participantAssets && participantAssets.url && (
+          <Card className="rounded-lg p-6 mt-4">
+            <h3 className="text-lg font-semibold mb-2">Payout Proof</h3>
+            {participantAssets.mimeType?.startsWith('image/') ? (
+              <>
+                <figure className="h-50">
+                  <img
+                    src={participantAssets.url}
+                    alt="Payout Proof"
+                    className="w-full h-full object-scale-down rounded border cursor-pointer"
+                    onClick={() => setShowImageModal(true)}
+                  />
+                </figure>
+
+                <a
+                  href={participantAssets.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline ml-2"
+                >
+                  <ImageIcon className=" h-4 w-4 inline-block mr-1" /> Open in
+                  new tab
+                </a>
+                <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
+                  <DialogContent className="flex flex-col items-center justify-center p-0 shadow-none sm:max-w-2/3">
+                    <img
+                      src={participantAssets.url}
+                      alt="Full Size Payout Proof"
+                      className="max-w-full max-h-[90vh] rounded border-0"
+                      // style={{ background: '#fff' }}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </>
+            ) : participantAssets.mimeType === 'application/pdf' ? (
+              <a
+                href={participantAssets.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline"
+              >
+                View PDF
+              </a>
+            ) : (
+              <a
+                href={participantAssets.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 underline"
+              >
+                Download File
+              </a>
+            )}
+          </Card>
+        )}
 
         <div className="bg-white border border-neutral-300 dark:bg-gray-900 dark:border-none rounded-lg shadow-md p-6 mt-4">
           <h3 className="text-xl font-semibold mb-4">

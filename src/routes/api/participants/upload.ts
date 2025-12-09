@@ -70,7 +70,9 @@ export const Route = createFileRoute('/api/participants/upload')({
           // Generate unique S3 key using configurable folder
           const extension = getExtensionFromMimeType(mimeType)
           const fileId = nanoid(16)
-          const assetsFolder = process.env.PARTICIPANT_ASSETS_FOLDER || DEFAULT_PARTICIPANT_ASSETS_FOLDER
+          const assetsFolder =
+            process.env.PARTICIPANT_ASSETS_FOLDER ||
+            DEFAULT_PARTICIPANT_ASSETS_FOLDER
           const s3Key = `${assetsFolder}/${drawingId}/${fileId}.${extension}`
 
           // Get presigned upload URL

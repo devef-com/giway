@@ -28,7 +28,6 @@ import { Route as SlotDrawingIdIndexRouteImport } from './routes/slot/$drawingId
 import { Route as DrawingsDrawingIdIndexRouteImport } from './routes/drawings/$drawingId/index'
 import { Route as ApiPacksIndexRouteImport } from './routes/api/packs/index'
 import { Route as ApiDrawingsIndexRouteImport } from './routes/api/drawings/index'
-import { Route as ApiAIndexRouteImport } from './routes/api/a/index'
 import { Route as SlotDrawingIdNumberToReserveRouteImport } from './routes/slot/$drawingId/$numberToReserve'
 import { Route as DrawingsDrawingIdEditRouteImport } from './routes/drawings/$drawingId/edit'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
@@ -159,11 +158,6 @@ const ApiPacksIndexRoute = ApiPacksIndexRouteImport.update({
 const ApiDrawingsIndexRoute = ApiDrawingsIndexRouteImport.update({
   id: '/api/drawings/',
   path: '/api/drawings/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAIndexRoute = ApiAIndexRouteImport.update({
-  id: '/api/a/',
-  path: '/api/a/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SlotDrawingIdNumberToReserveRoute =
@@ -398,7 +392,6 @@ export interface FileRoutesByFullPath {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/drawings/$drawingId/edit': typeof DrawingsDrawingIdEditRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
-  '/api/a': typeof ApiAIndexRoute
   '/api/drawings': typeof ApiDrawingsIndexRoute
   '/api/packs': typeof ApiPacksIndexRoute
   '/drawings/$drawingId': typeof DrawingsDrawingIdIndexRoute
@@ -456,7 +449,6 @@ export interface FileRoutesByTo {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/drawings/$drawingId/edit': typeof DrawingsDrawingIdEditRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
-  '/api/a': typeof ApiAIndexRoute
   '/api/drawings': typeof ApiDrawingsIndexRoute
   '/api/packs': typeof ApiPacksIndexRoute
   '/drawings/$drawingId': typeof DrawingsDrawingIdIndexRoute
@@ -515,7 +507,6 @@ export interface FileRoutesById {
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
   '/drawings/$drawingId/edit': typeof DrawingsDrawingIdEditRoute
   '/slot/$drawingId/$numberToReserve': typeof SlotDrawingIdNumberToReserveRoute
-  '/api/a/': typeof ApiAIndexRoute
   '/api/drawings/': typeof ApiDrawingsIndexRoute
   '/api/packs/': typeof ApiPacksIndexRoute
   '/drawings/$drawingId/': typeof DrawingsDrawingIdIndexRoute
@@ -575,7 +566,6 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/drawings/$drawingId/edit'
     | '/slot/$drawingId/$numberToReserve'
-    | '/api/a'
     | '/api/drawings'
     | '/api/packs'
     | '/drawings/$drawingId'
@@ -633,7 +623,6 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/drawings/$drawingId/edit'
     | '/slot/$drawingId/$numberToReserve'
-    | '/api/a'
     | '/api/drawings'
     | '/api/packs'
     | '/drawings/$drawingId'
@@ -691,7 +680,6 @@ export interface FileRouteTypes {
     | '/demo/start/server-funcs'
     | '/drawings/$drawingId/edit'
     | '/slot/$drawingId/$numberToReserve'
-    | '/api/a/'
     | '/api/drawings/'
     | '/api/packs/'
     | '/drawings/$drawingId/'
@@ -750,7 +738,6 @@ export interface RootRouteChildren {
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
   DrawingsDrawingIdEditRoute: typeof DrawingsDrawingIdEditRoute
   SlotDrawingIdNumberToReserveRoute: typeof SlotDrawingIdNumberToReserveRoute
-  ApiAIndexRoute: typeof ApiAIndexRoute
   ApiDrawingsIndexRoute: typeof ApiDrawingsIndexRoute
   ApiPacksIndexRoute: typeof ApiPacksIndexRoute
   DrawingsDrawingIdIndexRoute: typeof DrawingsDrawingIdIndexRoute
@@ -896,13 +883,6 @@ declare module '@tanstack/react-router' {
       path: '/api/drawings'
       fullPath: '/api/drawings'
       preLoaderRoute: typeof ApiDrawingsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/a/': {
-      id: '/api/a/'
-      path: '/api/a'
-      fullPath: '/api/a'
-      preLoaderRoute: typeof ApiAIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/slot/$drawingId/$numberToReserve': {
@@ -1243,7 +1223,6 @@ const rootRouteChildren: RootRouteChildren = {
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
   DrawingsDrawingIdEditRoute: DrawingsDrawingIdEditRoute,
   SlotDrawingIdNumberToReserveRoute: SlotDrawingIdNumberToReserveRoute,
-  ApiAIndexRoute: ApiAIndexRoute,
   ApiDrawingsIndexRoute: ApiDrawingsIndexRoute,
   ApiPacksIndexRoute: ApiPacksIndexRoute,
   DrawingsDrawingIdIndexRoute: DrawingsDrawingIdIndexRoute,
