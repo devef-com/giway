@@ -6,7 +6,9 @@ import {
   verifyDrawingOwnership,
 } from '@/lib/comments'
 
-export const Route = createFileRoute('/api/participant/$participantId/comments')({
+export const Route = createFileRoute(
+  '/api/participant/$participantId/comments',
+)({
   server: {
     handlers: {
       GET: async ({ request, params }) => {
@@ -98,10 +100,10 @@ export const Route = createFileRoute('/api/participant/$participantId/comments')
           })
 
           if (!result.success) {
-            return new Response(
-              JSON.stringify({ error: result.error }),
-              { status: 500, headers: { 'Content-Type': 'application/json' } },
-            )
+            return new Response(JSON.stringify({ error: result.error }), {
+              status: 500,
+              headers: { 'Content-Type': 'application/json' },
+            })
           }
 
           return new Response(

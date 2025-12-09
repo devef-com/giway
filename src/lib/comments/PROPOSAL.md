@@ -49,7 +49,9 @@ export const participantComments = pgTable('participant_comments', {
   participantId: integer('participant_id')
     .notNull()
     .references(() => participants.id, { onDelete: 'cascade' }),
-  authorId: text('author_id').references(() => user.id, { onDelete: 'cascade' }), // NULL for participant comments
+  authorId: text('author_id').references(() => user.id, {
+    onDelete: 'cascade',
+  }), // NULL for participant comments
   authorType: authorTypeEnum('author_type').notNull().default('host'),
   authorName: varchar('author_name', { length: 255 }), // For participant comments
   comment: text('comment').notNull(),
@@ -103,6 +105,7 @@ export type NewParticipantComment = typeof participantComments.$inferInsert
 **Description**: Returns all comments in the conversation. Host comments respect the `isVisibleToParticipant` flag, while participant comments are always visible.
 
 **Response**:
+
 ```json
 {
   "comments": [
@@ -133,6 +136,7 @@ export type NewParticipantComment = typeof participantComments.$inferInsert
 **Authentication**: Required (Host must own the drawing)
 
 **Request Body**:
+
 ```json
 {
   "comment": "Please submit payment proof by tomorrow",
@@ -141,6 +145,7 @@ export type NewParticipantComment = typeof participantComments.$inferInsert
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -163,6 +168,7 @@ export type NewParticipantComment = typeof participantComments.$inferInsert
 **Authentication**: None (Public access - no login required)
 
 **Request Body**:
+
 ```json
 {
   "comment": "I will submit it by today evening"
@@ -170,6 +176,7 @@ export type NewParticipantComment = typeof participantComments.$inferInsert
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -191,6 +198,7 @@ export type NewParticipantComment = typeof participantComments.$inferInsert
 **Authentication**: Required (Must be comment author and host)
 
 **Request Body**:
+
 ```json
 {
   "comment": "Updated comment text",
@@ -217,6 +225,7 @@ export type NewParticipantComment = typeof participantComments.$inferInsert
 **Description**: Returns all comments including private host comments (for host management view)
 
 **Response**:
+
 ```json
 {
   "comments": [
@@ -511,7 +520,11 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 
-export function ParticipantComments({ participantId }: { participantId: number }) {
+export function ParticipantComments({
+  participantId,
+}: {
+  participantId: number
+}) {
   const [comments, setComments] = useState<any[]>([])
   const [newComment, setNewComment] = useState('')
   const [isVisible, setIsVisible] = useState(true)
@@ -534,14 +547,17 @@ export function ParticipantComments({ participantId }: { participantId: number }
 
     setIsSubmitting(true)
     try {
-      const response = await fetch(`/api/participant/${participantId}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          comment: newComment,
-          isVisibleToParticipant: isVisible,
-        }),
-      })
+      const response = await fetch(
+        `/api/participant/${participantId}/comments`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            comment: newComment,
+            isVisibleToParticipant: isVisible,
+          }),
+        },
+      )
 
       if (response.ok) {
         setNewComment('')
@@ -556,7 +572,7 @@ export function ParticipantComments({ participantId }: { participantId: number }
   return (
     <Card className="rounded-lg p-6 mt-4">
       <h3 className="text-xl font-semibold mb-4">Comments</h3>
-      
+
       {/* Add Comment Form */}
       <div className="space-y-3 mb-6">
         <Textarea
@@ -565,7 +581,7 @@ export function ParticipantComments({ participantId }: { participantId: number }
           onChange={(e) => setNewComment(e.target.value)}
           className="min-h-[100px]"
         />
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Switch
@@ -573,11 +589,9 @@ export function ParticipantComments({ participantId }: { participantId: number }
               checked={isVisible}
               onCheckedChange={setIsVisible}
             />
-            <Label htmlFor="visible-switch">
-              Visible to participant
-            </Label>
+            <Label htmlFor="visible-switch">Visible to participant</Label>
           </div>
-          
+
           <Button
             onClick={handleAddComment}
             disabled={isSubmitting || !newComment.trim()}
@@ -590,7 +604,9 @@ export function ParticipantComments({ participantId }: { participantId: number }
       {/* Comments List - Conversation Thread */}
       <div className="space-y-3">
         {comments.length === 0 ? (
-          <p className="text-sm text-gray-500">No messages yet. Start the conversation!</p>
+          <p className="text-sm text-gray-500">
+            No messages yet. Start the conversation!
+          </p>
         ) : (
           comments.map((comment) => (
             <div
@@ -615,11 +631,12 @@ export function ParticipantComments({ participantId }: { participantId: number }
                     {new Date(comment.createdAt).toLocaleString()}
                   </span>
                 </div>
-                {comment.authorType === 'host' && !comment.isVisibleToParticipant && (
-                  <span className="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 px-2 py-1 rounded">
-                    Private
-                  </span>
-                )}
+                {comment.authorType === 'host' &&
+                  !comment.isVisibleToParticipant && (
+                    <span className="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 px-2 py-1 rounded">
+                      Private
+                    </span>
+                  )}
               </div>
               <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
             </div>
@@ -637,7 +654,7 @@ export function ParticipantComments({ participantId }: { participantId: number }
 import { ParticipantComments } from '@/components/ParticipantComments'
 
 // Add after the status change section (around line 250)
-<ParticipantComments participantId={participant.id} />
+;<ParticipantComments participantId={participant.id} />
 ```
 
 ### 2. Participant View (`/drawings/$drawingId/p/$participateId`)
@@ -646,12 +663,12 @@ Add a bidirectional conversation section where participants can view and reply t
 
 ```tsx
 // New component or inline in the participant view
-function ParticipantCommentsView({ 
-  drawingId, 
-  participantId 
-}: { 
+function ParticipantCommentsView({
+  drawingId,
+  participantId,
+}: {
   drawingId: string
-  participantId: string 
+  participantId: string
 }) {
   const [comments, setComments] = useState<any[]>([])
   const [newComment, setNewComment] = useState('')
@@ -662,7 +679,9 @@ function ParticipantCommentsView({
   }, [drawingId, participantId])
 
   const fetchComments = async () => {
-    const response = await fetch(`/api/drawings/${drawingId}/p/${participantId}/comments`)
+    const response = await fetch(
+      `/api/drawings/${drawingId}/p/${participantId}/comments`,
+    )
     if (response.ok) {
       const data = await response.json()
       setComments(data.comments || [])
@@ -674,11 +693,14 @@ function ParticipantCommentsView({
 
     setIsSubmitting(true)
     try {
-      const response = await fetch(`/api/drawings/${drawingId}/p/${participantId}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ comment: newComment }),
-      })
+      const response = await fetch(
+        `/api/drawings/${drawingId}/p/${participantId}/comments`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ comment: newComment }),
+        },
+      )
 
       if (response.ok) {
         setNewComment('')
@@ -691,10 +713,8 @@ function ParticipantCommentsView({
 
   return (
     <Card className="p-4 mt-4">
-      <h2 className="text-lg font-semibold mb-3">
-        Conversation with Host
-      </h2>
-      
+      <h2 className="text-lg font-semibold mb-3">Conversation with Host</h2>
+
       {/* Conversation Thread */}
       <div className="space-y-3 mb-4">
         {comments.length === 0 ? (
@@ -749,10 +769,7 @@ function ParticipantCommentsView({
 
 ```tsx
 // Add after the participant card (around line 158)
-<ParticipantCommentsView 
-  drawingId={drawingId} 
-  participantId={participateId} 
-/>
+<ParticipantCommentsView drawingId={drawingId} participantId={participateId} />
 ```
 
 ## API Route Files
@@ -770,7 +787,9 @@ import {
   verifyDrawingOwnership,
 } from '@/lib/comments'
 
-export const Route = createFileRoute('/api/participant/$participantId/comments')({
+export const Route = createFileRoute(
+  '/api/participant/$participantId/comments',
+)({
   server: {
     handlers: {
       GET: async ({ request, params }) => {
@@ -862,10 +881,10 @@ export const Route = createFileRoute('/api/participant/$participantId/comments')
           })
 
           if (!result.success) {
-            return new Response(
-              JSON.stringify({ error: result.error }),
-              { status: 500, headers: { 'Content-Type': 'application/json' } },
-            )
+            return new Response(JSON.stringify({ error: result.error }), {
+              status: 500,
+              headers: { 'Content-Type': 'application/json' },
+            })
           }
 
           return new Response(
@@ -890,7 +909,10 @@ Create `src/routes/api/drawings/$drawingId/p/$participantId.comments.ts`:
 
 ```typescript
 import { createFileRoute } from '@tanstack/react-router'
-import { getCommentsForParticipant, createParticipantComment } from '@/lib/comments'
+import {
+  getCommentsForParticipant,
+  createParticipantComment,
+} from '@/lib/comments'
 
 export const Route = createFileRoute(
   '/api/drawings/$drawingId/p/$participantId/comments',
@@ -899,7 +921,7 @@ export const Route = createFileRoute(
     handlers: {
       GET: async ({ params }) => {
         const participantId = parseInt(params.participantId, 10)
-        
+
         if (isNaN(participantId)) {
           return new Response(
             JSON.stringify({ error: 'Invalid participant ID' }),
@@ -923,7 +945,7 @@ export const Route = createFileRoute(
 
       POST: async ({ request, params }) => {
         const participantId = parseInt(params.participantId, 10)
-        
+
         if (isNaN(participantId)) {
           return new Response(
             JSON.stringify({ error: 'Invalid participant ID' }),
@@ -948,10 +970,10 @@ export const Route = createFileRoute(
           })
 
           if (!result.success) {
-            return new Response(
-              JSON.stringify({ error: result.error }),
-              { status: 500, headers: { 'Content-Type': 'application/json' } },
-            )
+            return new Response(JSON.stringify({ error: result.error }), {
+              status: 500,
+              headers: { 'Content-Type': 'application/json' },
+            })
           }
 
           return new Response(

@@ -1,73 +1,64 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
+import {
+  useParticipantComments,
+  useAddParticipantComment,
+} from '@/querys/useParticipantComments'
+import { Skeleton } from '@/components/ui/skeleton'
 
-export function ParticipantComments({ participantId }: { participantId: number }) {
-  const [comments, setComments] = useState<any[]>([])
+export function ParticipantComments({
+  participantId,
+}: {
+  participantId: number
+}) {
   const [newComment, setNewComment] = useState('')
   const [isVisible, setIsVisible] = useState(true)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
 
-  useEffect(() => {
-    fetchComments()
-  }, [participantId])
+  const { data, isLoading } = useParticipantComments(participantId)
+  const addComment = useAddParticipantComment(participantId)
 
-  const fetchComments = async () => {
-    try {
-      const response = await fetch(`/api/participant/${participantId}/comments`)
-      if (response.ok) {
-        const data = await response.json()
-        setComments(data.comments || [])
-      } else if (response.status !== 401 && response.status !== 403) {
-        toast.error('Failed to load comments')
-      }
-    } catch (error) {
-      console.error('Error fetching comments:', error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  const comments = data?.comments || []
 
   const handleAddComment = async () => {
     if (!newComment.trim()) return
 
-    setIsSubmitting(true)
-    try {
-      const response = await fetch(`/api/participant/${participantId}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          comment: newComment,
-          isVisibleToParticipant: isVisible,
-        }),
-      })
-
-      if (response.ok) {
-        toast.success('Comment added successfully')
-        setNewComment('')
-        setIsVisible(true)
-        await fetchComments()
-      } else {
-        const data = await response.json()
-        toast.error(data.error || 'Failed to add comment')
-      }
-    } catch (error) {
-      toast.error('Failed to add comment')
-    } finally {
-      setIsSubmitting(false)
-    }
+    addComment.mutate(
+      {
+        comment: newComment,
+        isVisibleToParticipant: isVisible,
+      },
+      {
+        onSuccess: () => {
+          toast.success('Comment added successfully')
+          setNewComment('')
+          setIsVisible(true)
+        },
+        onError: (error) => {
+          toast.error(error.message || 'Failed to add comment')
+        },
+      },
+    )
   }
 
   if (isLoading) {
     return (
       <Card className="rounded-lg p-6 mt-4">
         <h3 className="text-xl font-semibold mb-4">Conversation</h3>
-        <p className="text-sm text-gray-500">Loading conversation...</p>
+
+        <Skeleton className="h-10 w-full mb-4" />
+        <Skeleton className="h-10 w-full mb-4" />
+        <Skeleton className="h-10 w-full mb-4" />
+
+        <div className="space-y-3">
+          {[...Array(3)].map((_, index) => (
+            <Skeleton key={index} className="h-16 w-full" />
+          ))}
+        </div>
       </Card>
     )
   }
@@ -75,7 +66,7 @@ export function ParticipantComments({ participantId }: { participantId: number }
   return (
     <Card className="rounded-lg p-6 mt-4">
       <h3 className="text-xl font-semibold mb-4">Conversation</h3>
-      
+
       {/* Add Comment Form */}
       <div className="space-y-3 mb-6">
         <Textarea
@@ -84,7 +75,7 @@ export function ParticipantComments({ participantId }: { participantId: number }
           onChange={(e) => setNewComment(e.target.value)}
           className="min-h-[100px]"
         />
-        
+
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Switch
@@ -96,12 +87,12 @@ export function ParticipantComments({ participantId }: { participantId: number }
               Visible to participant
             </Label>
           </div>
-          
+
           <Button
             onClick={handleAddComment}
-            disabled={isSubmitting || !newComment.trim()}
+            disabled={addComment.isPending || !newComment.trim()}
           >
-            {isSubmitting ? 'Sending...' : 'Send Message'}
+            {addComment.isPending ? 'Sending...' : 'Send Message'}
           </Button>
         </div>
       </div>
@@ -109,7 +100,9 @@ export function ParticipantComments({ participantId }: { participantId: number }
       {/* Conversation Thread */}
       <div className="space-y-3">
         {comments.length === 0 ? (
-          <p className="text-sm text-gray-500">No messages yet. Start the conversation!</p>
+          <p className="text-sm text-gray-500">
+            No messages yet. Start the conversation!
+          </p>
         ) : (
           comments.map((comment) => (
             <div
@@ -134,11 +127,12 @@ export function ParticipantComments({ participantId }: { participantId: number }
                     {new Date(comment.createdAt).toLocaleString()}
                   </span>
                 </div>
-                {comment.authorType === 'host' && !comment.isVisibleToParticipant && (
-                  <span className="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 px-2 py-1 rounded">
-                    Private
-                  </span>
-                )}
+                {comment.authorType === 'host' &&
+                  !comment.isVisibleToParticipant && (
+                    <span className="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 px-2 py-1 rounded">
+                      Private
+                    </span>
+                  )}
               </div>
               <p className="text-sm whitespace-pre-wrap">{comment.comment}</p>
             </div>

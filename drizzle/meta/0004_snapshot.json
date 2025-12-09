@@ -94,12 +94,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -176,12 +172,8 @@
           "name": "assets_owner_id_user_id_fk",
           "tableFrom": "assets",
           "tableTo": "user",
-          "columnsFrom": [
-            "owner_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["owner_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -256,12 +248,8 @@
           "name": "balance_consumptions_user_id_user_id_fk",
           "tableFrom": "balance_consumptions",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -269,12 +257,8 @@
           "name": "balance_consumptions_drawing_id_drawings_id_fk",
           "tableFrom": "balance_consumptions",
           "tableTo": "drawings",
-          "columnsFrom": [
-            "drawing_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["drawing_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -377,9 +361,7 @@
         "coupons_code_unique": {
           "name": "coupons_code_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "code"
-          ]
+          "columns": ["code"]
         }
       },
       "policies": {},
@@ -436,12 +418,8 @@
           "name": "drawing_assets_drawing_id_drawings_id_fk",
           "tableFrom": "drawing_assets",
           "tableTo": "drawings",
-          "columnsFrom": [
-            "drawing_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["drawing_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -449,12 +427,8 @@
           "name": "drawing_assets_asset_id_assets_id_fk",
           "tableFrom": "drawing_assets",
           "tableTo": "assets",
-          "columnsFrom": [
-            "asset_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["asset_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -501,12 +475,8 @@
           "name": "drawing_winners_drawing_id_drawings_id_fk",
           "tableFrom": "drawing_winners",
           "tableTo": "drawings",
-          "columnsFrom": [
-            "drawing_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["drawing_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -514,12 +484,8 @@
           "name": "drawing_winners_participant_id_participants_id_fk",
           "tableFrom": "drawing_winners",
           "tableTo": "participants",
-          "columnsFrom": [
-            "participant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["participant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -626,12 +592,8 @@
           "name": "drawings_user_id_user_id_fk",
           "tableFrom": "drawings",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -710,12 +672,8 @@
           "name": "number_slots_drawing_id_drawings_id_fk",
           "tableFrom": "number_slots",
           "tableTo": "drawings",
-          "columnsFrom": [
-            "drawing_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["drawing_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -723,12 +681,8 @@
           "name": "number_slots_participant_id_participants_id_fk",
           "tableFrom": "number_slots",
           "tableTo": "participants",
-          "columnsFrom": [
-            "participant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["participant_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -823,12 +777,8 @@
           "name": "pack_redemptions_user_id_user_id_fk",
           "tableFrom": "pack_redemptions",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -836,12 +786,8 @@
           "name": "pack_redemptions_pack_id_packs_id_fk",
           "tableFrom": "pack_redemptions",
           "tableTo": "packs",
-          "columnsFrom": [
-            "pack_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pack_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -849,12 +795,8 @@
           "name": "pack_redemptions_coupon_id_coupons_id_fk",
           "tableFrom": "pack_redemptions",
           "tableTo": "coupons",
-          "columnsFrom": [
-            "coupon_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["coupon_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         }
@@ -951,9 +893,7 @@
         "packs_polar_id_unique": {
           "name": "packs_polar_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "polar_id"
-          ]
+          "columns": ["polar_id"]
         }
       },
       "policies": {},
@@ -1030,12 +970,8 @@
           "name": "participant_comments_participant_id_participants_id_fk",
           "tableFrom": "participant_comments",
           "tableTo": "participants",
-          "columnsFrom": [
-            "participant_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["participant_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1043,12 +979,8 @@
           "name": "participant_comments_author_id_user_id_fk",
           "tableFrom": "participant_comments",
           "tableTo": "user",
-          "columnsFrom": [
-            "author_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["author_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1131,12 +1063,8 @@
           "name": "participants_drawing_id_drawings_id_fk",
           "tableFrom": "participants",
           "tableTo": "drawings",
-          "columnsFrom": [
-            "drawing_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["drawing_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1144,12 +1072,8 @@
           "name": "participants_payment_capture_id_assets_id_fk",
           "tableFrom": "participants",
           "tableTo": "assets",
-          "columnsFrom": [
-            "payment_capture_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["payment_capture_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1220,12 +1144,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1235,9 +1155,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -1333,9 +1251,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -1413,12 +1329,8 @@
           "name": "user_balances_user_id_user_id_fk",
           "tableFrom": "user_balances",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1485,36 +1397,22 @@
     "public.author_type": {
       "name": "author_type",
       "schema": "public",
-      "values": [
-        "host",
-        "participant"
-      ]
+      "values": ["host", "participant"]
     },
     "public.giway_type": {
       "name": "giway_type",
       "schema": "public",
-      "values": [
-        "play_with_numbers",
-        "no_numbers"
-      ]
+      "values": ["play_with_numbers", "no_numbers"]
     },
     "public.redemption_source": {
       "name": "redemption_source",
       "schema": "public",
-      "values": [
-        "purchase",
-        "coupon",
-        "ads",
-        "monthly"
-      ]
+      "values": ["purchase", "coupon", "ads", "monthly"]
     },
     "public.winner_selection": {
       "name": "winner_selection",
       "schema": "public",
-      "values": [
-        "manually",
-        "system"
-      ]
+      "values": ["manually", "system"]
     }
   },
   "schemas": {},

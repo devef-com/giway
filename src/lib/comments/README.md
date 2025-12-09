@@ -50,6 +50,7 @@ The participant comments feature enables **two-way communication** between drawi
 ## Implementation Summary
 
 ### Database
+
 - Single table: `participant_comments`
 - Relations to `participants` and `user` tables
 - `author_type` enum: 'host' or 'participant'
@@ -57,12 +58,14 @@ The participant comments feature enables **two-way communication** between drawi
 - Visibility flag for host comment control
 
 ### Backend
+
 - Library functions in `src/lib/comments/index.ts`
 - Separate functions: `createHostComment()` and `createParticipantComment()`
 - Authorization checks for host-only operations
 - **No authentication required** for participant comments
 
 ### Frontend
+
 - Bidirectional conversation UI components
 - Clear visual distinction between host and participant messages
 - Reply functionality for participants

@@ -60,10 +60,10 @@ export const Route = createFileRoute(
           })
 
           if (!result.success) {
-            return new Response(
-              JSON.stringify({ error: result.error }),
-              { status: 500, headers: { 'Content-Type': 'application/json' } },
-            )
+            return new Response(JSON.stringify({ error: result.error }), {
+              status: 500,
+              headers: { 'Content-Type': 'application/json' },
+            })
           }
 
           return new Response(

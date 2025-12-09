@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/card'
 import { AlertCircleIcon, ImageIcon } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { ParticipantComments } from '@/components/ParticipantComments'
 
 export const Route = createFileRoute('/drawings/$drawingId/m/$participant')({
   component: RouteComponent,
@@ -325,7 +326,7 @@ function RouteComponent() {
 
         <ParticipantComments participantId={parseInt(participantId, 10)} />
 
-        <details className="mt-4">
+        <details className="hidden mt-4">
           <summary className="cursor-pointer text-sm text-gray-600 dark:text-gray-400">
             Debug Info
           </summary>

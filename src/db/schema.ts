@@ -96,7 +96,9 @@ export const participantComments = pgTable('participant_comments', {
   participantId: integer('participant_id')
     .notNull()
     .references(() => participants.id, { onDelete: 'cascade' }),
-  authorId: text('author_id').references(() => user.id, { onDelete: 'cascade' }), // NULL for participant comments
+  authorId: text('author_id').references(() => user.id, {
+    onDelete: 'cascade',
+  }), // NULL for participant comments
   authorType: authorTypeEnum('author_type').notNull().default('host'),
   authorName: varchar('author_name', { length: 255 }), // For participant comments
   comment: text('comment').notNull(),
