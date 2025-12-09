@@ -28,6 +28,8 @@ export const redemptionSourceEnum = pgEnum('redemption_source', [
   'monthly', // monthly free allowance
 ])
 
+export const authorTypeEnum = pgEnum('author_type', ['host', 'participant'])
+
 // Assets table (polymorphic)
 export const assets = pgTable('assets', {
   id: serial('id').primaryKey(),
@@ -86,6 +88,26 @@ export const participants = pgTable('participants', {
   isEligible: boolean('is_eligible'), // null = pending, true = approved, false = rejected
   paymentCaptureId: integer('payment_capture_id').references(() => assets.id), // Reference to payment proof asset
   createdAt: timestamp('created_at').notNull().defaultNow(),
+})
+
+// Participant Comments table (bidirectional communication)
+export const participantComments = pgTable('participant_comments', {
+  id: serial('id').primaryKey(),
+  participantId: integer('participant_id')
+    .notNull()
+    .references(() => participants.id, { onDelete: 'cascade' }),
+  authorId: text('author_id').references(() => user.id, { onDelete: 'cascade' }), // NULL for participant comments
+  authorType: authorTypeEnum('author_type').notNull().default('host'),
+  authorName: varchar('author_name', { length: 255 }), // For participant comments
+  comment: text('comment').notNull(),
+  isVisibleToParticipant: boolean('is_visible_to_participant')
+    .notNull()
+    .default(true), // Only relevant for host comments
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at')
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 })
 
 // Drawing Winners junction table
@@ -306,6 +328,22 @@ export const participantsRelations = relations(
     }),
     numberSlots: many(numberSlots),
     wonDrawings: many(drawingWinners),
+    comments: many(participantComments),
+  }),
+)
+
+// Participant Comments relations
+export const participantCommentsRelations = relations(
+  participantComments,
+  ({ one }) => ({
+    participant: one(participants, {
+      fields: [participantComments.participantId],
+      references: [participants.id],
+    }),
+    author: one(user, {
+      fields: [participantComments.authorId],
+      references: [user.id],
+    }),
   }),
 )
 
@@ -412,3 +450,5 @@ export type Coupon = typeof coupons.$inferSelect
 export type NewCoupon = typeof coupons.$inferInsert
 export type BalanceConsumption = typeof balanceConsumptions.$inferSelect
 export type NewBalanceConsumption = typeof balanceConsumptions.$inferInsert
+export type ParticipantComment = typeof participantComments.$inferSelect
+export type NewParticipantComment = typeof participantComments.$inferInsert

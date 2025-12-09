@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useDrawing } from '@/querys/useDrawing'
+import { ParticipantCommentsView } from '@/components/ParticipantCommentsView'
 
 const HOST = import.meta.env.APP_HOST || 'http://localhost:3000'
 
@@ -201,6 +202,11 @@ function RouteComponent() {
               Download ticket
             </Button>
           </div>
+
+          <ParticipantCommentsView
+            drawingId={drawingId}
+            participantId={participateId}
+          />
         </>
       ) : isLoading ? (
         <div>Loading participant data...</div>
