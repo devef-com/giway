@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import type { ParticipantStatus } from '@/lib/participants'
 import { Card } from '@/components/ui/card'
-import { AlertCircleIcon } from 'lucide-react'
+import { AlertCircleIcon, ImageIcon } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 
@@ -201,6 +201,16 @@ function RouteComponent() {
                     onClick={() => setShowImageModal(true)}
                   />
                 </figure>
+
+                <a
+                  href={participantAssets.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline ml-2"
+                >
+                  <ImageIcon className=" h-4 w-4 inline-block mr-1" /> Open in
+                  new tab
+                </a>
                 <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
                   <DialogContent className="flex flex-col items-center justify-center p-0 shadow-none sm:max-w-2/3">
                     <img

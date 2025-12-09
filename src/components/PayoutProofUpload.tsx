@@ -13,7 +13,7 @@ const ALLOWED_FILE_TYPES = [
   'application/pdf',
 ] as const
 
-const MAX_FILE_SIZE = 1 * 1024 * 1024 // 1MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024 // 2MB
 
 type AllowedFileType = (typeof ALLOWED_FILE_TYPES)[number]
 
@@ -64,9 +64,9 @@ export function PayoutProofUpload({
         return
       }
 
-      // Validate file size
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error('File size too large. Maximum allowed: 1MB')
+      // Only apply size limit to PDFs
+      if (file.type === 'application/pdf' && file.size > MAX_FILE_SIZE) {
+        toast.error('PDF file size too large. Maximum allowed: 2MB')
         return
       }
 
