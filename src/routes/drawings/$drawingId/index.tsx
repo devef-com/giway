@@ -74,7 +74,7 @@ function DrawingDetail() {
   )
   const { data: drawingWinners, isLoading: loadingWinners } = useDrawingWinners(
     drawingId,
-    !!session.data && loadWinners,
+    loadWinners,
   )
 
   const {
@@ -83,7 +83,7 @@ function DrawingDetail() {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-  } = useParticipants(drawingId, !!session.data, {
+  } = useParticipants(drawingId, true, {
     status: statusFilter,
     name: nameSearch,
     limit,
@@ -269,11 +269,11 @@ function DrawingDetail() {
     },
   ]
 
-  if (!session.data) {
+  if (!session.data && !session.isPending) {
     return (
       <div className="min-h-screen p-6">
         <div className="max-w-4xl mx-auto">
-          <Card className="p-6 bg-slate-800/50 border-slate-700">
+          <Card className="p-6">
             <p className="text-white text-center">
               Please log in to view this drawing.{' '}
               <a
@@ -289,12 +289,18 @@ function DrawingDetail() {
     )
   }
 
-  if (drawingLoading) {
+  if (!session.data || drawingLoading) {
     return (
-      <div className="min-h-screen p-6">
-        <div className="max-w-6xl mx-auto">
-          <Card className="p-6 bg-slate-800/50 border-slate-700">
-            <p className="text-white text-center">Loading...</p>
+      <div className="min-h-[calc(100svh-129px)] p-6">
+        <div className="max-w-6xl mx-auto space-y-6">
+          {/* Main card skeleton */}
+          <Card className="p-4 min-h-40">
+            <Skeleton className="w-full h-16 rounded-xl bg-slate-800/50 border-slate-700 mb-1" />
+            <Skeleton className="w-full h-16 rounded-xl bg-slate-800/50 border-slate-700" />
+          </Card>
+          <Card className="p-4 min-h-40">
+            <Skeleton className="w-full h-16 rounded-xl bg-slate-800/50 border-slate-700 mb-1" />
+            <Skeleton className="w-full h-26 rounded-xl bg-slate-800/50 border-slate-700" />
           </Card>
         </div>
       </div>
@@ -303,7 +309,7 @@ function DrawingDetail() {
 
   if (!drawing) {
     return (
-      <div className="min-h-screen p-6">
+      <div className="min-h-[calc(100svh-129px)] p-6">
         <div className="max-w-6xl mx-auto">
           <Card className="p-6 bg-slate-800/50 border-slate-700">
             <p className="text-white text-center">Drawing not found</p>
@@ -314,7 +320,7 @@ function DrawingDetail() {
   }
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-[calc(100svh-129px)] p-6">
       <div className="max-w-6xl mx-auto">
         <Card className="p-4 border-slate-700 mb-6 gap-2">
           <div className="grid grid-cols-[1fr_auto]">
