@@ -40,7 +40,9 @@ export const assets = pgTable('assets', {
   size: integer('size'), // File size in bytes
   s3Key: varchar('s3_key', { length: 500 }), // S3/R2 storage key
   ownerId: text('owner_id').references(() => user.id, { onDelete: 'set null' }), // Owner of the asset
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 })
 
 // Drawing Assets junction table (for multiple images per drawing)
@@ -54,7 +56,9 @@ export const drawingAssets = pgTable('drawing_assets', {
     .references(() => assets.id, { onDelete: 'cascade' }),
   sortOrder: integer('sort_order').default(0), // For ordering images
   isCover: boolean('is_cover').default(false), // Only one per drawing, used for OG meta image
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 })
 
 // Number slots table (for efficient number availability tracking)
@@ -68,10 +72,14 @@ export const numberSlots = pgTable('number_slots', {
   participantId: integer('participant_id').references(() => participants.id, {
     onDelete: 'set null',
   }),
-  reservedAt: timestamp('reserved_at'),
-  expiresAt: timestamp('expires_at'), // For temporary reservations
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  reservedAt: timestamp('reserved_at', { withTimezone: true }),
+  expiresAt: timestamp('expires_at', { withTimezone: true }), // For temporary reservations
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 })
 
 // Participants table
@@ -87,7 +95,9 @@ export const participants = pgTable('participants', {
   logNumbers: integer('log_numbers').array(), // Track numbers selected by rejected participants
   isEligible: boolean('is_eligible'), // null = pending, true = approved, false = rejected
   paymentCaptureId: integer('payment_capture_id').references(() => assets.id), // Reference to payment proof asset
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 })
 
 // Participant Comments table (bidirectional communication)
@@ -105,8 +115,10 @@ export const participantComments = pgTable('participant_comments', {
   isVisibleToParticipant: boolean('is_visible_to_participant')
     .notNull()
     .default(true), // Only relevant for host comments
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at')
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
@@ -121,7 +133,9 @@ export const drawingWinners = pgTable('drawing_winners', {
   participantId: integer('participant_id')
     .notNull()
     .references(() => participants.id, { onDelete: 'cascade' }),
-  selectedAt: timestamp('selected_at').notNull().defaultNow(),
+  selectedAt: timestamp('selected_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   // Optional: Add fields like prize tier, announcement status, etc.
 })
 
@@ -140,15 +154,17 @@ export const drawings = pgTable('drawings', {
   playWithNumbers: boolean('play_with_numbers').default(false),
   winnersAmount: integer('winners_amount').notNull().default(1), // how many winners to select
   winnerNumbers: integer('winner_numbers').array(), // Array of winning numbers(enter by user or randomly selected)
-  endAt: timestamp('end_at').notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  endAt: timestamp('end_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 })
 
 // Copilot: do Not delete this
 export const todos = pgTable('todos', {
   id: serial('id').primaryKey(),
   title: text('title').notNull(),
-  createdAt: timestamp('created_at').defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 })
 
 // Packs table - defines available packs for purchase/redemption
@@ -161,8 +177,12 @@ export const packs = pgTable('packs', {
   emails: integer('emails').notNull().default(0), // max email notifications
   price: integer('price').notNull().default(0), // price in cents
   isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
   polarId: varchar('polar_id', { length: 250 }).unique(), // Polar product ID for subscriptions
 })
 
@@ -176,9 +196,13 @@ export const userBalances = pgTable('user_balances', {
   participants: integer('participants').notNull().default(0),
   images: integer('images').notNull().default(0),
   emails: integer('emails').notNull().default(0),
-  expiresAt: timestamp('expires_at'), // null = never expires (purchased), set = monthly allowance
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }), // null = never expires (purchased), set = monthly allowance
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 })
 
 // Pack redemptions table - logs all pack purchases/redemptions
@@ -199,7 +223,9 @@ export const packRedemptions = pgTable('pack_redemptions', {
   images: integer('images').notNull().default(0),
   emails: integer('emails').notNull().default(0),
   amountPaid: integer('amount_paid').default(0), // amount in cents if purchased
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 })
 
 // Coupons table - for coupon redemption system
@@ -212,10 +238,14 @@ export const coupons = pgTable('coupons', {
   emails: integer('emails').notNull().default(0),
   maxUses: integer('max_uses'), // null = unlimited
   usedCount: integer('used_count').notNull().default(0),
-  expiresAt: timestamp('expires_at'), // null = never expires
+  expiresAt: timestamp('expires_at', { withTimezone: true }), // null = never expires
   isActive: boolean('is_active').notNull().default(true),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 })
 
 // Balance consumptions table - tracks what was consumed when creating drawings
@@ -231,7 +261,9 @@ export const balanceConsumptions = pgTable('balance_consumptions', {
   participants: integer('participants').notNull().default(0), // participants allocated
   images: integer('images').notNull().default(0), // images used
   emails: integer('emails').notNull().default(0), // emails allocated
-  createdAt: timestamp('created_at').notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
 })
 
 // Better Auth tables
@@ -241,8 +273,10 @@ export const user = pgTable('user', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').default(false).notNull(),
   image: text('image'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
@@ -250,9 +284,11 @@ export const user = pgTable('user', {
 
 export const session = pgTable('session', {
   id: text('id').primaryKey(),
-  expiresAt: timestamp('expires_at').notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   token: text('token').notNull().unique(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
   updatedAt: timestamp('updated_at')
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
@@ -273,12 +309,18 @@ export const account = pgTable('account', {
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
   idToken: text('id_token'),
-  accessTokenExpiresAt: timestamp('access_token_expires_at'),
-  refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+  accessTokenExpiresAt: timestamp('access_token_expires_at', {
+    withTimezone: true,
+  }),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at', {
+    withTimezone: true,
+  }),
   scope: text('scope'),
   password: text('password'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 })
@@ -287,9 +329,11 @@ export const verification = pgTable('verification', {
   id: text('id').primaryKey(),
   identifier: text('identifier').notNull(),
   value: text('value').notNull(),
-  expiresAt: timestamp('expires_at').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at')
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),

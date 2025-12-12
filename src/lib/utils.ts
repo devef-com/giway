@@ -93,40 +93,36 @@ export const getTimeRemainingText = (endDate: string) => {
 }
 
 export const formatDateGiway = (dateString: string) => {
-  // Parse the UTC timestamp and display in UTC to match stored time
   const date = new Date(dateString)
-  const now = new Date()
 
-  // Compare dates in UTC
-  const todayUTC = Date.UTC(
-    now.getUTCFullYear(),
-    now.getUTCMonth(),
-    now.getUTCDate(),
-  )
-  const yesterdayUTC = todayUTC - 86400000 // 24 hours in ms
-  const participantDayUTC = Date.UTC(
-    date.getUTCFullYear(),
-    date.getUTCMonth(),
-    date.getUTCDate(),
-  )
+  const userTZ = Intl.DateTimeFormat().resolvedOptions().timeZone
 
-  const time = date.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-    timeZone: 'UTC',
+  const formatter = (opts: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: userTZ,
+      ...opts,
+    }).format(date)
+
+  const todayLocal = new Date().toLocaleDateString(navigator.language, {
+    timeZone: userTZ,
+  })
+  const dateLocal = date.toLocaleDateString(navigator.language, {
+    timeZone: userTZ,
   })
 
-  if (participantDayUTC === todayUTC) {
-    return `Today ${time}`
-  } else if (participantDayUTC === yesterdayUTC) {
-    return `Yesterday ${time}`
-  } else {
-    const monthDay = date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: '2-digit',
-      timeZone: 'UTC',
-    })
-    return `${monthDay} ${time}`
+  if (dateLocal === todayLocal) {
+    return `Today ${formatter({ hour: '2-digit', minute: '2-digit', hour12: true })}`
   }
+
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayLocal = yesterday.toLocaleDateString(navigator.language, {
+    timeZone: userTZ,
+  })
+
+  if (dateLocal === yesterdayLocal) {
+    return `Yesterday ${formatter({ hour: '2-digit', minute: '2-digit', hour12: true })}`
+  }
+
+  return `${formatter({ month: 'short', day: '2-digit' })} ${formatter({ hour: '2-digit', minute: '2-digit', hour12: true })}`
 }
