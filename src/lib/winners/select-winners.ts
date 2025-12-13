@@ -105,6 +105,7 @@ export async function selectRandomWinners(
     (participant: (typeof eligibleParticipants)[0]) => ({
       participantId: participant.id,
       participantName: participant.name,
+      winningNumber: participant.selectedNumber!,
     }),
   )
 }
@@ -370,6 +371,11 @@ export async function selectWinners(
       drawingId,
       winnersAmount: drawingData.winnersAmount,
     })
+
+    await db
+      .update(drawings)
+      .set({ winnerNumbers: winners.map((w) => w.winningNumber!) })
+      .where(eq(drawings.id, drawingId))
 
     result = {
       drawingId,
