@@ -3,6 +3,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { eq, desc } from 'drizzle-orm'
 import {
   CircleAlert,
   ImageIcon,
@@ -11,6 +12,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  MoveRightIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -31,7 +33,6 @@ import { useParticipate } from '@/querys/useParticipate'
 import { useDrawingWinners } from '@/querys/useDrawingWinners'
 import { Drawing, drawings, drawingAssets, assets } from '@/db/schema'
 import { db } from '@/db/index'
-import { eq, desc } from 'drizzle-orm'
 
 const getDrawing = createServerFn({
   method: 'GET',
@@ -746,28 +747,7 @@ function SlotDrawingParticipation() {
                 )}
                 onClick={handleReserveNumbers}
               >
-                <svg
-                  width="31"
-                  height="31"
-                  viewBox="0 0 31 31"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19.4235 9.34772L25.1786 15.1057L19.4235 20.8622"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M6.47449 15.1071H25.1786"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <MoveRightIcon className="text-white" />
               </div>
               <div
                 className={cn(
@@ -782,8 +762,8 @@ function SlotDrawingParticipation() {
                       onClick={() => goToPage(i)}
                       className={`rounded-full transition-all duration-200 cursor-pointer hover:opacity-80 ${
                         i === currentPage
-                          ? 'w-3 h-3 bg-[#14b8a6]'
-                          : 'w-2.5 h-2.5 bg-border-light dark:bg-border-dark'
+                          ? 'w-4 h-4 bg-[#14b8a6]'
+                          : 'w-3.5 h-3.5 bg-border-light dark:bg-border-dark'
                       }`}
                     />
                   ))}
