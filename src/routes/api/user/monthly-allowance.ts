@@ -7,7 +7,7 @@ import { auth } from '@/lib/auth'
 
 // Monthly allowance configuration (only for play_with_numbers)
 const MONTHLY_ALLOWANCE = {
-  participants: 200,
+  participants: 100,
   images: 1,
   emails: 0,
   giwayType: 'play_with_numbers' as const,

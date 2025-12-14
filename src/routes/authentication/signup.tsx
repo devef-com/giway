@@ -17,6 +17,21 @@ function SignUp() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const claimMonthlyAllowance = async () => {
+    try {
+      // Best-effort: grant the monthly allowance after signup.
+      // Server will no-op (400) if already claimed.
+      await fetch('/api/user/monthly-allowance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+      })
+    } catch (err) {
+      // Don't block signup flow if this fails.
+      console.error('Failed to claim monthly allowance after signup:', err)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
@@ -35,8 +50,9 @@ function SignUp() {
       }
 
       if (data) {
+        await claimMonthlyAllowance()
         // Successfully signed up, redirect to home or dashboard
-        navigate({ to: '/' })
+        navigate({ to: '/drawings' })
       }
     } catch (err) {
       setError('An unexpected error occurred')
