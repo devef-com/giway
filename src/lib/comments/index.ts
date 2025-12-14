@@ -1,6 +1,6 @@
 import { db } from '@/db/index'
 import { participantComments, participants, drawings, user } from '@/db/schema'
-import { eq, and, desc, or } from 'drizzle-orm'
+import { eq, and, or } from 'drizzle-orm'
 
 export interface CreateHostCommentParams {
   participantId: number

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { eq, sql } from 'drizzle-orm'
+import { eq, sql, and } from 'drizzle-orm'
 
 import { db } from '@/db/index'
 import { packRedemptions, balanceConsumptions } from '@/db/schema'
@@ -38,7 +38,12 @@ export async function calculateUserBalance(
       ),
     })
     .from(packRedemptions)
-    .where(eq(packRedemptions.userId, userId))
+    .where(
+      and(
+        eq(packRedemptions.userId, userId),
+        sql`not ("source" = 'monthly' and "created_at" < date_trunc('month', NOW()))`,
+      ),
+    )
     .groupBy(packRedemptions.giwayType)
 
   // Get all consumptions (debits) - grouped by giway type
