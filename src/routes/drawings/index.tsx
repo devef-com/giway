@@ -63,7 +63,7 @@ function DrawingsList() {
   // }
 
   return (
-    <div className="min-h-[calc(100svh-128px)] p-6">
+    <div className="min-h-[calc(100svh-129px)] p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-xl font-bold">My Drawings</h1>
@@ -211,8 +211,8 @@ function DrawingsList() {
             ))}
           </div>
         ) : (
-          <Card className="p-6 bg-slate-800/50 border-slate-700">
-            <p className="text-center">
+          <Card className="p-6 min-h-40 ">
+            <p className="text-center my-auto">
               No drawings yet.{' '}
               <Link
                 to="/drawings/create"

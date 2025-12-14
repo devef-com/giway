@@ -77,7 +77,13 @@ export function formatNumber(
 }
 
 export const getTimeRemainingText = (endDate: string) => {
-  const end = new Date(endDate)
+  const isFullIsoWithTimezone =
+    /Z$/.test(endDate) || /[+-]\d{2}:?\d{2}$/.test(endDate)
+
+  // If we get a "datetime-local" style string (no timezone), treat it as UTC wall time.
+  const end = isFullIsoWithTimezone
+    ? new Date(endDate)
+    : new Date(datetimeLocalToUtcISOString(endDate))
   const now = new Date()
   const diff = end.getTime() - now.getTime()
 
@@ -125,4 +131,26 @@ export const formatDateGiway = (dateString: string) => {
   }
 
   return `${formatter({ month: 'short', day: '2-digit' })} ${formatter({ hour: '2-digit', minute: '2-digit', hour12: true })}`
+}
+
+export function datetimeLocalToUtcISOString(value: string) {
+  // `value` format: YYYY-MM-DDTHH:mm (no timezone)
+  // Treat it as a *local* wall time and serialize to a UTC ISO string (Z).
+  const [datePart, timePart] = value.split('T')
+  if (!datePart || !timePart) return value
+
+  const [year, month, day] = datePart.split('-').map(Number)
+  const [hour, minute] = timePart.split(':').map(Number)
+
+  if (
+    !Number.isFinite(year) ||
+    !Number.isFinite(month) ||
+    !Number.isFinite(day) ||
+    !Number.isFinite(hour) ||
+    !Number.isFinite(minute)
+  ) {
+    return value
+  }
+
+  return new Date(year, month - 1, day, hour, minute, 0, 0).toISOString()
 }

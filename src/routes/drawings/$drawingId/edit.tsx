@@ -40,6 +40,7 @@ import { format } from 'date-fns'
 import useMobile from '@/hooks/useMobile'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
+import { datetimeLocalToUtcISOString } from '@/lib/utils'
 
 export const Route = createFileRoute('/drawings/$drawingId/edit')({
   component: EditDrawing,
@@ -78,14 +79,15 @@ function EditDrawing() {
   const [isOpen, setIsOpen] = useState(false)
   const isMobile = useMobile()
   const [endAtError, setEndAtError] = useState('')
-
   // Populate form data when drawing is loaded
   useEffect(() => {
     if (drawing) {
       const endDate = new Date(drawing.endAt)
       const year = endDate.getFullYear()
-      const month = String(endDate.getMonth() + 1).padStart(2, '0')
-      const day = String(endDate.getDate()).padStart(2, '0')
+      const monthNumber = endDate.getMonth() + 1
+      const month = String(monthNumber).padStart(2, '0')
+      const dayNumber = endDate.getDate()
+      const day = String(dayNumber).padStart(2, '0')
       const hours = String(endDate.getHours()).padStart(2, '0')
       const minutes = String(endDate.getMinutes()).padStart(2, '0')
       const isoString = `${year}-${month}-${day}T${hours}:${minutes}`
@@ -212,7 +214,7 @@ function EditDrawing() {
           price: formData.isPaid ? formData.price : 0,
           winnerSelection: formData.winnerSelection,
           winnersAmount: formData.winnersAmount,
-          endAt: formData.endAt,
+          endAt: datetimeLocalToUtcISOString(formData.endAt),
           // Note: playWithNumbers and quantityOfNumbers are NOT editable
         }),
       })

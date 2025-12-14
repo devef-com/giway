@@ -53,7 +53,7 @@ import {
   ExpandableContent,
   ExpandableTitle,
 } from '@/components/ui/expandable'
-import { cn } from '@/lib/utils'
+import { cn, datetimeLocalToUtcISOString } from '@/lib/utils'
 
 export const Route = createFileRoute('/drawings/create')({
   component: CreateDrawing,
@@ -232,6 +232,7 @@ function CreateDrawing() {
         },
         body: JSON.stringify({
           ...formData,
+          endAt: datetimeLocalToUtcISOString(formData.endAt),
           guidelines: filteredGuidelines,
           price: formData.isPaid ? formData.price : 0,
         }),

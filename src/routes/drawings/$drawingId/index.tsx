@@ -380,7 +380,7 @@ function DrawingDetail() {
                   )}
                   <p className="mb-2 text-sm">
                     <strong>End Date:</strong>{' '}
-                    {new Date(drawing.endAt).toLocaleString()}
+                    {new Date(drawing.endAt).toLocaleString(navigator.language)}
                   </p>
                 </div>
                 {drawing.guidelines && drawing.guidelines.length > 0 && (
