@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { eq, desc } from 'drizzle-orm'
 import {
   CircleAlert,
   ImageIcon,
@@ -11,6 +12,7 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  MoveRightIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,13 +22,17 @@ import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import DrawingSlotHeader from '@/components/DrawingSlotHeader'
 import { useDrawingStats } from '@/querys/useDrawingStats'
-import { useNumberSlots } from '@/querys/useNumberSlots'
+import {
+  fetchNumberSlotsPage,
+  getNumberSlotsPageQueryKey,
+  type NumberSlotsPageData,
+  useNumberSlotsPage,
+} from '@/querys/useNumberSlotsPage'
 import { useReservationTime } from '@/querys/useReservationTime'
 import { useParticipate } from '@/querys/useParticipate'
 import { useDrawingWinners } from '@/querys/useDrawingWinners'
 import { Drawing, drawings, drawingAssets, assets } from '@/db/schema'
 import { db } from '@/db/index'
-import { eq, desc } from 'drizzle-orm'
 
 const getDrawing = createServerFn({
   method: 'GET',
@@ -244,41 +250,48 @@ function SlotDrawingParticipation() {
     ? Math.ceil(drawing.quantityOfNumbers / NUMBERS_PER_PAGE)
     : 0
 
-  // Fetch slots for current page and adjacent pages (batched loading for optimization)
-  // Memoize the numbers calculation to avoid unnecessary recalculations
-  const numbersToFetch = useMemo(() => {
-    if (!drawing) return []
+  // Fetch slots for the currently visible page only (true pagination)
+  const currentPageForApi = currentPage + 1 // API is 1-based
+  const slotsQueryEnabled =
+    !!drawing && !!drawing.playWithNumbers && !hasDrawingEnded
 
-    const pagesToFetch = [
-      Math.max(0, currentPage - 1),
-      currentPage,
-      Math.min(totalPages - 1, currentPage + 1),
-    ].filter((page, index, array) => array.indexOf(page) === index) // Remove duplicates
-
-    const numbers: Array<number> = []
-    pagesToFetch.forEach((page) => {
-      const startIdx = page * NUMBERS_PER_PAGE
-      const endIdx = Math.min(
-        startIdx + NUMBERS_PER_PAGE,
-        drawing.quantityOfNumbers,
-      )
-      for (let i = startIdx; i < endIdx; i++) {
-        numbers.push(i + 1)
-      }
-    })
-
-    return numbers
-  }, [drawing?.quantityOfNumbers, currentPage])
-
-  const { data: slotsData } = useNumberSlots(
+  const { data: slotsData } = useNumberSlotsPage(
     drawingId,
-    numbersToFetch,
-    !!drawing && !!drawing.playWithNumbers && !hasDrawingEnded,
+    currentPageForApi,
+    NUMBERS_PER_PAGE,
+    slotsQueryEnabled,
     {
       staleTime: 30000,
       refetchOnWindowFocus: true,
     },
   )
+
+  // Prefetch adjacent pages so swipe feels instant without fetching huge payloads
+  useEffect(() => {
+    if (!slotsQueryEnabled) return
+    if (totalPages <= 1) return
+
+    const adjacentPages = [
+      Math.max(0, currentPage - 1),
+      Math.min(totalPages - 1, currentPage + 1),
+    ].filter((p) => p !== currentPage)
+
+    adjacentPages.forEach((pageIndex) => {
+      const page = pageIndex + 1
+      queryClient.prefetchQuery({
+        queryKey: getNumberSlotsPageQueryKey(drawingId, page, NUMBERS_PER_PAGE),
+        queryFn: () => fetchNumberSlotsPage(drawingId, page, NUMBERS_PER_PAGE),
+        staleTime: 30000,
+      })
+    })
+  }, [
+    currentPage,
+    totalPages,
+    drawingId,
+    queryClient,
+    slotsQueryEnabled,
+    NUMBERS_PER_PAGE,
+  ])
 
   // Clear selections when returning to this page (e.g., user went back from reservation page)
   useEffect(() => {
@@ -287,6 +300,9 @@ function SlotDrawingParticipation() {
 
     // Invalidate slots query to refresh the grid and show any released numbers
     queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
+    queryClient.invalidateQueries({
+      queryKey: ['number-slots-page', drawingId],
+    })
   }, [drawingId, queryClient])
 
   // Handle scroll to update active page
@@ -297,15 +313,14 @@ function SlotDrawingParticipation() {
     const handleScroll = () => {
       const scrollLeft = scrollContainer.scrollLeft
       const pageWidth = scrollContainer.offsetWidth
+      if (!pageWidth) return
       const page = Math.round(scrollLeft / pageWidth)
-      if (page !== currentPage) {
-        setCurrentPage(page)
-      }
+      setCurrentPage((prev) => (prev === page ? prev : page))
     }
 
     scrollContainer.addEventListener('scroll', handleScroll)
     return () => scrollContainer.removeEventListener('scroll', handleScroll)
-  }, [currentPage, scrollContainerRef.current])
+  }, [])
 
   // Position floating controls to stay within scroll container bounds
   useEffect(() => {
@@ -428,6 +443,9 @@ function SlotDrawingParticipation() {
 
         // Invalidate slots cache to show updated status
         queryClient.invalidateQueries({ queryKey: ['number-slots', drawingId] })
+        queryClient.invalidateQueries({
+          queryKey: ['number-slots-page', drawingId],
+        })
 
         // Navigate to the form page with reserved state
         navigate({
@@ -630,10 +648,26 @@ function SlotDrawingParticipation() {
                     (_unused, i) => startIdx + i + 1,
                   )
 
+                  const ghostCount = Math.max(
+                    0,
+                    NUMBERS_PER_PAGE - pageNumbers.length,
+                  )
+
+                  const pageSlotsData =
+                    pageIndex === currentPage
+                      ? slotsData
+                      : queryClient.getQueryData<NumberSlotsPageData>(
+                          getNumberSlotsPageQueryKey(
+                            drawingId,
+                            pageIndex + 1,
+                            NUMBERS_PER_PAGE,
+                          ),
+                        )
+
                   return (
                     <div
                       key={pageIndex}
-                      className="shrink-0 w-full snap-start overflow-y-auto"
+                      className="shrink-0 w-full snap-start overflow-y-auto px-2"
                       style={{
                         scrollbarWidth: 'none',
                         msOverflowStyle: 'none',
@@ -641,7 +675,7 @@ function SlotDrawingParticipation() {
                     >
                       <div className="grid grid-cols-6 gap-2 pb-4">
                         {pageNumbers.map((number) => {
-                          const slot = slotsData?.slots.find(
+                          const slot = pageSlotsData?.slots.find(
                             (s) => s.number === number,
                           )
                           const isSelected = selectedNumbers.includes(number)
@@ -679,6 +713,15 @@ function SlotDrawingParticipation() {
                             </button>
                           )
                         })}
+
+                        {ghostCount > 0 &&
+                          Array.from({ length: ghostCount }, (_unused, i) => (
+                            <div
+                              key={`ghost-${pageIndex}-${i}`}
+                              aria-hidden
+                              className="aspect-square w-full px-0 py-0 rounded-lg border border-border-light dark:border-border-dark bg-transparent"
+                            />
+                          ))}
                       </div>
                     </div>
                   )
@@ -704,28 +747,7 @@ function SlotDrawingParticipation() {
                 )}
                 onClick={handleReserveNumbers}
               >
-                <svg
-                  width="31"
-                  height="31"
-                  viewBox="0 0 31 31"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M19.4235 9.34772L25.1786 15.1057L19.4235 20.8622"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M6.47449 15.1071H25.1786"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <MoveRightIcon className="text-white" />
               </div>
               <div
                 className={cn(
@@ -740,8 +762,8 @@ function SlotDrawingParticipation() {
                       onClick={() => goToPage(i)}
                       className={`rounded-full transition-all duration-200 cursor-pointer hover:opacity-80 ${
                         i === currentPage
-                          ? 'w-3 h-3 bg-[#14b8a6]'
-                          : 'w-2.5 h-2.5 bg-border-light dark:bg-border-dark'
+                          ? 'w-4 h-4 bg-[#14b8a6]'
+                          : 'w-3.5 h-3.5 bg-border-light dark:bg-border-dark'
                       }`}
                     />
                   ))}
@@ -749,7 +771,18 @@ function SlotDrawingParticipation() {
               </div>
               {selectedNumbers.length > 0 && (
                 <div className="text-center mt-2 text-sm text-gray-600 dark:text-gray-400">
-                  Selected: {selectedNumbers.join(', ')}
+                  {(() => {
+                    const maxToShow = 4
+                    const shown = selectedNumbers.slice(0, maxToShow)
+                    const remaining = selectedNumbers.length - shown.length
+
+                    return (
+                      <>
+                        Selected: {shown.join(', ')}
+                        {remaining > 0 ? ` +${remaining}` : ''}
+                      </>
+                    )
+                  })()}
                 </div>
               )}
             </div>

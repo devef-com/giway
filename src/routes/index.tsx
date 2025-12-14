@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -9,6 +10,8 @@ import {
 } from '@/components/ui/card'
 import {
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Gift,
   Trophy,
   Users,
@@ -23,6 +26,137 @@ import {
 export const Route = createFileRoute('/')({
   component: LandingPage,
 })
+
+function GiwayNumbersPreview() {
+  const TOTAL_NUMBERS = 640
+  const NUMBERS_PER_PAGE = 6 * 17 // mirrors the real grid paging
+  const PREVIEW_CELLS = 6 * 5 // smaller, landing-friendly preview
+
+  const totalPages = Math.ceil(TOTAL_NUMBERS / NUMBERS_PER_PAGE)
+  const [pageIndex, setPageIndex] = useState(
+    +(TOTAL_NUMBERS / NUMBERS_PER_PAGE).toFixed(),
+  )
+
+  const pageStart = pageIndex * NUMBERS_PER_PAGE + 1
+  const pageEnd = Math.min(pageStart + NUMBERS_PER_PAGE - 1, TOTAL_NUMBERS)
+
+  const numbersToShow = useMemo(() => {
+    const count = Math.min(PREVIEW_CELLS, pageEnd - pageStart + 1)
+    return Array.from({ length: count }, (_unused, i) => pageStart + i)
+  }, [pageStart, pageEnd])
+
+  const selected = useMemo(() => new Set([pageStart + 4]), [pageStart])
+  const reserved = useMemo(
+    () => new Set([pageStart + 12, pageStart + 20]),
+    [pageStart],
+  )
+  const taken = useMemo(
+    () => new Set([pageStart + 1, pageStart + 8]),
+    [pageStart],
+  )
+
+  const ghostCount = Math.max(0, PREVIEW_CELLS - numbersToShow.length)
+
+  return (
+    <Card className="h-full w-full overflow-hidden border-primary/20 shadow-2xl">
+      <div className="p-5 h-full flex flex-col">
+        <div className="flex items-start justify-between gap-4">
+          <div className="text-left">
+            <div className="text-sm text-muted-foreground">Giway preview</div>
+            <div className="text-xl font-semibold tracking-tight">
+              AirPods 4 Gen
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-bold tracking-tight">
+              {TOTAL_NUMBERS}
+            </div>
+            <div className="text-xs text-muted-foreground">disponibles</div>
+          </div>
+        </div>
+
+        <div className="mt-4 grid grid-cols-6 gap-2 flex-1">
+          {numbersToShow.map((n) => {
+            const isSelected = selected.has(n)
+            const isTaken = taken.has(n)
+            const isReserved = reserved.has(n)
+
+            const base =
+              'aspect-square w-full rounded-lg border flex items-center justify-center text-base md:text-xl font-medium transition-colors'
+            const stateClass = isSelected
+              ? 'bg-primary text-primary-foreground border-primary'
+              : isTaken
+                ? 'bg-muted text-muted-foreground border-muted'
+                : isReserved
+                  ? 'bg-primary/10 text-foreground border-primary/20'
+                  : 'bg-background text-foreground border-border'
+
+            return (
+              <div key={n} className={`${base} ${stateClass}`} aria-hidden>
+                {isTaken ? '' : n}
+              </div>
+            )
+          })}
+
+          {ghostCount > 0 &&
+            Array.from({ length: ghostCount }, (_unused, i) => (
+              <div
+                key={`ghost-${pageIndex}-${i}`}
+                aria-hidden
+                className="aspect-square w-full rounded-lg border border-border bg-transparent"
+              />
+            ))}
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <div className="text-xs text-muted-foreground">
+            Showing {pageStart}–{pageEnd}
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setPageIndex((p) => Math.max(0, p - 1))}
+              disabled={pageIndex === 0}
+              className="h-9 w-9 inline-flex items-center justify-center rounded-full border bg-background text-foreground disabled:opacity-50"
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+
+            <div className="flex items-center gap-2 rounded-full border bg-background px-3 py-2">
+              {Array.from({ length: totalPages }, (_unused, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setPageIndex(i)}
+                  className={
+                    i === pageIndex
+                      ? 'h-2.5 w-2.5 rounded-full bg-primary'
+                      : 'h-2 w-2 rounded-full bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                  }
+                  aria-label={`Go to page ${i + 1}`}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                setPageIndex((p) => Math.min(totalPages - 1, p + 1))
+              }
+              disabled={pageIndex >= totalPages - 1}
+              className="h-9 w-9 inline-flex items-center justify-center rounded-full border bg-background text-foreground disabled:opacity-50"
+              aria-label="Next page"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </Card>
+  )
+}
 
 function LandingPage() {
   return (
@@ -50,13 +184,9 @@ function LandingPage() {
           </Button>
         </div>
 
-        {/* Image Placeholder */}
-        <div className="w-full max-w-4xl aspect-video bg-muted rounded-xl border-2 border-dashed border-muted-foreground/25 flex items-center justify-center relative overflow-hidden shadow-2xl mt-8">
-          <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
-            <span className="text-lg font-medium">
-              Application Screenshot Placeholder
-            </span>
-          </div>
+        {/* Giway Preview */}
+        <div className="w-full max-w-4xl mt-8">
+          <GiwayNumbersPreview />
         </div>
       </section>
 
@@ -333,9 +463,9 @@ function LandingPage() {
                     <span>Never expires</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-4" asChild>
+                {/* <Button className="w-full mt-4" asChild>
                   <Link to="/store">View Packs</Link>
-                </Button>
+                </Button> */}
               </CardContent>
             </Card>
 

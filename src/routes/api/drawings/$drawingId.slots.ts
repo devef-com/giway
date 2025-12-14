@@ -4,8 +4,11 @@ import { getNumberSlots } from '@/lib/number-slots'
 /**
  * GET /api/drawings/:drawingId/slots
  *
- * Returns slot status for specific numbers
- * Query params: ?numbers=1,2,3,4,5
+ * Returns slot status for specific numbers OR for a page.
+ *
+ * Query params:
+ * - Specific numbers: ?numbers=1,2,3,4,5
+ * - Pagination: ?page=1&pageSize=100
  */
 export const Route = createFileRoute('/api/drawings/$drawingId/slots')({
   server: {
@@ -20,21 +23,45 @@ export const Route = createFileRoute('/api/drawings/$drawingId/slots')({
         try {
           const url = new URL(request.url)
           const numbersParam = url.searchParams.get('numbers')
+          const pageParam = url.searchParams.get('page')
+          const pageSizeParam = url.searchParams.get('pageSize')
 
-          if (!numbersParam) {
+          const hasNumbersQuery = !!numbersParam && numbersParam.length > 0
+          const hasPaginationQuery = !!pageParam || !!pageSizeParam
+
+          if (!hasNumbersQuery && !hasPaginationQuery) {
             return new Response(
-              JSON.stringify({ error: 'Missing numbers parameter' }),
+              JSON.stringify({
+                error:
+                  'Missing query. Provide either numbers or page/pageSize.',
+              }),
               { status: 400, headers: { 'Content-Type': 'application/json' } },
             )
           }
 
-          const numbers = numbersParam.split(',').map(Number)
+          const result = hasNumbersQuery
+            ? await (async () => {
+                const numbers = numbersParam!.split(',').map(Number)
 
-          const result = await getNumberSlots({
-            drawingId: params.drawingId,
-            numbers,
-            pageSize: numbers.length,
-          })
+                return getNumberSlots({
+                  drawingId: params.drawingId,
+                  numbers,
+                  pageSize: numbers.length,
+                })
+              })()
+            : await (async () => {
+                const page = Math.max(1, Number(pageParam ?? '1') || 1)
+                const pageSize = Math.min(
+                  1000,
+                  Math.max(1, Number(pageSizeParam ?? '100') || 100),
+                )
+
+                return getNumberSlots({
+                  drawingId: params.drawingId,
+                  page,
+                  pageSize,
+                })
+              })()
 
           return new Response(JSON.stringify(result), {
             status: 200,
