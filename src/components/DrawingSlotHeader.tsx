@@ -58,8 +58,7 @@ function DrawingSlotHeader({
           <div className="flex items-center gap-2 px-2 py-1 md:px-4 border-2 border-blue-500 rounded-lg bg-blue-50 dark:bg-blue-950">
             <Clock className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             <span className="text-sm font-semibold text-blue-600 dark:text-blue-300">
-              {drawing.endAt &&
-                getTimeRemainingText(drawing.endAt as unknown as string)}
+              {drawing.endAt && getTimeRemainingText(drawing.endAt)}
             </span>
           </div>
         </div>

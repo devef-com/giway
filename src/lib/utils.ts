@@ -76,11 +76,17 @@ export function formatNumber(
   return negative ? `-${grouped}` : grouped
 }
 
-export const getTimeRemainingText = (endDate: string) => {
+export const getTimeRemainingText = (endDate: unknown): string => {
+  if (endDate instanceof Date) {
+    return getTimeRemainingText(endDate.toISOString())
+  }
+
+  if (typeof endDate !== 'string') return ''
+
   const isFullIsoWithTimezone =
     /Z$/.test(endDate) || /[+-]\d{2}:?\d{2}$/.test(endDate)
 
-  // If we get a "datetime-local" style string (no timezone), treat it as UTC wall time.
+  // If we get a "datetime-local" style string (no timezone), convert it to an ISO string.
   const end = isFullIsoWithTimezone
     ? new Date(endDate)
     : new Date(datetimeLocalToUtcISOString(endDate))
@@ -89,13 +95,15 @@ export const getTimeRemainingText = (endDate: string) => {
 
   if (diff <= 0) return 'Ended'
 
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  // Round up to the next minute so "< 1 minute" doesn't show as "0M".
+  const totalMinutes = Math.ceil(diff / (1000 * 60))
+  const days = Math.floor(totalMinutes / (60 * 24))
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60)
+  const minutes = totalMinutes % 60
 
-  if (days > 0) {
-    return `${days}d ${hours}H`
-  }
-  return `${hours}H`
+  if (days > 0) return `${days}d ${hours}H`
+  if (hours > 0) return `${hours}H ${minutes}M`
+  return `${minutes}M`
 }
 
 export const formatDateGiway = (dateString: string) => {
@@ -133,7 +141,10 @@ export const formatDateGiway = (dateString: string) => {
   return `${formatter({ month: 'short', day: '2-digit' })} ${formatter({ hour: '2-digit', minute: '2-digit', hour12: true })}`
 }
 
-export function datetimeLocalToUtcISOString(value: string) {
+export function datetimeLocalToUtcISOString(value: unknown) {
+  if (value instanceof Date) return value.toISOString()
+  if (typeof value !== 'string') return ''
+
   // `value` format: YYYY-MM-DDTHH:mm (no timezone)
   // Treat it as a *local* wall time and serialize to a UTC ISO string (Z).
   const [datePart, timePart] = value.split('T')
