@@ -19,19 +19,19 @@ export default defineConfig({
     viteReact(),
   ],
   build: {
-    manifest: true, // ✅ REQUIRED for Nitro asset mapping
-    assetsDir: 'assets',
-    rollupOptions: {
-      output: {
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.names?.includes('styles.css')) {
-            return 'assets/styles[extname]'
-          }
-          return 'assets/[name]-[hash][extname]'
-        },
-      },
-    },
+    // manifest: true, // ✅ REQUIRED for Nitro asset mapping
+    // assetsDir: 'assets',
+    // rollupOptions: {
+    //   output: {
+    //     entryFileNames: 'assets/[name]-[hash].js',
+    //     chunkFileNames: 'assets/[name]-[hash].js',
+    //     assetFileNames: (assetInfo) => {
+    //       if (assetInfo.names?.includes('styles.css')) {
+    //         return 'assets/styles[extname]'
+    //       }
+    //       return 'assets/[name]-[hash][extname]'
+    //     },
+    //   },
+    // },
   },
 })
