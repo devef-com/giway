@@ -186,6 +186,29 @@ export const packs = pgTable('packs', {
   polarId: varchar('polar_id', { length: 250 }).unique(), // Polar product ID for subscriptions
 })
 
+// PayPal payments table - stores PayPal order/capture state (server-driven)
+export const paypalPayments = pgTable('paypal_payments', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  packId: integer('pack_id').references(() => packs.id, {
+    onDelete: 'set null',
+  }),
+  paypalOrderId: varchar('paypal_order_id', { length: 255 }).notNull().unique(),
+  paypalCaptureId: varchar('paypal_capture_id', { length: 255 }),
+  payerId: varchar('payer_id', { length: 255 }),
+  amountPaid: integer('amount_paid').notNull().default(0), // amount in cents
+  currency: varchar('currency', { length: 10 }).notNull().default('USD'),
+  status: varchar('status', { length: 30 }).notNull().default('CREATED'),
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+})
+
 // User balances table - tracks current available balance for users
 export const userBalances = pgTable('user_balances', {
   id: serial('id').primaryKey(),
@@ -214,6 +237,9 @@ export const packRedemptions = pgTable('pack_redemptions', {
   packId: integer('pack_id').references(() => packs.id, {
     onDelete: 'set null',
   }),
+  paypalPaymentId: integer('paypal_payment_id')
+    .references(() => paypalPayments.id, { onDelete: 'set null' })
+    .unique(),
   source: redemptionSourceEnum('source').notNull(), // 'purchase', 'coupon', 'ads', 'monthly'
   couponId: integer('coupon_id').references(() => coupons.id, {
     onDelete: 'set null',

@@ -43,6 +43,20 @@
       "when": 1765557116108,
       "tag": "0005_flowery_sabra",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1765907699097,
+      "tag": "0006_paypal_payments",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1765907699098,
+      "tag": "0007_pack_redemptions_paypal_payment_id",
+      "breakpoints": true
     }
   ]
 }

@@ -35,8 +35,11 @@ import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api
 import { Route as DemoApiTqTodosRouteImport } from './routes/demo/api.tq-todos'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
 import { Route as ApiWebhookPolarRouteImport } from './routes/api/webhook.polar'
+import { Route as ApiWebhookPaypalRouteImport } from './routes/api/webhook.paypal'
 import { Route as ApiUserMonthlyAllowanceRouteImport } from './routes/api/user/monthly-allowance'
 import { Route as ApiUserBalanceRouteImport } from './routes/api/user/balance'
+import { Route as ApiPaypalCreateOrderRouteImport } from './routes/api/paypal/create-order'
+import { Route as ApiPaypalCaptureOrderRouteImport } from './routes/api/paypal/capture-order'
 import { Route as ApiParticipantsUploadRouteImport } from './routes/api/participants/upload'
 import { Route as ApiParticipantsAssetsRouteImport } from './routes/api/participants/assets'
 import { Route as ApiParticipantParticipantIdRouteImport } from './routes/api/participant.$participantId'
@@ -196,6 +199,11 @@ const ApiWebhookPolarRoute = ApiWebhookPolarRouteImport.update({
   path: '/api/webhook/polar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiWebhookPaypalRoute = ApiWebhookPaypalRouteImport.update({
+  id: '/api/webhook/paypal',
+  path: '/api/webhook/paypal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiUserMonthlyAllowanceRoute = ApiUserMonthlyAllowanceRouteImport.update({
   id: '/api/user/monthly-allowance',
   path: '/api/user/monthly-allowance',
@@ -204,6 +212,16 @@ const ApiUserMonthlyAllowanceRoute = ApiUserMonthlyAllowanceRouteImport.update({
 const ApiUserBalanceRoute = ApiUserBalanceRouteImport.update({
   id: '/api/user/balance',
   path: '/api/user/balance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaypalCreateOrderRoute = ApiPaypalCreateOrderRouteImport.update({
+  id: '/api/paypal/create-order',
+  path: '/api/paypal/create-order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPaypalCaptureOrderRoute = ApiPaypalCaptureOrderRouteImport.update({
+  id: '/api/paypal/capture-order',
+  path: '/api/paypal/capture-order',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiParticipantsUploadRoute = ApiParticipantsUploadRouteImport.update({
@@ -383,8 +401,11 @@ export interface FileRoutesByFullPath {
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRouteWithChildren
   '/api/participants/assets': typeof ApiParticipantsAssetsRoute
   '/api/participants/upload': typeof ApiParticipantsUploadRoute
+  '/api/paypal/capture-order': typeof ApiPaypalCaptureOrderRoute
+  '/api/paypal/create-order': typeof ApiPaypalCreateOrderRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
   '/api/user/monthly-allowance': typeof ApiUserMonthlyAllowanceRoute
+  '/api/webhook/paypal': typeof ApiWebhookPaypalRoute
   '/api/webhook/polar': typeof ApiWebhookPolarRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -440,8 +461,11 @@ export interface FileRoutesByTo {
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRouteWithChildren
   '/api/participants/assets': typeof ApiParticipantsAssetsRoute
   '/api/participants/upload': typeof ApiParticipantsUploadRoute
+  '/api/paypal/capture-order': typeof ApiPaypalCaptureOrderRoute
+  '/api/paypal/create-order': typeof ApiPaypalCreateOrderRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
   '/api/user/monthly-allowance': typeof ApiUserMonthlyAllowanceRoute
+  '/api/webhook/paypal': typeof ApiWebhookPaypalRoute
   '/api/webhook/polar': typeof ApiWebhookPolarRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -498,8 +522,11 @@ export interface FileRoutesById {
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRouteWithChildren
   '/api/participants/assets': typeof ApiParticipantsAssetsRoute
   '/api/participants/upload': typeof ApiParticipantsUploadRoute
+  '/api/paypal/capture-order': typeof ApiPaypalCaptureOrderRoute
+  '/api/paypal/create-order': typeof ApiPaypalCreateOrderRoute
   '/api/user/balance': typeof ApiUserBalanceRoute
   '/api/user/monthly-allowance': typeof ApiUserMonthlyAllowanceRoute
+  '/api/webhook/paypal': typeof ApiWebhookPaypalRoute
   '/api/webhook/polar': typeof ApiWebhookPolarRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/api/tq-todos': typeof DemoApiTqTodosRoute
@@ -557,8 +584,11 @@ export interface FileRouteTypes {
     | '/api/participant/$participantId'
     | '/api/participants/assets'
     | '/api/participants/upload'
+    | '/api/paypal/capture-order'
+    | '/api/paypal/create-order'
     | '/api/user/balance'
     | '/api/user/monthly-allowance'
+    | '/api/webhook/paypal'
     | '/api/webhook/polar'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -614,8 +644,11 @@ export interface FileRouteTypes {
     | '/api/participant/$participantId'
     | '/api/participants/assets'
     | '/api/participants/upload'
+    | '/api/paypal/capture-order'
+    | '/api/paypal/create-order'
     | '/api/user/balance'
     | '/api/user/monthly-allowance'
+    | '/api/webhook/paypal'
     | '/api/webhook/polar'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -671,8 +704,11 @@ export interface FileRouteTypes {
     | '/api/participant/$participantId'
     | '/api/participants/assets'
     | '/api/participants/upload'
+    | '/api/paypal/capture-order'
+    | '/api/paypal/create-order'
     | '/api/user/balance'
     | '/api/user/monthly-allowance'
+    | '/api/webhook/paypal'
     | '/api/webhook/polar'
     | '/demo/api/names'
     | '/demo/api/tq-todos'
@@ -729,8 +765,11 @@ export interface RootRouteChildren {
   ApiParticipantParticipantIdRoute: typeof ApiParticipantParticipantIdRouteWithChildren
   ApiParticipantsAssetsRoute: typeof ApiParticipantsAssetsRoute
   ApiParticipantsUploadRoute: typeof ApiParticipantsUploadRoute
+  ApiPaypalCaptureOrderRoute: typeof ApiPaypalCaptureOrderRoute
+  ApiPaypalCreateOrderRoute: typeof ApiPaypalCreateOrderRoute
   ApiUserBalanceRoute: typeof ApiUserBalanceRoute
   ApiUserMonthlyAllowanceRoute: typeof ApiUserMonthlyAllowanceRoute
+  ApiWebhookPaypalRoute: typeof ApiWebhookPaypalRoute
   ApiWebhookPolarRoute: typeof ApiWebhookPolarRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoApiTqTodosRoute: typeof DemoApiTqTodosRoute
@@ -934,6 +973,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiWebhookPolarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/webhook/paypal': {
+      id: '/api/webhook/paypal'
+      path: '/api/webhook/paypal'
+      fullPath: '/api/webhook/paypal'
+      preLoaderRoute: typeof ApiWebhookPaypalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/user/monthly-allowance': {
       id: '/api/user/monthly-allowance'
       path: '/api/user/monthly-allowance'
@@ -946,6 +992,20 @@ declare module '@tanstack/react-router' {
       path: '/api/user/balance'
       fullPath: '/api/user/balance'
       preLoaderRoute: typeof ApiUserBalanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/paypal/create-order': {
+      id: '/api/paypal/create-order'
+      path: '/api/paypal/create-order'
+      fullPath: '/api/paypal/create-order'
+      preLoaderRoute: typeof ApiPaypalCreateOrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/paypal/capture-order': {
+      id: '/api/paypal/capture-order'
+      path: '/api/paypal/capture-order'
+      fullPath: '/api/paypal/capture-order'
+      preLoaderRoute: typeof ApiPaypalCaptureOrderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/participants/upload': {
@@ -1214,8 +1274,11 @@ const rootRouteChildren: RootRouteChildren = {
     ApiParticipantParticipantIdRouteWithChildren,
   ApiParticipantsAssetsRoute: ApiParticipantsAssetsRoute,
   ApiParticipantsUploadRoute: ApiParticipantsUploadRoute,
+  ApiPaypalCaptureOrderRoute: ApiPaypalCaptureOrderRoute,
+  ApiPaypalCreateOrderRoute: ApiPaypalCreateOrderRoute,
   ApiUserBalanceRoute: ApiUserBalanceRoute,
   ApiUserMonthlyAllowanceRoute: ApiUserMonthlyAllowanceRoute,
+  ApiWebhookPaypalRoute: ApiWebhookPaypalRoute,
   ApiWebhookPolarRoute: ApiWebhookPolarRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoApiTqTodosRoute: DemoApiTqTodosRoute,
