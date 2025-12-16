@@ -52,6 +52,13 @@ R2_SECRET_ACCESS_KEY=
 R2_BUCKET_NAME=
 R2_PUBLIC_DOMAIN=
 
+# PayPal (server + frontend)
+PAYPAL_ENV=sandbox
+PAYPAL_SANDBOX_CLIENT_ID=
+PAYPAL_SANDBOX_CLIENT_SECRET=
+PAYPAL_WEBHOOK_ID=
+VITE_PAYPAL_CLIENT_ID=
+
 # Required: PostgreSQL credentials for docker-compose (use strong values!)
 POSTGRES_USER=your_db_user
 POSTGRES_PASSWORD=your_secure_password

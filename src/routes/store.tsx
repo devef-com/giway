@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { PolarCheckoutButton } from '@/components/PolarCheckoutButton'
+import { PayPalCheckoutButton } from '@/components/PayPalCheckoutButton'
 import { usePacks } from '@/querys/usePacks'
 import { useUserBalance } from '@/querys/useUserBalance'
 import { authClient } from '@/lib/auth-client'
@@ -179,7 +179,6 @@ function StorePage() {
                                   selectedPackId === pack.id ? null : pack.id,
                                 )
                               }
-                              disabled
                             >
                               {selectedPackId === pack.id
                                 ? 'Cancel'
@@ -188,19 +187,12 @@ function StorePage() {
                           </div>
                           {selectedPackId === pack.id &&
                             session.data?.user &&
-                            (pack.polarId ? (
-                              <PolarCheckoutButton
-                                productId={pack.polarId}
-                                userId={session.data.user.id}
-                                customerEmail={session.data.user.email}
-                                customerName={session.data.user.name}
+                            (
+                              <PayPalCheckoutButton
+                                packId={pack.id}
                                 className="w-full"
                               />
-                            ) : (
-                              <p className="text-sm text-muted-foreground text-center py-2">
-                                Polar product not configured for this pack.
-                              </p>
-                            ))}
+                            )}
                         </div>
                       </CardFooter>
                     </Card>
@@ -255,7 +247,6 @@ function StorePage() {
                             </span>
                             <Button
                               variant="outline"
-                              disabled
                               onClick={() =>
                                 setSelectedPackId(
                                   selectedPackId === pack.id ? null : pack.id,
@@ -269,19 +260,12 @@ function StorePage() {
                           </div>
                           {selectedPackId === pack.id &&
                             session.data?.user &&
-                            (pack.polarId ? (
-                              <PolarCheckoutButton
-                                productId={pack.polarId}
-                                userId={session.data.user.id}
-                                customerEmail={session.data.user.email}
-                                customerName={session.data.user.name}
+                            (
+                              <PayPalCheckoutButton
+                                packId={pack.id}
                                 className="w-full"
                               />
-                            ) : (
-                              <p className="text-sm text-muted-foreground text-center py-2">
-                                Polar product not configured for this pack.
-                              </p>
-                            ))}
+                            )}
                         </div>
                       </CardFooter>
                     </Card>
