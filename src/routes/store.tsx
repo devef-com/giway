@@ -1,5 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { Image, Mail, Package, Sparkles, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,7 +23,7 @@ export const Route = createFileRoute('/store')({
 function StorePage() {
   const session = authClient.useSession()
   const { data: packs, isLoading: isPacksLoading } = usePacks()
-  const { data: balance, isLoading: isBalanceLoading } = useUserBalance(
+  const { data: balance, isLoading: isBalanceLoading, refetch } = useUserBalance(
     !!session.data,
   )
   const [selectedPackId, setSelectedPackId] = useState<number | null>(null)
@@ -34,6 +35,12 @@ function StorePage() {
 
   const formatPrice = (cents: number) => {
     return `$${(cents / 100).toFixed(2)}`
+  }
+
+  const onSuccess = () => {
+    toast.success('Pack purchased successfully!');
+    refetch();
+    setSelectedPackId(null);
   }
 
   if (!session.data) {
@@ -191,6 +198,7 @@ function StorePage() {
                               <PayPalCheckoutButton
                                 packId={pack.id}
                                 className="w-full"
+                                onSuccess={onSuccess}
                               />
                             )}
                         </div>
@@ -264,6 +272,7 @@ function StorePage() {
                               <PayPalCheckoutButton
                                 packId={pack.id}
                                 className="w-full"
+                                onSuccess={onSuccess}
                               />
                             )}
                         </div>
