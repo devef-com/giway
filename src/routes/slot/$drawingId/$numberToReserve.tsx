@@ -1,12 +1,10 @@
 import {
   createFileRoute,
-  useCanGoBack,
   useNavigate,
-  useRouter,
 } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { useQueryClient } from '@tanstack/react-query'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowLeft, CircleAlert, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import { eq } from 'drizzle-orm/sql'
@@ -53,8 +51,6 @@ function ReserveNumberForm() {
   const { drawingId, numberToReserve } = Route.useParams()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const router = useRouter()
-  const canGoBack = useCanGoBack()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -71,12 +67,19 @@ function ReserveNumberForm() {
   const [isTitleExpanded, setIsTitleExpanded] = useState(false)
 
   // Parse selected numbers from the route parameter
-  const selectedNumbers = numberToReserve.split(',').map((n) => parseInt(n, 10))
+  const selectedNumbers = useMemo(() => {
+    return numberToReserve
+      .split(',')
+      .map((n) => Number.parseInt(n, 10))
+      .filter((n) => Number.isFinite(n))
+  }, [numberToReserve])
 
   // Create a unique key for this reservation in localStorage
   // Use sorted copy to match the key created on the previous page
-  const sortedNumbers = [...selectedNumbers].sort((a, b) => a - b)
-  const reservationKey = `reservation_${drawingId}_${sortedNumbers.join('_')}`
+  const reservationKey = useMemo(() => {
+    const sortedNumbers = [...selectedNumbers].sort((a, b) => a - b)
+    return `reservation_${drawingId}_${sortedNumbers.join('_')}`
+  }, [drawingId, selectedNumbers])
 
   // Fetch drawing details
   const { data: drawing, isLoading: drawingLoading } = useDrawing(drawingId)
@@ -102,82 +105,67 @@ function ReserveNumberForm() {
     }
   }, [drawingId, queryClient, reservationKey, selectedNumbers])
 
-  // Reserve numbers on mount (only if not already reserved from previous page)
+  // Validate reservation on mount: only require a valid timestamp.
+  // (We intentionally do NOT re-validate the numbers list from localStorage.)
   useEffect(() => {
-    const checkAndMarkReservation = () => {
-      if (reservationComplete || !drawing) return
+    const reservationTimeMs =
+      (reservationTimeData?.reservationTimeMinutes ?? 4) * 60 * 1000
 
-      // Check if we already have a valid reservation in localStorage
-      const storedReservation = localStorage.getItem(reservationKey)
-      if (storedReservation) {
-        try {
-          const { timestamp, numbers } = JSON.parse(storedReservation)
-          const now = Date.now()
-          const reservationTime =
-            (reservationTimeData?.reservationTimeMinutes || 4) * 60 * 1000
-
-          // Check if reservation is still valid (within 4 minutes)
-          if (
-            now - timestamp < reservationTime &&
-            JSON.stringify(numbers.sort()) ===
-              JSON.stringify(selectedNumbers.sort())
-          ) {
-            // Reservation is still valid, mark as complete
-            setReservationComplete(true)
-            return
-          } else {
-            // Reservation expired, redirect back
-            // TODO call to release numbers endpoint
-            releaseReservation()
-            toast.error('Reservation expired. Please select numbers again.')
-            navigate({
-              to: '/slot/$drawingId',
-              params: { drawingId },
-              replace: true,
-            })
-          }
-        } catch (e) {
-          // Invalid data, redirect back
-          releaseReservation()
-          toast.error('Invalid reservation. Please select numbers again.')
-          navigate({
-            to: '/slot/$drawingId',
-            params: { drawingId },
-            replace: true,
-          })
-        }
-      } else {
-        // No reservation found, redirect back
-        toast.error('No reservation found. Please select numbers again.')
-        canGoBack
-          ? router.history.back()
-          : navigate({
-              to: '/slot/$drawingId',
-              params: { drawingId },
-              replace: true,
-            })
-      }
+    const storedReservation = localStorage.getItem(reservationKey)
+    console.log(window.location)
+    if (!storedReservation) {
+      toast.error('No reservation found. Please select numbers again.')
+      // navigate({
+      //   to: '/slot/$drawingId',
+      //   params: { drawingId },
+      //   replace: true,
+      // })
+      return
     }
 
-    checkAndMarkReservation()
-  }, [
-    drawingId,
-    drawing,
-    reservationComplete,
-    reservationKey,
-    selectedNumbers,
-    reservationTimeData,
-    navigate,
-    releaseReservation,
-  ])
+    try {
+      const parsed = JSON.parse(storedReservation) as { timestamp?: unknown }
+      const timestamp =
+        typeof parsed.timestamp === 'number'
+          ? parsed.timestamp
+          : Number(parsed.timestamp)
+
+      if (!Number.isFinite(timestamp)) {
+        throw new Error('Invalid timestamp')
+      }
+
+      const now = Date.now()
+      if (now - timestamp < reservationTimeMs) {
+        setReservationTimestamp(timestamp)
+        setReservationComplete(true)
+        return
+      }
+
+      releaseReservation()
+      toast.error('Reservation expired. Please select numbers again.')
+      // navigate({
+      //   to: '/slot/$drawingId',
+      //   params: { drawingId },
+      //   replace: true,
+      // })
+    } catch {
+      releaseReservation()
+      toast.error('Invalid reservation. Please select numbers again.')
+      // navigate({
+      //   to: '/slot/$drawingId',
+      //   params: { drawingId },
+      //   replace: true,
+      // })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Countdown timer effect
   useEffect(() => {
-    if (!reservationComplete || !reservationTimeData || !reservationTimestamp)
-      return
+    if (!reservationComplete || !reservationTimestamp) return
 
     const reservationTime =
-      reservationTimeData.reservationTimeMinutes * 60 * 1000
+      (reservationTimeData?.reservationTimeMinutes ?? 4) * 60 * 1000
 
     const updateTimer = () => {
       const now = Date.now()
@@ -202,29 +190,18 @@ function ReserveNumberForm() {
       }
     }
 
-    // Update immediately
+    // Update every second (and do an immediate update)
+    const interval = setInterval(updateTimer, 1000)
     updateTimer()
 
-    // Update every second
-    const interval = setInterval(updateTimer, 1000)
-
     return () => clearInterval(interval)
-  }, [reservationComplete, reservationTimeData, reservationTimestamp])
-
-  // Load timestamp from localStorage when reservation is complete
-  useEffect(() => {
-    if (!reservationComplete) return
-
-    const storedReservation = localStorage.getItem(reservationKey)
-    if (!storedReservation) return
-
-    try {
-      const { timestamp } = JSON.parse(storedReservation)
-      setReservationTimestamp(timestamp)
-    } catch (e) {
-      console.error('Error parsing reservation data:', e)
-    }
-  }, [reservationComplete, reservationKey])
+  }, [
+    reservationComplete,
+    reservationTimeData?.reservationTimeMinutes,
+    reservationTimestamp,
+    drawingId,
+    selectedNumbers,
+  ])
 
   // Release reservations when navigating away from the page (including back button)
   const cleanupRef = useRef({
@@ -399,7 +376,7 @@ function ReserveNumberForm() {
 
   const handleCancel = async () => {
     await releaseReservation()
-    navigate({ to: '/slot/$drawingId', params: { drawingId } })
+    navigate({ to: '/slot/$drawingId', params: { drawingId }, replace: true })
   }
 
   const reserveAgain = async () => {
@@ -420,9 +397,6 @@ function ReserveNumberForm() {
 
       if (allSuccessful) {
         // Store reservation in localStorage with timestamp
-        // Create a copy for sorting to avoid mutation
-        const sortedNumbers = [...selectedNumbers].sort((a, b) => a - b)
-        const reservationKey = `reservation_${drawingId}_${sortedNumbers.join('_')}`
         const reservationData = JSON.stringify({
           timestamp: Date.now(),
           numbers: selectedNumbers,
