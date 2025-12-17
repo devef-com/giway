@@ -170,7 +170,7 @@ function GiwayNumbersPreview() {
 }
 
 function LandingPage() {
-  const { locale } = useLanguage() // This will trigger re-render on locale change
+  const { locale } = useLanguage() // Context subscription triggers re-render on locale change
   
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">

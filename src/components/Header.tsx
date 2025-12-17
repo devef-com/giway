@@ -63,7 +63,7 @@ const NavLink = ({ to, children, onClick, isMobile = false }: NavLinkProps) => (
 export default function Header() {
   const location = useLocation()
   const currentPath = location.pathname
-  const { locale } = useLanguage() // This will trigger re-render on locale change
+  const { locale } = useLanguage() // Context subscription triggers re-render on locale change
 
   /**
    * Determines if the navigation menu should be visible based on the current path.
