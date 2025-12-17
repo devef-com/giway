@@ -23,9 +23,11 @@ export const Route = createFileRoute('/store')({
 function StorePage() {
   const session = authClient.useSession()
   const { data: packs, isLoading: isPacksLoading } = usePacks()
-  const { data: balance, isLoading: isBalanceLoading, refetch } = useUserBalance(
-    !!session.data,
-  )
+  const {
+    data: balance,
+    isLoading: isBalanceLoading,
+    refetch,
+  } = useUserBalance(!!session.data)
   const [selectedPackId, setSelectedPackId] = useState<number | null>(null)
 
   // Group packs by type
@@ -38,9 +40,9 @@ function StorePage() {
   }
 
   const onSuccess = () => {
-    toast.success('Pack purchased successfully!');
-    refetch();
-    setSelectedPackId(null);
+    toast.success('Pack purchased successfully!')
+    refetch()
+    setSelectedPackId(null)
   }
 
   if (!session.data) {
@@ -192,15 +194,13 @@ function StorePage() {
                                 : 'Buy Pack'}
                             </Button>
                           </div>
-                          {selectedPackId === pack.id &&
-                            session.data?.user &&
-                            (
-                              <PayPalCheckoutButton
-                                packId={pack.id}
-                                className="w-full"
-                                onSuccess={onSuccess}
-                              />
-                            )}
+                          {selectedPackId === pack.id && session.data?.user && (
+                            <PayPalCheckoutButton
+                              packId={pack.id}
+                              className="w-full"
+                              onSuccess={onSuccess}
+                            />
+                          )}
                         </div>
                       </CardFooter>
                     </Card>
@@ -266,15 +266,13 @@ function StorePage() {
                                 : 'Buy Pack'}
                             </Button>
                           </div>
-                          {selectedPackId === pack.id &&
-                            session.data?.user &&
-                            (
-                              <PayPalCheckoutButton
-                                packId={pack.id}
-                                className="w-full"
-                                onSuccess={onSuccess}
-                              />
-                            )}
+                          {selectedPackId === pack.id && session.data?.user && (
+                            <PayPalCheckoutButton
+                              packId={pack.id}
+                              className="w-full"
+                              onSuccess={onSuccess}
+                            />
+                          )}
                         </div>
                       </CardFooter>
                     </Card>

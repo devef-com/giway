@@ -1,3 +1,4 @@
+//https://docs.paypal.ai/payments/methods/paypal/sdk/js/v6/paypal-checkout
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 
@@ -15,7 +16,9 @@ function loadPayPalSdk(clientId: string, currency: string) {
     return new Promise<void>((resolve, reject) => {
       if (window.paypal) return resolve()
       existing.addEventListener('load', () => resolve())
-      existing.addEventListener('error', () => reject(new Error('PayPal SDK failed to load')))
+      existing.addEventListener('error', () =>
+        reject(new Error('PayPal SDK failed to load')),
+      )
     })
   }
 
@@ -66,7 +69,10 @@ export function PayPalCheckoutButton({
       if (!containerRef.current) return
 
       // Re-render when pack changes
-      if (renderedForPackRef.current === packId && containerRef.current.childNodes.length > 0) {
+      if (
+        renderedForPackRef.current === packId &&
+        containerRef.current.childNodes.length > 0
+      ) {
         return
       }
 

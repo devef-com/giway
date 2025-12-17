@@ -34,7 +34,7 @@ function requirePayPalCreds() {
 
   return { clientId, clientSecret }
 }
-
+// TODO: implement caching with proper expiration handling
 let cachedAccessToken: { token: string; expiresAtMs: number } | undefined
 
 export async function getPayPalAccessToken() {

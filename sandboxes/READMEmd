@@ -1,0 +1,33 @@
+Refer to https://docs.deno.com/sandboxes/getting_started/
+
+## Create an organization token
+
+The @deno/sandbox SDK authenticates using the DENO_DEPLOY_TOKEN environment variable. Generate it from Settings → Organization tokens, copy the value, and store it securely. Then export it in your local shell or CI job:
+```bash
+export DENO_DEPLOY_TOKEN=<your-token>
+```
+
+## Install the SDK
+
+The SDK works in both Deno and Node.js environments.
+
+```bash
+# Using Deno
+deno add jsr:@deno/sandbox
+
+# Using npm
+npm install @deno/sandbox
+
+# Using pnpm
+pnpm install jsr:@deno/sandbox
+
+# Using yarn
+yarn add jsr:@deno/sandbox
+```
+
+
+## Run your sandbox code
+
+```bash
+deno -EN --env-file main.ts
+```

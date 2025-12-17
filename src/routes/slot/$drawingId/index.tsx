@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { createServerFn } from '@tanstack/react-start'
 import { useQueryClient } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
@@ -80,7 +80,7 @@ export const Route = createFileRoute('/slot/$drawingId/')({
     const drawing = await getDrawing({ data: params.drawingId })
 
     if (!drawing) {
-      throw new Response('Drawing not found', { status: 404 })
+      throw redirect({ to: '/drawings' })
     }
 
     return drawing
@@ -508,7 +508,7 @@ function SlotDrawingParticipation() {
       {/* <pre>
         {JSON.stringify(drawing, null, 2)}
       </pre> */}
-      <div className="flex w-full flex-col p-4 sm:max-w-[600px] sm:mx-auto">
+      <div className="flex w-full flex-col p-4 sm:max-w-150 sm:mx-auto">
         {/* Drawing Details Card */}
         <DrawingSlotHeader
           drawing={drawing}
@@ -519,7 +519,7 @@ function SlotDrawingParticipation() {
           {drawing.assets &&
           drawing.assets.filter((a) => !a.isCover).length > 0 ? (
             <div
-              className="relative w-[120px] h-[120px] rounded-lg overflow-hidden cursor-pointer group"
+              className="relative w-30 h-30 rounded-lg overflow-hidden cursor-pointer group"
               onClick={() => {
                 setGalleryIndex(0)
                 setGalleryOpen(true)
@@ -537,7 +537,7 @@ function SlotDrawingParticipation() {
               )}
             </div>
           ) : (
-            <div className="w-[120px] h-[120px] rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+            <div className="w-30 h-30 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
               <ImageIcon
                 size={48}
                 strokeWidth={0.7}
@@ -728,7 +728,7 @@ function SlotDrawingParticipation() {
                 })}
               </div>
               {(selectedNumbers.length > 0 || totalPages > 1) && (
-                <div className="h-[100px]"></div>
+                <div className="h-25"></div>
               )}
             </div>
 
@@ -742,7 +742,7 @@ function SlotDrawingParticipation() {
             >
               <div
                 className={cn(
-                  'w-[47px] h-[47px] grid justify-center items-center mx-auto bg-[#14b8a6] rounded-full cursor-pointer hover:bg-[#0d9488] transition-colors',
+                  'w-11.75 h-11.75 grid justify-center items-center mx-auto bg-[#14b8a6] rounded-full cursor-pointer hover:bg-[#0d9488] transition-colors',
                   selectedNumbers.length === 0 && 'hidden',
                 )}
                 onClick={handleReserveNumbers}
@@ -795,7 +795,7 @@ function SlotDrawingParticipation() {
         <div>
           <form
             onSubmit={handleSubmit}
-            className="space-y-4 sm:max-w-[600px] sm:mx-auto px-4"
+            className="space-y-4 sm:max-w-150 sm:mx-auto px-4"
           >
             <Form
               formData={formData}
@@ -823,7 +823,7 @@ function SlotDrawingParticipation() {
       )}
       <div className="px-2">
         {/* Help/Info Section */}
-        <Card className="p-4 gap-2 bg-white dark:bg-slate-800/30 dark:border-slate-700 sm:max-w-[600px] mx-auto mt-2 mb-4">
+        <Card className="p-4 gap-2 bg-white dark:bg-slate-800/30 dark:border-slate-700 sm:max-w-150 mx-auto mt-2 mb-4">
           <div className="flex items-center gap-2 text-sm text-gray-400">
             <InfoIcon className="w-5 h-5 text-cyan-400" />
             <p className="text-text-light-primary dark:text-text-dark-primary font-medium ">
