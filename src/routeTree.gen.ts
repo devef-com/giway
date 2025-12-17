@@ -56,6 +56,7 @@ import { Route as DrawingsDrawingIdMParticipantRouteImport } from './routes/draw
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
 import { Route as DemoStartSsrDataOnlyRouteImport } from './routes/demo/start.ssr.data-only'
+import { Route as DDrawingIdPParticipantRouteImport } from './routes/d.$drawingId.p.$participant'
 import { Route as ApiParticipantParticipantIdCommentsRouteImport } from './routes/api/participant/$participantId.comments'
 import { Route as ApiDrawingsDrawingIdUploadRouteImport } from './routes/api/drawings/$drawingId/upload'
 import { Route as ApiDrawingsDrawingIdStatsRouteImport } from './routes/api/drawings/$drawingId.stats'
@@ -308,6 +309,11 @@ const DemoStartSsrDataOnlyRoute = DemoStartSsrDataOnlyRouteImport.update({
   path: '/demo/start/ssr/data-only',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DDrawingIdPParticipantRoute = DDrawingIdPParticipantRouteImport.update({
+  id: '/d/$drawingId/p/$participant',
+  path: '/d/$drawingId/p/$participant',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiParticipantParticipantIdCommentsRoute =
   ApiParticipantParticipantIdCommentsRouteImport.update({
     id: '/comments',
@@ -427,6 +433,7 @@ export interface FileRoutesByFullPath {
   '/api/drawings/$drawingId/stats': typeof ApiDrawingsDrawingIdStatsRoute
   '/api/drawings/$drawingId/upload': typeof ApiDrawingsDrawingIdUploadRoute
   '/api/participant/$participantId/comments': typeof ApiParticipantParticipantIdCommentsRoute
+  '/d/$drawingId/p/$participant': typeof DDrawingIdPParticipantRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -487,6 +494,7 @@ export interface FileRoutesByTo {
   '/api/drawings/$drawingId/stats': typeof ApiDrawingsDrawingIdStatsRoute
   '/api/drawings/$drawingId/upload': typeof ApiDrawingsDrawingIdUploadRoute
   '/api/participant/$participantId/comments': typeof ApiParticipantParticipantIdCommentsRoute
+  '/d/$drawingId/p/$participant': typeof DDrawingIdPParticipantRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -548,6 +556,7 @@ export interface FileRoutesById {
   '/api/drawings/$drawingId/stats': typeof ApiDrawingsDrawingIdStatsRoute
   '/api/drawings/$drawingId/upload': typeof ApiDrawingsDrawingIdUploadRoute
   '/api/participant/$participantId/comments': typeof ApiParticipantParticipantIdCommentsRoute
+  '/d/$drawingId/p/$participant': typeof DDrawingIdPParticipantRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -610,6 +619,7 @@ export interface FileRouteTypes {
     | '/api/drawings/$drawingId/stats'
     | '/api/drawings/$drawingId/upload'
     | '/api/participant/$participantId/comments'
+    | '/d/$drawingId/p/$participant'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -670,6 +680,7 @@ export interface FileRouteTypes {
     | '/api/drawings/$drawingId/stats'
     | '/api/drawings/$drawingId/upload'
     | '/api/participant/$participantId/comments'
+    | '/d/$drawingId/p/$participant'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -730,6 +741,7 @@ export interface FileRouteTypes {
     | '/api/drawings/$drawingId/stats'
     | '/api/drawings/$drawingId/upload'
     | '/api/participant/$participantId/comments'
+    | '/d/$drawingId/p/$participant'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -781,6 +793,7 @@ export interface RootRouteChildren {
   ApiPacksIndexRoute: typeof ApiPacksIndexRoute
   DrawingsDrawingIdIndexRoute: typeof DrawingsDrawingIdIndexRoute
   SlotDrawingIdIndexRoute: typeof SlotDrawingIdIndexRoute
+  DDrawingIdPParticipantRoute: typeof DDrawingIdPParticipantRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
@@ -1120,6 +1133,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DemoStartSsrDataOnlyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/d/$drawingId/p/$participant': {
+      id: '/d/$drawingId/p/$participant'
+      path: '/d/$drawingId/p/$participant'
+      fullPath: '/d/$drawingId/p/$participant'
+      preLoaderRoute: typeof DDrawingIdPParticipantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/participant/$participantId/comments': {
       id: '/api/participant/$participantId/comments'
       path: '/comments'
@@ -1290,6 +1310,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPacksIndexRoute: ApiPacksIndexRoute,
   DrawingsDrawingIdIndexRoute: DrawingsDrawingIdIndexRoute,
   SlotDrawingIdIndexRoute: SlotDrawingIdIndexRoute,
+  DDrawingIdPParticipantRoute: DDrawingIdPParticipantRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,

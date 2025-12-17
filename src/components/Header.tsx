@@ -10,6 +10,8 @@ const NOT_VISIBLE_AT = [
   '/authentication/signup',
   '/slot/*',
   '/s/*',
+  '/drawings/$drawingId/p/$participateId',
+  '/d/$drawingId/p/$participateId',
 ]
 
 const Logo = () => (
@@ -59,10 +61,21 @@ export default function Header() {
   const location = useLocation()
   const currentPath = location.pathname
 
+  /**
+   * Determines if the navigation menu should be visible based on the current path.
+   *
+   * Converts path patterns in NOT_VISIBLE_AT array to regex and tests against current path:
+   * - **Exact paths**: `/` → matches exactly "/"
+   * - **Wildcard paths**: `/slot/*` → matches "/slot/" followed by anything (e.g., "/slot/123", "/slot/abc/def")
+   * - **Dynamic params**: `/drawings/$drawingId/p/$participateId` → matches TanStack Router params
+   *   (e.g., "/drawings/123/p/456", "/drawings/abc-def/p/xyz-123")
+   *
+   * @returns {boolean} true if navigation should be visible, false if current path matches any hidden pattern
+   */
   const isNavVisible = () => {
     const patterns = NOT_VISIBLE_AT.map((path) => {
-      if (path.includes('*')) {
-        const regexStr = path.replace(/\*/g, '.*')
+      if (path.includes('*') || path.includes('$')) {
+        let regexStr = path.replace(/\*/g, '.*').replace(/\$[^/]+/g, '[^/]+')
         return new RegExp(`^${regexStr}$`)
       } else {
         return new RegExp(`^${path}$`)

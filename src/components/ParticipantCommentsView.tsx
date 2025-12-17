@@ -75,9 +75,9 @@ export function ParticipantCommentsView({
   }
 
   // Only show if there are comments or user has interacted
-  if (comments.length === 0 && !newComment) {
-    return null
-  }
+  // if (comments.length === 0 && !newComment) {
+  //   return null
+  // }
 
   return (
     <Card className="p-4 mt-4">
@@ -119,7 +119,7 @@ export function ParticipantCommentsView({
           placeholder="Write your message..."
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          className="min-h-[80px]"
+          className="min-h-20"
         />
         <Button
           onClick={handleAddComment}

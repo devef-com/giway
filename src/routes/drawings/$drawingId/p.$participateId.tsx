@@ -66,7 +66,7 @@ function RouteComponent() {
 
     // Generate QR SVG string
     const qrSvgString = new QRCodeSVG({
-      content: `${HOST}/drawings/${drawingId}/p/${participateId}`,
+      content: `${HOST}/d/${drawingId}/p/${participateId}`,
       padding: 4,
       width: 180,
       height: 180,
@@ -120,7 +120,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="mx-auto max-w-md p-4">
+    <div className="mx-auto max-w-md p-4 min-h-[calc(100svh-129px)]">
       {participantData ? (
         <>
           <Card className="p-4">
@@ -150,15 +150,18 @@ function RouteComponent() {
               </p>
             </div>
 
-            <span className="text-sm inline-flex items-center gap-2 text-text-light-secondary dark:text-text-dark-secondary">
+            <span
+              className={cn(
+                'text-sm inline-flex items-center gap-2 text-text-light-secondary dark:text-text-dark-secondary',
+                participantData.isEligible != null ? 'hidden' : '',
+              )}
+            >
               <InfoIcon size={18} />
-              {participantData.isEligible == null
-                ? 'Your participation is pending approval.'
-                : ''}
+              Your participation is pending approval.
             </span>
           </Card>
 
-          <div className="max-w-[500px] h-[250px] mt-4 bg-[#000000] rounded-[2.5rem] grid grid-cols-[1fr_2px_1fr] items-center overflow-hidden relative p-2 shadow-2xl border border-white/20">
+          <div className="max-w-125 h-62.5 mt-4 bg-[#000000] rounded-[2.5rem] grid grid-cols-[1fr_2px_1fr] items-center overflow-hidden relative p-2 shadow-2xl border border-white/20">
             {/* Left Section */}
             <div className="flex-1 h-full flex flex-col justify-between pl-5 py-8">
               <h1 className="text-[#ffffff] text-xl font-bold tracking-tight">
@@ -175,14 +178,14 @@ function RouteComponent() {
             <div className="h-[80%] w-px bg-[#ffffff] opacity-100 mx-2"></div>
 
             {/* Right Section */}
-            <div className="w-[200px] h-full flex items-center justify-center">
+            <div className="w-50 h-full flex items-center justify-center">
               {/* Grey Box - bg-gray-300 -> bg-[#d1d5db] */}
               <div className="mr-0">
                 <span
-                  className="w-[200px]"
+                  className="w-50"
                   dangerouslySetInnerHTML={{
                     __html: new QRCodeSVG({
-                      content: `${HOST}/drawings/${drawingId}/p/${participateId}`,
+                      content: `${HOST}/d/${drawingId}/p/${participateId}`,
                       padding: 4,
                       width: 180,
                       height: 180,
