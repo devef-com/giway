@@ -20,7 +20,7 @@ import type { QueryClient } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
 import Footer from '@/components/Footer'
 import { useTranslation } from 'react-i18next'
-import { setSSRLanguage } from '@/lib/i18n'
+import i18n, { setSSRLanguage } from '@/lib/i18n'
 interface MyRouterContext {
   queryClient: QueryClient
 }
@@ -43,7 +43,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
       {
         name: 'description',
-        content: 'Giway - The easiest way to manage drawings and giveaways.',
+        content: i18n.t('app.description'),
       },
       {
         name: 'keywords',
@@ -63,7 +63,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
       {
         property: 'og:description',
-        content: 'Giway - The easiest way to manage drawings and giveaways.',
+        content: i18n.t('app.description'),
       },
       {
         property: 'og:type',
@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
       {
         name: 'twitter:description',
-        content: 'Giway - The easiest way to manage drawings and giveaways.',
+        content: i18n.t('app.description'),
       },
     ],
     links: [

@@ -273,6 +273,8 @@
   "drawings.createFirst": "Create your first drawing",
   "drawings.noDrawings": "No drawings yet. Create your first giway to get started!",
   "drawings.loginRequired": "Please log in to view your drawings.",
+  "slot.meta.title": "Giway - {{title}",
+  "slot.meta.description": "Join the giway for {{title}}. Participate now for a chance to win!",
   "slot.form.fullName": "Full Name",
   "slot.form.fullNamePlaceholder": "Enter your full name",
   "slot.form.email": "Email",

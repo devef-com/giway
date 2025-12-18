@@ -34,6 +34,7 @@ import { useParticipate } from '@/querys/useParticipate'
 import { useDrawingWinners } from '@/querys/useDrawingWinners'
 import { Drawing, drawings, drawingAssets, assets } from '@/db/schema'
 import { db } from '@/db/index'
+import i18n from '@/lib/i18n'
 
 const getDrawing = createServerFn({
   method: 'GET',
@@ -87,8 +88,8 @@ export const Route = createFileRoute('/slot/$drawingId/')({
     return drawing
   },
   head: (ctx) => {
-    const title = `Join Giway - ${ctx.loaderData?.title || ''}`
-    const description = `Join the giway for ${ctx.loaderData?.title || 'this event'}. ${ctx.loaderData?.playWithNumbers ? 'Reserve your number(s) and participate now!' : 'Participate now'}`
+    const title = i18n.t('slot.meta.title', { title: ctx.loaderData?.title.slice(0, 50) || '' })
+    const description = i18n.t('slot.meta.description', { title: ctx.loaderData?.title || 'this event' })
 
     // Prefer cover image, fallback to first image
     const coverImage = ctx.loaderData?.assets?.find((a) => a.isCover)?.url
@@ -104,10 +105,10 @@ export const Route = createFileRoute('/slot/$drawingId/')({
         { property: 'og:type', content: 'website' },
         ...(ogImage
           ? [
-              { property: 'og:image', content: ogImage },
-              { property: 'og:image:width', content: '1200' }, // 1.91:1 aspect ratio - width should be 1.9 X the height
-              { property: 'og:image:height', content: '630' },
-            ]
+            { property: 'og:image', content: ogImage },
+            { property: 'og:image:width', content: '1200' }, // 1.91:1 aspect ratio - width should be 1.9 X the height
+            { property: 'og:image:height', content: '630' },
+          ]
           : []),
         // Twitter Card tags
         {
@@ -538,7 +539,7 @@ function SlotDrawingParticipation() {
         />
         <div className="grid grid-cols-[max-content_1fr] items-center gap-4 mb-4">
           {drawing.assets &&
-          drawing.assets.filter((a) => !a.isCover).length > 0 ? (
+            drawing.assets.filter((a) => !a.isCover).length > 0 ? (
             <div
               className="relative w-30 h-30 rounded-lg overflow-hidden cursor-pointer group"
               onClick={() => {
@@ -681,12 +682,12 @@ function SlotDrawingParticipation() {
                     pageIndex === currentPage
                       ? slotsData
                       : queryClient.getQueryData<NumberSlotsPageData>(
-                          getNumberSlotsPageQueryKey(
-                            drawingId,
-                            pageIndex + 1,
-                            NUMBERS_PER_PAGE,
-                          ),
-                        )
+                        getNumberSlotsPageQueryKey(
+                          drawingId,
+                          pageIndex + 1,
+                          NUMBERS_PER_PAGE,
+                        ),
+                      )
 
                   return (
                     <div
@@ -718,14 +719,13 @@ function SlotDrawingParticipation() {
                               className={`
                                 aspect-square w-full px-0 py-0 rounded-lg flex items-center justify-center 
                                 text-xl font-normal transition-colors duration-200 cursor-pointer
-                                border ${
-                                  isSelected
-                                    ? 'bg-[#14b8a6] border-[#14b8a6] text-white'
-                                    : isTaken
-                                      ? 'bg-red-500/20 border-red-500/50 text-red-300 cursor-not-allowed'
-                                      : isReserved
-                                        ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300 cursor-not-allowed'
-                                        : 'border-border-light dark:border-border-dark text-text-light-primary dark:text-text-dark-primary bg-background-light dark:bg-background-dark hover:bg-[#14b8a6]/10'
+                                border ${isSelected
+                                  ? 'bg-[#14b8a6] border-[#14b8a6] text-white'
+                                  : isTaken
+                                    ? 'bg-red-500/20 border-red-500/50 text-red-300 cursor-not-allowed'
+                                    : isReserved
+                                      ? 'bg-yellow-500/20 border-yellow-500/50 text-yellow-300 cursor-not-allowed'
+                                      : 'border-border-light dark:border-border-dark text-text-light-primary dark:text-text-dark-primary bg-background-light dark:bg-background-dark hover:bg-[#14b8a6]/10'
                                 }
                               `}
                               style={{
@@ -784,11 +784,10 @@ function SlotDrawingParticipation() {
                     <button
                       key={i}
                       onClick={() => goToPage(i)}
-                      className={`rounded-full transition-all duration-200 cursor-pointer hover:opacity-80 ${
-                        i === currentPage
-                          ? 'w-4 h-4 bg-[#14b8a6]'
-                          : 'w-3.5 h-3.5 bg-border-light dark:bg-border-dark'
-                      }`}
+                      className={`rounded-full transition-all duration-200 cursor-pointer hover:opacity-80 ${i === currentPage
+                        ? 'w-4 h-4 bg-[#14b8a6]'
+                        : 'w-3.5 h-3.5 bg-border-light dark:bg-border-dark'
+                        }`}
                     />
                   ))}
                 </div>
