@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tantml:router'
+import { createFileRoute } from '@tanstack/react-router'
 import { Download, InfoIcon } from 'lucide-react'
 // import html2pdf from "html2pdf.js";
 import QRCodeSVG from 'qrcode-svg'
