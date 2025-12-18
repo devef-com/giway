@@ -1,6 +1,7 @@
 //https://docs.paypal.ai/payments/methods/paypal/sdk/js/v6/paypal-checkout
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
 
 declare global {
   interface Window {
@@ -17,7 +18,7 @@ function loadPayPalSdk(clientId: string, currency: string) {
       if (window.paypal) return resolve()
       existing.addEventListener('load', () => resolve())
       existing.addEventListener('error', () =>
-        reject(new Error('PayPal SDK failed to load')),
+        reject(new Error('PAYPAL_SDK_FAILED_TO_LOAD')),
       )
     })
   }
@@ -31,7 +32,7 @@ function loadPayPalSdk(clientId: string, currency: string) {
     )}&currency=${encodeURIComponent(currency)}&intent=capture&components=buttons`
 
     script.onload = () => resolve()
-    script.onerror = () => reject(new Error('PayPal SDK failed to load'))
+    script.onerror = () => reject(new Error('PAYPAL_SDK_FAILED_TO_LOAD'))
 
     document.body.appendChild(script)
   })
@@ -46,6 +47,7 @@ export function PayPalCheckoutButton({
   className?: string
   onSuccess?: () => void
 }) {
+  const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement | null>(null)
   const renderedForPackRef = useRef<number | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -85,7 +87,7 @@ export function PayPalCheckoutButton({
 
         if (cancelled) return
         if (!window.paypal?.Buttons) {
-          throw new Error('PayPal SDK not available')
+          throw new Error('PAYPAL_SDK_NOT_AVAILABLE')
         }
 
         window.paypal
@@ -99,7 +101,7 @@ export function PayPalCheckoutButton({
 
               if (!res.ok) {
                 const text = await res.text().catch(() => '')
-                throw new Error(text || 'Failed to create order')
+                throw new Error(text || 'PAYPAL_FAILED_TO_CREATE_ORDER')
               }
 
               const data = (await res.json()) as { orderId: string }
@@ -115,7 +117,7 @@ export function PayPalCheckoutButton({
 
               if (!res.ok) {
                 const text = await res.text().catch(() => '')
-                throw new Error(text || 'Failed to capture order')
+                throw new Error(text || 'PAYPAL_FAILED_TO_CAPTURE_ORDER')
               }
 
               onSuccess?.()
@@ -123,7 +125,7 @@ export function PayPalCheckoutButton({
 
             onError: (err: any) => {
               console.error('PayPal button error:', err)
-              setError('PayPal checkout failed. Please try again.')
+              setError(t('checkout.paypal.checkoutFailed'))
             },
           })
           .render(containerRef.current)
@@ -131,7 +133,16 @@ export function PayPalCheckoutButton({
         renderedForPackRef.current = packId
       } catch (e: any) {
         console.error(e)
-        setError(e?.message || 'Failed to load PayPal')
+        const code = String(e?.message || '')
+        if (
+          code === 'PAYPAL_SDK_FAILED_TO_LOAD' ||
+          code === 'PAYPAL_SDK_NOT_AVAILABLE'
+        ) {
+          setError(t('checkout.paypal.loadFailed'))
+        } else {
+          // Keep server responses (if any), otherwise fall back to a friendly, translated message
+          setError(code && !code.startsWith('PAYPAL_') ? code : t('checkout.paypal.loadFailed'))
+        }
       } finally {
         setIsLoading(false)
       }
@@ -148,10 +159,10 @@ export function PayPalCheckoutButton({
     return (
       <div className={className}>
         <Button variant="outline" disabled className="w-full">
-          PayPal not configured
+          {t('checkout.paypal.notConfigured')}
         </Button>
         <p className="text-xs text-muted-foreground text-center mt-2">
-          Set VITE_PAYPAL_CLIENT_ID
+          {t('checkout.paypal.setClientId')}
         </p>
       </div>
     )
@@ -162,7 +173,7 @@ export function PayPalCheckoutButton({
       <div ref={containerRef} />
       {isLoading && (
         <p className="text-xs text-muted-foreground text-center mt-2">
-          Loading PayPal…
+          {t('checkout.paypal.loading')}
         </p>
       )}
       {error && (

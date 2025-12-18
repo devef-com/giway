@@ -15,12 +15,14 @@ import { PayPalCheckoutButton } from '@/components/PayPalCheckoutButton'
 import { usePacks } from '@/querys/usePacks'
 import { useUserBalance } from '@/querys/useUserBalance'
 import { authClient } from '@/lib/auth-client'
+import { Trans, useTranslation } from 'react-i18next'
 
 export const Route = createFileRoute('/store')({
   component: StorePage,
 })
 
 function StorePage() {
+  const { t } = useTranslation()
   const session = authClient.useSession()
   const { data: packs, isLoading: isPacksLoading } = usePacks()
   const {
@@ -40,7 +42,7 @@ function StorePage() {
   }
 
   const onSuccess = () => {
-    toast.success('Pack purchased successfully!')
+    toast.success(t('store.packPurchased'))
     refetch()
     setSelectedPackId(null)
   }
@@ -51,14 +53,17 @@ function StorePage() {
         <div className="max-w-4xl mx-auto">
           <Card className="p-6">
             <p className="text-center">
-              Please{' '}
-              <Link
-                to="/authentication/login"
-                className="text-primary hover:underline"
-              >
-                log in
-              </Link>{' '}
-              to view the store.
+              <Trans
+                i18nKey="store.loginRequired"
+                components={{
+                  login: (
+                    <Link
+                      to="/authentication/login"
+                      className="text-primary hover:underline"
+                    />
+                  ),
+                }}
+              />
             </p>
           </Card>
         </div>
@@ -71,13 +76,13 @@ function StorePage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Store</h1>
+            <h1 className="text-3xl font-bold mb-2">{t('store.title')}</h1>
             <p className="text-muted-foreground">
-              Get packs to create more giways
+              {t('store.subtitle')}
             </p>
           </div>
           <Link to="/drawings/create">
-            <Button>Create Giway</Button>
+            <Button>{t('store.createGiway')}</Button>
           </Link>
         </div>
 
@@ -87,44 +92,44 @@ function StorePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Sparkles className="h-5 w-5" />
-                Your Current Balance
+                {t('store.currentBalance')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 rounded-lg border bg-muted/50">
                   <p className="font-medium mb-2">
-                    Raffles (Play with Numbers)
+                    {t('store.raffleBalance')}
                   </p>
                   <div className="flex gap-4 text-sm">
                     <span className="flex items-center gap-1">
                       <Users className="h-4 w-4" />
-                      {balance.playWithNumbers.participants} participants
+                      {balance.playWithNumbers.participants} {t('store.participants')}
                     </span>
                     <span className="flex items-center gap-1">
                       <Image className="h-4 w-4" />
-                      {balance.playWithNumbers.images} images
+                      {balance.playWithNumbers.images} {t('store.images')}
                     </span>
                     <span className="flex items-center gap-1">
                       <Mail className="h-4 w-4" />
-                      {balance.playWithNumbers.emails} emails
+                      {balance.playWithNumbers.emails} {t('store.emails')}
                     </span>
                   </div>
                 </div>
                 <div className="p-4 rounded-lg border bg-muted/50">
-                  <p className="font-medium mb-2">Giveaways (No Numbers)</p>
+                  <p className="font-medium mb-2">{t('store.giveawayBalance')}</p>
                   <div className="flex gap-4 text-sm">
                     <span className="flex items-center gap-1">
                       <Users className="h-4 w-4" />
-                      {balance.noNumbers.participants} participants
+                      {balance.noNumbers.participants} {t('store.participants')}
                     </span>
                     <span className="flex items-center gap-1">
                       <Image className="h-4 w-4" />
-                      {balance.noNumbers.images} images
+                      {balance.noNumbers.images} {t('store.images')}
                     </span>
                     <span className="flex items-center gap-1">
                       <Mail className="h-4 w-4" />
-                      {balance.noNumbers.emails} emails
+                      {balance.noNumbers.emails} {t('store.emails')}
                     </span>
                   </div>
                 </div>
@@ -135,7 +140,7 @@ function StorePage() {
 
         {isPacksLoading ? (
           <Card className="p-6">
-            <p className="text-center">Loading packs...</p>
+            <p className="text-center">{t('store.loadingPacks')}</p>
           </Card>
         ) : packs && packs.length > 0 ? (
           <>
@@ -143,7 +148,7 @@ function StorePage() {
             {rafflesPacks.length > 0 && (
               <div className="mb-8">
                 <h2 className="text-xl font-semibold mb-4">
-                  Raffle Packs (Play with Numbers)
+                  {t('store.rafflePacks')}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {rafflesPacks.map((pack) => (
@@ -154,7 +159,7 @@ function StorePage() {
                           {pack.name}
                         </CardTitle>
                         <CardDescription>
-                          For raffles where participants pick numbers
+                          {t('store.raffleDescription')}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="flex-1">
@@ -162,16 +167,20 @@ function StorePage() {
                           <li className="flex items-center gap-2 text-sm">
                             <Users className="h-4 w-4 text-primary" />
                             <span>
-                              {pack.participants.toLocaleString()} participants
+                              {pack.participants.toLocaleString()} {t('store.participants')}
                             </span>
                           </li>
                           <li className="flex items-center gap-2 text-sm">
                             <Image className="h-4 w-4 text-primary" />
-                            <span>{pack.images} images</span>
+                            <span>
+                              {pack.images} {t('store.images')}
+                            </span>
                           </li>
                           <li className="flex items-center gap-2 text-sm">
                             <Mail className="h-4 w-4 text-primary" />
-                            <span>{pack.emails.toLocaleString()} emails</span>
+                            <span>
+                              {pack.emails.toLocaleString()} {t('store.emails')}
+                            </span>
                           </li>
                         </ul>
                       </CardContent>
@@ -190,8 +199,8 @@ function StorePage() {
                               }
                             >
                               {selectedPackId === pack.id
-                                ? 'Cancel'
-                                : 'Buy Pack'}
+                                ? t('common.cancel')
+                                : t('store.buyPack')}
                             </Button>
                           </div>
                           {selectedPackId === pack.id && session.data?.user && (
@@ -213,7 +222,7 @@ function StorePage() {
             {giveawayPacks.length > 0 && (
               <div className="mb-8">
                 <h2 className="text-xl font-semibold mb-4">
-                  Giveaway Packs (No Numbers)
+                  {t('store.giveawayPacks')}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {giveawayPacks.map((pack) => (
@@ -224,7 +233,7 @@ function StorePage() {
                           {pack.name}
                         </CardTitle>
                         <CardDescription>
-                          For giveaways with random winner selection
+                          {t('store.giveawayDescription')}
                         </CardDescription>
                       </CardHeader>
                       <CardContent className="flex-1">
@@ -232,17 +241,21 @@ function StorePage() {
                           <li className="flex items-center gap-2 text-sm">
                             <Users className="h-4 w-4 text-primary" />
                             <span>
-                              {pack.participants.toLocaleString()} participants
+                              {pack.participants.toLocaleString()} {t('store.participants')}
                             </span>
                           </li>
                           <li className="flex items-center gap-2 text-sm">
                             <Image className="h-4 w-4 text-primary" />
-                            <span>{pack.images} images</span>
+                            <span>
+                              {pack.images} {t('store.images')}
+                            </span>
                           </li>
                           {pack.emails > 0 && (
                             <li className="flex items-center gap-2 text-sm">
                               <Mail className="h-4 w-4 text-primary" />
-                              <span>{pack.emails.toLocaleString()} emails</span>
+                              <span>
+                                {pack.emails.toLocaleString()} {t('store.emails')}
+                              </span>
                             </li>
                           )}
                         </ul>
@@ -262,8 +275,8 @@ function StorePage() {
                               }
                             >
                               {selectedPackId === pack.id
-                                ? 'Cancel'
-                                : 'Buy Pack'}
+                                ? t('common.cancel')
+                                : t('store.buyPack')}
                             </Button>
                           </div>
                           {selectedPackId === pack.id && session.data?.user && (
@@ -284,7 +297,7 @@ function StorePage() {
         ) : (
           <Card className="p-6">
             <p className="text-center text-muted-foreground">
-              No packs available at the moment. Check back later!
+              {t('store.noPacks')}
             </p>
           </Card>
         )}
@@ -292,24 +305,24 @@ function StorePage() {
         {/* Monthly Free Info */}
         <Card className="mt-8 bg-primary/5 border-primary/20">
           <CardHeader>
-            <CardTitle>Monthly Free Allowance</CardTitle>
+            <CardTitle>{t('store.monthlyFree.title')}</CardTitle>
             <CardDescription>
-              Active users receive free resources each month
+              {t('store.monthlyFree.description')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex gap-4 text-sm">
               <span className="flex items-center gap-1">
                 <Users className="h-4 w-4" />
-                100 participants (Raffle only)
+                {t('store.monthlyFree.participants')}
               </span>
               <span className="flex items-center gap-1">
-                <Image className="h-4 w-4" />1 image
+                <Image className="h-4 w-4" />
+                {t('store.monthlyFree.images')}
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
-              * Monthly allowances expire at the end of each month and cannot be
-              accumulated.
+              {t('store.monthlyFree.note')}
             </p>
           </CardContent>
         </Card>

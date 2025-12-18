@@ -5,100 +5,78 @@ import {
   ExpandableTitle,
 } from '@/components/ui/expandable'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useTranslation } from 'react-i18next'
 
 export const Route = createFileRoute('/support')({
   component: SupportPage,
 })
 
 function SupportPage() {
+  const { t } = useTranslation()
   return (
     <div>
       <main className="container mx-auto py-10 px-4 max-w-3xl min-h-[calc(100svh-129px)]">
         <div className="space-y-8">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight">Support & FAQ</h1>
-            <p className="text-muted-foreground text-lg">
-              Find answers to common questions about Giway.
-            </p>
+            <h1 className="text-4xl font-bold">{t('support.title')}</h1>
+            <p className="text-muted-foreground text-lg">{t('support.subtitle')}</p>
           </div>
 
           <Card>
             <CardHeader>
-              <CardTitle>Frequently Asked Questions</CardTitle>
+              <CardTitle>{t('support.faq.title')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <Expandable className="border rounded-md">
-                <ExpandableTitle>What is a Giway?</ExpandableTitle>
+                <ExpandableTitle>{t('support.faq.whatIsGiway.q')}</ExpandableTitle>
                 <ExpandableContent>
                   <p className="text-muted-foreground">
-                    A Giway is an event on our platform. It can be a Raffle
-                    (where participants pick numbers) or a Giveaway Drawing
-                    (where winners are picked randomly without number
-                    selection).
+                    {t('support.faq.whatIsGiway.a')}
                   </p>
                 </ExpandableContent>
               </Expandable>
 
               <Expandable className="border rounded-md">
-                <ExpandableTitle>
-                  What is the difference between Free and Paid events?
-                </ExpandableTitle>
+                <ExpandableTitle>{t('support.faq.freeVsPaid.q')}</ExpandableTitle>
                 <ExpandableContent>
                   <p className="text-muted-foreground">
-                    In Free events, participants can only select one number. In
-                    Paid events, the host sets a price, and participants can
-                    select multiple numbers.
+                    {t('support.faq.freeVsPaid.a')}
                   </p>
                 </ExpandableContent>
               </Expandable>
 
               <Expandable className="border rounded-md">
-                <ExpandableTitle>
-                  How does "Play with Numbers" work?
-                </ExpandableTitle>
+                <ExpandableTitle>{t('support.faq.playWithNumbers.q')}</ExpandableTitle>
                 <ExpandableContent>
                   <p className="text-muted-foreground">
-                    When "Play with Numbers" is enabled (Raffle), participants
-                    actively select numbers. If disabled, the system
-                    automatically assigns winners.
+                    {t('support.faq.playWithNumbers.a')}
                   </p>
                 </ExpandableContent>
               </Expandable>
 
               <Expandable className="border rounded-md">
-                <ExpandableTitle>
-                  How do I get more participants for my Giway?
-                </ExpandableTitle>
+                <ExpandableTitle>{t('support.faq.moreParticipants.q')}</ExpandableTitle>
                 <ExpandableContent>
                   <p className="text-muted-foreground">
-                    You can increase your participant limit by purchasing Packs,
-                    redeeming coupons, or watching ads (for Raffle Giways).
-                    Every month, active users also get free rewards (100
-                    participants for Raffles).
+                    {t('support.faq.moreParticipants.a')}
                   </p>
                 </ExpandableContent>
               </Expandable>
 
               <Expandable className="border rounded-md">
-                <ExpandableTitle>
-                  What happens if I reject a participant?
-                </ExpandableTitle>
+                <ExpandableTitle>{t('support.faq.rejectParticipant.q')}</ExpandableTitle>
                 <ExpandableContent>
                   <p className="text-muted-foreground">
-                    If you reject a participant, their reserved number slots are
-                    released. However, we keep a record of the numbers they had
-                    selected in case you need to reference them later.
+                    {t('support.faq.rejectParticipant.a')}
                   </p>
                 </ExpandableContent>
               </Expandable>
 
               <Expandable className="border rounded-md">
-                <ExpandableTitle>Do my purchased packs expire?</ExpandableTitle>
+                <ExpandableTitle>{t('support.faq.packsExpire.q')}</ExpandableTitle>
                 <ExpandableContent>
                   <p className="text-muted-foreground">
-                    No, purchased packs and redeemed coupons never expire. Only
-                    the monthly active-user rewards expire at the end of each
-                    month.
+                    {t('support.faq.packsExpire.a')}
                   </p>
                 </ExpandableContent>
               </Expandable>
@@ -106,17 +84,14 @@ function SupportPage() {
           </Card>
 
           <div className="text-center space-y-4 pt-8">
-            <h2 className="text-2xl font-semibold">Still have questions?</h2>
-            <p className="text-muted-foreground">
-              We are here to help. Contact our support team for further
-              assistance.
-            </p>
+            <h2 className="text-2xl font-semibold">{t('support.contact.title')}</h2>
+            <p className="text-muted-foreground">{t('support.contact.subtitle')}</p>
             {/* Placeholder for contact button or email */}
             <a
               href="mailto:team@giway.com"
               className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
             >
-              Contact Support
+              {t('support.contact.button')}
             </a>
           </div>
         </div>

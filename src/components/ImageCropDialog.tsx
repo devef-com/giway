@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import Cropper from 'react-easy-crop'
 import type { Area, Point } from 'react-easy-crop'
 import { RotateCcw, RotateCw, ZoomIn, ZoomOut } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -36,6 +37,7 @@ export function ImageCropDialog({
   onCropComplete,
   initialMode = 'free',
 }: ImageCropDialogProps) {
+  const { t } = useTranslation()
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
@@ -135,9 +137,9 @@ export function ImageCropDialog({
         showCloseButton={false}
       >
         <DialogHeader>
-          <DialogTitle>Edit Image</DialogTitle>
+          <DialogTitle>{t('image.crop.title')}</DialogTitle>
           <DialogDescription>
-            Crop, rotate, and adjust your image
+            {t('image.crop.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -150,7 +152,7 @@ export function ImageCropDialog({
               size="sm"
               onClick={() => handleModeChange('free')}
             >
-              Free Crop
+              {t('image.crop.freeCrop')}
             </Button>
             <Button
               type="button"
@@ -158,14 +160,13 @@ export function ImageCropDialog({
               size="sm"
               onClick={() => handleModeChange('cover')}
             >
-              Cover (1.91:1)
+              {t('image.crop.coverCrop')}
             </Button>
           </div>
 
           {mode === 'cover' && (
             <p className="text-xs text-muted-foreground">
-              Cover images are used for social sharing (Open Graph). Output:
-              1200×630px
+              {t('image.crop.coverInfo')}
             </p>
           )}
 
@@ -194,7 +195,9 @@ export function ImageCropDialog({
           <div className="space-y-3">
             {/* Zoom control */}
             <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground w-14">Zoom</span>
+              <span className="text-sm text-muted-foreground w-14">
+                {t('image.crop.zoom')}
+              </span>
               <Button
                 type="button"
                 variant="outline"
@@ -228,7 +231,9 @@ export function ImageCropDialog({
 
             {/* Rotation control */}
             <div className="flex items-center gap-3">
-              <span className="text-sm text-muted-foreground w-14">Rotate</span>
+              <span className="text-sm text-muted-foreground w-14">
+                {t('image.crop.rotate')}
+              </span>
               <Button
                 type="button"
                 variant="outline"
@@ -265,7 +270,7 @@ export function ImageCropDialog({
 
         <DialogFooter className="gap-2 sm:gap-0">
           <Button type="button" variant="outline" onClick={handleClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             type="button"
@@ -273,10 +278,10 @@ export function ImageCropDialog({
             disabled={isProcessing || !croppedAreaPixels}
           >
             {isProcessing
-              ? 'Processing...'
+              ? t('image.crop.processing')
               : mode === 'cover'
-                ? 'Set as Cover'
-                : 'Apply'}
+                ? t('image.crop.setAsCover')
+                : t('image.crop.apply')}
           </Button>
         </DialogFooter>
       </DialogContent>

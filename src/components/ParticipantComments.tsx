@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import {
   useParticipantComments,
   useAddParticipantComment,
@@ -16,6 +17,7 @@ export function ParticipantComments({
 }: {
   participantId: string
 }) {
+  const { t } = useTranslation()
   const [newComment, setNewComment] = useState('')
   const [isVisible, setIsVisible] = useState(true)
 
@@ -34,12 +36,12 @@ export function ParticipantComments({
       },
       {
         onSuccess: () => {
-          toast.success('Comment added successfully')
+          toast.success(t('participant.comments.success'))
           setNewComment('')
           setIsVisible(true)
         },
         onError: (error) => {
-          toast.error(error.message || 'Failed to add comment')
+          toast.error(error.message || t('participant.comments.error'))
         },
       },
     )
@@ -48,7 +50,9 @@ export function ParticipantComments({
   if (isLoading) {
     return (
       <Card className="rounded-lg p-6 mt-4">
-        <h3 className="text-xl font-semibold mb-4">Conversation</h3>
+        <h3 className="text-xl font-semibold mb-4">
+          {t('participant.comments.title')}
+        </h3>
 
         <Skeleton className="h-10 w-full mb-4" />
         <Skeleton className="h-10 w-full mb-4" />
@@ -65,15 +69,17 @@ export function ParticipantComments({
 
   return (
     <Card className="rounded-lg p-6 mt-4">
-      <h3 className="text-xl font-semibold mb-4">Conversation</h3>
+      <h3 className="text-xl font-semibold mb-4">
+        {t('participant.comments.title')}
+      </h3>
 
       {/* Add Comment Form */}
       <div className="space-y-3 mb-6">
         <Textarea
-          placeholder="Add a message..."
+          placeholder={t('participant.comments.placeholder')}
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          className="min-h-[100px]"
+          className="min-h-25"
         />
 
         <div className="flex items-center justify-between">
@@ -84,7 +90,7 @@ export function ParticipantComments({
               onCheckedChange={setIsVisible}
             />
             <Label htmlFor="visible-switch" className="text-sm">
-              Visible to participant
+              {t('participant.comments.visibleToParticipant')}
             </Label>
           </div>
 
@@ -92,7 +98,9 @@ export function ParticipantComments({
             onClick={handleAddComment}
             disabled={addComment.isPending || !newComment.trim()}
           >
-            {addComment.isPending ? 'Sending...' : 'Send Message'}
+            {addComment.isPending
+              ? t('participant.comments.sending')
+              : t('participant.comments.sendMessage')}
           </Button>
         </div>
       </div>
@@ -101,17 +109,16 @@ export function ParticipantComments({
       <div className="space-y-3">
         {comments.length === 0 ? (
           <p className="text-sm text-gray-500">
-            No messages yet. Start the conversation!
+            {t('participant.comments.noMessages')}
           </p>
         ) : (
           comments.map((comment) => (
             <div
               key={comment.id}
-              className={`border rounded-lg p-4 ${
-                comment.authorType === 'participant'
-                  ? 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950'
-                  : 'border-gray-200 dark:border-gray-700'
-              }`}
+              className={`border rounded-lg p-4 ${comment.authorType === 'participant'
+                ? 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950'
+                : 'border-gray-200 dark:border-gray-700'
+                }`}
             >
               <div className="flex justify-between items-start mb-2">
                 <div>
@@ -119,7 +126,7 @@ export function ParticipantComments({
                     {comment.authorName}
                     {comment.authorType === 'participant' && (
                       <span className="ml-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-0.5 rounded">
-                        Participant
+                        {t('participant.comments.participant')}
                       </span>
                     )}
                   </span>
@@ -130,7 +137,7 @@ export function ParticipantComments({
                 {comment.authorType === 'host' &&
                   !comment.isVisibleToParticipant && (
                     <span className="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 px-2 py-1 rounded">
-                      Private
+                      {t('participant.comments.private')}
                     </span>
                   )}
               </div>

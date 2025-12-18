@@ -25,6 +25,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { useDrawings } from '@/querys/useDrawings'
 import { getTimeRemainingText } from '@/lib/utils'
 import getSession from '@/server-fn/get-session'
+import { useTranslation } from 'react-i18next'
 
 export const Route = createFileRoute('/drawings/')({
   component: DrawingsList,
@@ -36,6 +37,7 @@ export const Route = createFileRoute('/drawings/')({
 
 function DrawingsList() {
   // const session = authClient.useSession()
+  const { t } = useTranslation()
   const { session } = Route.useLoaderData()
 
   const { data: drawings, isLoading } = useDrawings(!!session)
@@ -66,11 +68,11 @@ function DrawingsList() {
     <div className="min-h-[calc(100svh-129px)] p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-xl font-bold">My Drawings</h1>
+          <h1 className="text-xl font-bold">{t('drawings.title')}</h1>
           <Link to="/drawings/create">
             <Button variant="default">
               <PlusIcon className="w-4 h-4" />
-              new
+              {t('drawings.new')}
             </Button>
           </Link>
         </div>
@@ -107,7 +109,7 @@ function DrawingsList() {
                 <CardHeader>
                   <CardTitle>{drawing.title}</CardTitle>
                   <CardDescription>
-                    Created on{' '}
+                    {t('drawings.createdOn')}{' '}
                     {new Date(drawing.createdAt).toLocaleDateString(
                       navigator.language,
                       {
@@ -128,17 +130,17 @@ function DrawingsList() {
                           <Cpu className="w-4 h-4" />
                         )}
                         <span className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
-                          Selection:{' '}
+                          {t('drawings.selection')}:{' '}
                           {drawing.winnerSelection === 'manually'
-                            ? 'Enter number manually'
-                            : 'System generated'}
+                            ? t('drawings.selectionManual')
+                            : t('drawings.selectionSystem')}
                         </span>
                       </div>
                       {drawing.playWithNumbers && (
                         <div className="flex items-center gap-2 mb-2">
                           <Hash className="w-4 h-4" />
                           <span className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
-                            Numbers: {drawing.quantityOfNumbers}
+                            {t('drawings.numbers')}: {drawing.quantityOfNumbers}
                           </span>
                         </div>
                       )}
@@ -149,16 +151,16 @@ function DrawingsList() {
                           <Gift className="w-4 h-4" />
                         )}
                         <span className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
-                          Type:{' '}
+                          {t('drawings.type')}:{' '}
                           {drawing.isPaid
-                            ? `Paid ($${(drawing.price ?? 0).toLocaleString()})`
-                            : 'Free'}
+                            ? `${t('drawings.paid')} ($${(drawing.price ?? 0).toLocaleString()})`
+                            : t('common.free')}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4" />
                         <span className="text-sm text-text-light-secondary dark:text-text-dark-secondary">
-                          End Date: {getTimeRemainingText(drawing.endAt)}
+                          {t('drawings.endDate')}: {getTimeRemainingText(drawing.endAt)}
                         </span>
                       </div>
                     </div>
@@ -169,7 +171,7 @@ function DrawingsList() {
                       >
                         <Button variant="outline">
                           <Eye className="w-4 h-4 mr-2" />
-                          View
+                          {t('drawings.view')}
                         </Button>
                       </Link>
                       <Button
@@ -177,7 +179,7 @@ function DrawingsList() {
                           // toast.success('Lol!')
                           const url = `${window.location.origin}/slot/${drawing.id}`
                           navigator.clipboard.writeText(url).then(() => {
-                            toast.success('Link copied to clipboard!')
+                            toast.success(t('drawings.linkCopied'))
                           })
                         }}
                         variant="outline"
@@ -190,7 +192,7 @@ function DrawingsList() {
                           const url = `${window.location.origin}/slot/${drawing.id}`
                           navigator
                             .share({
-                              title: 'Join my drawing!',
+                              title: t('drawings.shareTitle'),
                               text: drawing.title,
                               url: url,
                             })
@@ -213,12 +215,12 @@ function DrawingsList() {
         ) : (
           <Card className="p-6 min-h-40 ">
             <p className="text-center my-auto">
-              No drawings yet.{' '}
+              {t('drawings.none')}{' '}
               <Link
                 to="/drawings/create"
                 className="text-cyan-400 hover:text-cyan-300"
               >
-                Create your first drawing
+                {t('drawings.createFirst')}
               </Link>
             </p>
           </Card>

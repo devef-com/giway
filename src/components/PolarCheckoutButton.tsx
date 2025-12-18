@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
 
 interface PolarCheckoutButtonProps {
   productId: string // Polar product ID (from pack.polarId)
@@ -15,6 +16,8 @@ export function PolarCheckoutButton({
   customerName,
   className,
 }: PolarCheckoutButtonProps) {
+  const { t } = useTranslation()
+
   // Build checkout URL with query params
   // The /api/checkout route handles the redirect to Polar
   const buildCheckoutUrl = () => {
@@ -33,7 +36,7 @@ export function PolarCheckoutButton({
 
   return (
     <Button asChild className={className}>
-      <a href={buildCheckoutUrl()}>Buy with Polar</a>
+      <a href={buildCheckoutUrl()}>{t('checkout.polar.buyWithPolar')}</a>
     </Button>
   )
 }

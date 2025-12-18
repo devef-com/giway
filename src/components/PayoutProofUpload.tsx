@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FileText, FileUp, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { compressImage, isAllowedImageType } from '@/lib/image-compression'
@@ -36,6 +37,7 @@ export function PayoutProofUpload({
   onFileChange,
   disabled = false,
 }: PayoutProofUploadProps) {
+  const { t } = useTranslation()
   const [fileData, setFileData] = useState<PayoutProofFile | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -58,15 +60,13 @@ export function PayoutProofUpload({
 
       // Validate file type
       if (!isAllowedFileType(file.type)) {
-        toast.error(
-          'Invalid file type. Please upload an image (JPEG, PNG, WEBP) or PDF.',
-        )
+        toast.error(t('payoutProof.invalidType'))
         return
       }
 
       // Only apply size limit to PDFs
       if (file.type === 'application/pdf' && file.size > MAX_FILE_SIZE) {
-        toast.error('PDF file size too large. Maximum allowed: 2MB')
+        toast.error(t('payoutProof.pdfTooLarge', { maxMb: 2 }))
         return
       }
 
@@ -93,7 +93,7 @@ export function PayoutProofUpload({
         onFileChange?.(processedFile)
       } catch (error) {
         console.error('Failed to process file:', error)
-        toast.error('Failed to process file. Please try again.')
+        toast.error(t('payoutProof.processFailed'))
       } finally {
         setIsProcessing(false)
       }
@@ -121,7 +121,7 @@ export function PayoutProofUpload({
             {fileData.isImage && fileData.previewUrl ? (
               <img
                 src={fileData.previewUrl}
-                alt="Payment proof preview"
+                alt={t('payoutProof.previewAlt')}
                 className="h-16 w-16 object-cover rounded"
               />
             ) : (
@@ -151,11 +151,10 @@ export function PayoutProofUpload({
         </Card>
       ) : (
         <div
-          className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
-            disabled || isProcessing
+          className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${disabled || isProcessing
               ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
               : 'border-gray-300 hover:border-cyan-500 cursor-pointer'
-          }`}
+            }`}
           onClick={() =>
             !disabled && !isProcessing && fileInputRef.current?.click()
           }
@@ -171,16 +170,18 @@ export function PayoutProofUpload({
           {isProcessing ? (
             <div className="flex flex-col items-center gap-2">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
-              <p className="text-sm text-gray-600">Processing file...</p>
+              <p className="text-sm text-gray-600">
+                {t('payoutProof.processing')}
+              </p>
             </div>
           ) : (
             <>
               <FileUp className="mx-auto h-10 w-10 text-gray-400" />
               <p className="mt-2 text-sm text-gray-600">
-                Click to upload payment proof
+                {t('payoutProof.clickToUpload')}
               </p>
               <p className="mt-1 text-xs text-gray-500">
-                Image (JPEG, PNG, WEBP) or PDF (max 1MB)
+                {t('payoutProof.allowedTypes', { maxMb: 2 })}
               </p>
             </>
           )}

@@ -16,19 +16,6 @@ const NOT_VISIBLE_AT = [
   '/d/$drawingId/p/$participateId',
 ]
 
-const Logo = () => (
-  <Link to="/" className="inline-flex items-center gap-2">
-    <figure className="w-6 h-6">
-      <img
-        src="/logo192.png"
-        alt="Giway logo"
-        className="w-full h-full object-contain"
-      />
-    </figure>
-    <span className="text-lg font-bold text-foreground">Giway</span>
-  </Link>
-)
-
 interface NavLinkProps {
   to: string
   children: React.ReactNode
@@ -63,6 +50,19 @@ export default function Header() {
   const { t } = useTranslation()
   const location = useLocation()
   const currentPath = location.pathname
+
+  const Logo = () => (
+    <Link to="/" className="inline-flex items-center gap-2">
+      <figure className="w-6 h-6">
+        <img
+          src="/logo192.png"
+          alt={t('app.logoAlt')}
+          className="w-full h-full object-contain"
+        />
+      </figure>
+      <span className="text-lg font-bold text-foreground">{t('app.title')}</span>
+    </Link>
+  )
 
   /**
    * Determines if the navigation menu should be visible based on the current path.
@@ -120,7 +120,7 @@ export default function Header() {
               <button
                 onClick={() => setIsOpen(true)}
                 className="p-2 -ml-2 text-foreground hover:bg-muted rounded-lg transition-colors"
-                aria-label="Open menu"
+                aria-label={t('nav.openMenu')}
               >
                 <Menu size={20} />
               </button>
@@ -170,7 +170,7 @@ export default function Header() {
           <button
             onClick={() => setIsOpen(false)}
             className="p-2 -ml-2 text-foreground hover:bg-muted rounded-lg transition-colors"
-            aria-label="Close menu"
+            aria-label={t('nav.closeMenu')}
           >
             <X size={20} />
           </button>
@@ -180,7 +180,9 @@ export default function Header() {
 
         {/* User Info */}
         <div className="hidden px-4 py-3 border-b border-border">
-          <p className="text-sm text-muted-foreground">username@domain.com</p>
+          <p className="text-sm text-muted-foreground">
+            {t('nav.userPlaceholderEmail')}
+          </p>
         </div>
 
         {/* Navigation Links */}

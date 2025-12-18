@@ -4,12 +4,14 @@ import { authClient } from '@/lib/auth-client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useTranslation } from 'react-i18next'
 
 export const Route = createFileRoute('/authentication/signup')({
   component: SignUp,
 })
 
 function SignUp() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -45,7 +47,7 @@ function SignUp() {
       })
 
       if (error) {
-        setError(error.message || 'Failed to sign up')
+        setError(error.message || t('auth.signup.errorDefault'))
         return
       }
 
@@ -55,7 +57,7 @@ function SignUp() {
         navigate({ to: '/drawings' })
       }
     } catch (err) {
-      setError('An unexpected error occurred')
+      setError(t('auth.signup.errorUnexpected'))
       console.error(err)
     } finally {
       setLoading(false)
@@ -73,26 +75,29 @@ function SignUp() {
       <div className="hidden w-1/2 bg-black lg:block relative">
         <img
           src="https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2529&auto=format&fit=crop"
-          alt="Signup Background"
+          alt={t('auth.signup.backgroundAlt')}
           className="absolute inset-0 h-full w-full object-cover opacity-60"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent" />
         <div className="absolute bottom-10 left-10 right-10 text-white p-8">
           <h2 className="text-3xl font-bold leading-tight">
-            "Seamlessly manage participants and number slots for your next big
-            event."
+            {t('auth.signup.backgroundQuote')}
           </h2>
           <div className="mt-6">
-            <p className="text-lg font-semibold">Giway</p>
-            <p className="text-sm text-gray-300">Advanced Raffle System</p>
+            <p className="text-lg font-semibold">{t('auth.signup.backgroundTitle')}</p>
+            <p className="text-sm text-gray-300">{t('auth.signup.backgroundSubtitle')}</p>
           </div>
         </div>
         <div className="absolute top-8 left-8 flex items-center gap-2 text-white font-bold text-xl">
           {/* Logo placeholder */}
           <div className="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center">
-            <img src="/logo_white.png" alt="Giway Logo" className="h-8/12" />
+            <img
+              src="/logo_white.png"
+              alt={t('app.logoAlt')}
+              className="h-8/12"
+            />
           </div>
-          Giway
+          {t('app.title')}
         </div>
       </div>
 
@@ -101,20 +106,20 @@ function SignUp() {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center lg:text-left">
             <h1 className="text-3xl font-bold tracking-tight">
-              Create an account
+              {t('auth.signup.title')}
             </h1>
             <p className="mt-2 text-muted-foreground">
-              Enter your information to create your account
+              {t('auth.signup.subtitle')}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t('common.name')}</Label>
               <Input
                 id="name"
                 type="text"
-                placeholder="John Doe"
+                placeholder={t('auth.signup.namePlaceholder')}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -123,11 +128,11 @@ function SignUp() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('common.email')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="john@example.com"
+                placeholder={t('auth.signup.emailPlaceholder')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -136,7 +141,7 @@ function SignUp() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('common.password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -161,7 +166,9 @@ function SignUp() {
               className="w-full h-11 bg-teal-primary hover:bg-teal-primary-dark text-white font-semibold text-base"
               disabled={loading}
             >
-              {loading ? 'Creating account...' : 'Sign Up'}
+              {loading
+                ? t('auth.signup.creatingAccount')
+                : t('auth.signup.signUpButton')}
             </Button>
 
             <div className="hidden relative">
@@ -202,12 +209,12 @@ function SignUp() {
           </form>
 
           <p className="text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
+            {t('auth.signup.haveAccount')}{' '}
             <Link
               to="/authentication/login"
               className="font-medium text-teal-primary hover:underline"
             >
-              Log in
+              {t('auth.signup.loginLink')}
             </Link>
           </p>
         </div>

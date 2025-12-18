@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Crop, ImageIcon, Trash2, X } from 'lucide-react'
 import { nanoid } from 'nanoid'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
@@ -50,6 +51,7 @@ export function ImageUpload({
   maxImages = 5,
   disabled = false,
 }: ImageUploadProps) {
+  const { t } = useTranslation()
   const [images, setImages] = useState<Array<UploadedImage>>([])
   const [isCompressing, setIsCompressing] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -93,7 +95,7 @@ export function ImageUpload({
     async (files: File[]) => {
       const remainingSlots = maxImages - images.length
       if (remainingSlots <= 0) {
-        toast.error(`Maximum ${maxImages} images allowed`)
+        toast.error(t('image.upload.maxImagesError', { max: maxImages }))
         return
       }
 
@@ -103,7 +105,7 @@ export function ImageUpload({
       const validFiles = filesToProcess.filter((file) => {
         if (!isAllowedImageType(file.type)) {
           toast.error(
-            `Invalid file type: ${file.name}. Allowed types: JPEG, PNG, WEBP`,
+            t('image.upload.invalidFileType', { name: file.name }),
           )
           return false
         }
@@ -136,7 +138,7 @@ export function ImageUpload({
             newImages.push(uploadedImage)
           } catch (error) {
             console.error('Failed to compress image:', error)
-            toast.error(`Failed to process image: ${file.name}`)
+            toast.error(t('image.upload.processingError', { name: file.name }))
           }
         }
 
@@ -287,7 +289,7 @@ export function ImageUpload({
           return updatedImages
         })
 
-        toast.success('Cover image set successfully!')
+        toast.success(t('image.crop.coverSuccess'))
       } else {
         // Free crop - update the file to be uploaded
         const editedFile = new File([croppedBlob], `edited-${timestamp}.webp`, {
@@ -315,7 +317,7 @@ export function ImageUpload({
           return updatedImages
         })
 
-        toast.success('Image edited successfully!')
+        toast.success(t('image.crop.editSuccess'))
       }
 
       setSelectedImageForCrop(null)
@@ -438,7 +440,7 @@ export function ImageUpload({
     // Check if a cover is set
     const hasCover = images.some((img) => img.isCover && img.coverFile)
     if (!hasCover && pendingImages.length > 0) {
-      toast.error('Please set a cover image before uploading')
+      toast.error(t('image.upload.setCoverError'))
       // Open crop dialog for first pending image in cover mode
       const firstPending = pendingImages[0]
       setSelectedImageForCrop(firstPending)
@@ -453,7 +455,7 @@ export function ImageUpload({
 
     const failedCount = results.filter((r) => r.status === 'rejected').length
     if (failedCount > 0) {
-      toast.error(`Failed to upload ${failedCount} image(s)`)
+      toast.error(t('image.upload.uploadError', { count: failedCount }))
     }
   }, [images, uploadImage])
 
@@ -463,7 +465,7 @@ export function ImageUpload({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium">
-          Images ({images.length}/{maxImages})
+          {t('image.upload.label', { count: images.length, max: maxImages })}
         </label>
         {images.length > 0 && drawingId && (
           <Button
@@ -477,7 +479,7 @@ export function ImageUpload({
               isCompressing
             }
           >
-            Upload All
+            {t('image.upload.uploadAll')}
           </Button>
         )}
       </div>
@@ -486,34 +488,33 @@ export function ImageUpload({
       {images.length > 0 && (
         <>
           <p className="text-xs text-muted-foreground">
-            Click the crop icon to edit an image.
+            {t('image.upload.clickToEdit')}
             {images.length > 1
-              ? ' You can also set one as cover for social sharing.'
+              ? ` ${t('image.upload.setCover')}`
               : ''}
           </p>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
             {images.map((image) => (
               <Card
                 key={image.id}
-                className={`group relative aspect-square overflow-hidden p-0 ${
-                  image.isCover ? 'ring-2 ring-primary ring-offset-2' : ''
-                }`}
+                className={`group relative aspect-square overflow-hidden p-0 ${image.isCover ? 'ring-2 ring-primary ring-offset-2' : ''
+                  }`}
               >
                 <img
                   src={image.previewUrl}
-                  alt="Preview"
+                  alt={t('image.upload.previewAlt')}
                   className="h-full w-full object-cover"
                 />
                 {/* Edited badge */}
                 {image.isEdited && !image.isCover && (
                   <div className="absolute bottom-1 left-1 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                    Edited
+                    {t('image.upload.edited')}
                   </div>
                 )}
                 {/* Cover badge */}
                 {image.isCover && (
                   <div className="absolute bottom-1 left-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
-                    Cover
+                    {t('image.upload.cover')}
                   </div>
                 )}
                 {/* Status overlay */}
@@ -534,7 +535,7 @@ export function ImageUpload({
                     onClick={() => openCropDialog(image)}
                     className="absolute inset-0 m-auto flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white transition-opacity hover:bg-black/80 opacity-0 group-hover:opacity-100"
                     disabled={disabled}
-                    title="Edit image"
+                    title={t('image.upload.editImageTitle')}
                   >
                     <Crop className="h-5 w-5" />
                   </button>
@@ -557,13 +558,12 @@ export function ImageUpload({
       {/* Upload area */}
       {canAddMore && (
         <div
-          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-            disabled || isCompressing
+          className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${disabled || isCompressing
               ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
               : isDragging
                 ? 'border-primary bg-primary/10 cursor-pointer'
                 : 'border-gray-300 hover:border-primary cursor-pointer'
-          }`}
+            }`}
           onClick={() =>
             !disabled && !isCompressing && fileInputRef.current?.click()
           }
@@ -584,13 +584,13 @@ export function ImageUpload({
           <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
           <p className="mt-2 text-sm text-gray-600">
             {isCompressing ? (
-              'Compressing images...'
+              t('image.upload.compressing')
             ) : (
               <>
-                Click or drag images to upload
+                {t('image.upload.clickOrDrag')}
                 <br />
                 <span className="text-xs text-gray-500">
-                  JPEG, PNG, WEBP (max {maxImages} images)
+                  {t('image.upload.allowedTypes', { max: maxImages })}
                 </span>
               </>
             )}

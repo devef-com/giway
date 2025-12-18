@@ -19,12 +19,14 @@ import {
   LogOut,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
 
 export const Route = createFileRoute('/account/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const { t } = useTranslation()
   const session = authClient.useSession()
   const { data: balance, isLoading: balanceLoading } = useUserBalance()
   const navigate = useNavigate()
@@ -66,7 +68,7 @@ function RouteComponent() {
           <Card className="border-destructive">
             <CardContent className="pt-6">
               <div className="text-center text-destructive">
-                Error loading account information. Please try again.
+                {t('account.errorLoading')}
               </div>
             </CardContent>
           </Card>
@@ -82,7 +84,7 @@ function RouteComponent() {
           <Card>
             <CardContent className="pt-6">
               <div className="text-center text-muted-foreground">
-                No session found. Please log in to view your account.
+                {t('account.noSession')}
               </div>
             </CardContent>
           </Card>
@@ -98,9 +100,11 @@ function RouteComponent() {
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="flex gap-2 justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Account</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {t('account.title')}
+            </h1>
             <p className="text-muted-foreground">
-              Manage your account settings and view your information.
+              {t('account.subtitle')}
             </p>
           </div>
           <Button variant="outline" size="icon" onClick={signOut}>
@@ -112,17 +116,17 @@ function RouteComponent() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              Profile Information
+              {t('account.profileInfo')}
             </CardTitle>
             <CardDescription>
-              Your personal account details and preferences.
+              {t('account.profileDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3">
               <User className="h-4 w-4 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-sm font-medium">Name</p>
+                <p className="text-sm font-medium">{t('common.name')}</p>
                 <p className="text-sm text-muted-foreground">{user.name}</p>
               </div>
             </div>
@@ -130,7 +134,7 @@ function RouteComponent() {
             <div className="flex items-center gap-3">
               <Mail className="h-4 w-4 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-sm font-medium">Email</p>
+                <p className="text-sm font-medium">{t('common.email')}</p>
                 <p className="text-sm text-muted-foreground">{user.email}</p>
               </div>
               {user.emailVerified ? (
@@ -143,7 +147,7 @@ function RouteComponent() {
             <div className="flex items-center gap-3">
               <Calendar className="h-4 w-4 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-sm font-medium">Member Since</p>
+                <p className="text-sm font-medium">{t('account.memberSince')}</p>
                 <p className="text-sm text-muted-foreground">
                   {new Date(user.createdAt).toLocaleDateString(
                     navigator.language,
@@ -161,10 +165,10 @@ function RouteComponent() {
               <div className="flex items-center gap-3">
                 <User className="h-4 w-4 text-muted-foreground" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium">Profile Picture</p>
+                  <p className="text-sm font-medium">{t('account.profilePicture')}</p>
                   <img
                     src={user.image}
-                    alt="Profile"
+                    alt={t('account.profilePicture')}
                     className="w-16 h-16 rounded-full object-cover border"
                   />
                 </div>
@@ -177,10 +181,10 @@ function RouteComponent() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Coins className="h-5 w-5" />
-              Account Balance
+              {t('account.balance')}
             </CardTitle>
             <CardDescription>
-              Your current balance for different types of drawings.
+              {t('account.balanceDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -195,28 +199,40 @@ function RouteComponent() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <h4 className="font-medium text-sm">
-                    Raffles (Play with Numbers)
+                    {t('account.raffleBalance')}
                   </h4>
                   <div className="space-y-1 text-sm text-muted-foreground">
-                    <p>Participants: {balance.playWithNumbers.participants}</p>
-                    <p>Images: {balance.playWithNumbers.images}</p>
-                    <p>Emails: {balance.playWithNumbers.emails}</p>
+                    <p>
+                      {t('store.participants')}: {balance.playWithNumbers.participants}
+                    </p>
+                    <p>
+                      {t('store.images')}: {balance.playWithNumbers.images}
+                    </p>
+                    <p>
+                      {t('store.emails')}: {balance.playWithNumbers.emails}
+                    </p>
                   </div>
                 </div>
                 <div className="space-y-2">
                   <h4 className="font-medium text-sm">
-                    Giveaways (No Numbers)
+                    {t('account.giveawayBalance')}
                   </h4>
                   <div className="space-y-1 text-sm text-muted-foreground">
-                    <p>Participants: {balance.noNumbers.participants}</p>
-                    <p>Images: {balance.noNumbers.images}</p>
-                    <p>Emails: {balance.noNumbers.emails}</p>
+                    <p>
+                      {t('store.participants')}: {balance.noNumbers.participants}
+                    </p>
+                    <p>
+                      {t('store.images')}: {balance.noNumbers.images}
+                    </p>
+                    <p>
+                      {t('store.emails')}: {balance.noNumbers.emails}
+                    </p>
                   </div>
                 </div>
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Unable to load balance information.
+                {t('account.balanceUnavailable')}
               </p>
             )}
           </CardContent>

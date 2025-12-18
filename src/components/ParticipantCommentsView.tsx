@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 
 export function ParticipantCommentsView({
   drawingId,
@@ -11,6 +12,7 @@ export function ParticipantCommentsView({
   drawingId: string
   participantId: string
 }) {
+  const { t } = useTranslation()
   const [comments, setComments] = useState<any[]>([])
   const [newComment, setNewComment] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -51,15 +53,15 @@ export function ParticipantCommentsView({
       )
 
       if (response.ok) {
-        toast.success('Message sent successfully')
+        toast.success(t('participant.commentsView.sendSuccess'))
         setNewComment('')
         await fetchComments()
       } else {
         const data = await response.json()
-        toast.error(data.error || 'Failed to send message')
+        toast.error(data.error || t('participant.commentsView.sendError'))
       }
     } catch (error) {
-      toast.error('Failed to send message')
+      toast.error(t('participant.commentsView.sendError'))
     } finally {
       setIsSubmitting(false)
     }
@@ -68,8 +70,12 @@ export function ParticipantCommentsView({
   if (isLoading) {
     return (
       <Card className="p-4 mt-4">
-        <h2 className="text-lg font-semibold mb-3">Conversation with Host</h2>
-        <p className="text-sm text-gray-500">Loading conversation...</p>
+        <h2 className="text-lg font-semibold mb-3">
+          {t('participant.commentsView.title')}
+        </h2>
+        <p className="text-sm text-gray-500">
+          {t('participant.commentsView.loading')}
+        </p>
       </Card>
     )
   }
@@ -81,27 +87,30 @@ export function ParticipantCommentsView({
 
   return (
     <Card className="p-4 mt-4">
-      <h2 className="text-lg font-semibold mb-3">Conversation with Host</h2>
+      <h2 className="text-lg font-semibold mb-3">
+        {t('participant.commentsView.title')}
+      </h2>
 
       {/* Conversation Thread */}
       <div className="space-y-3 mb-4">
         {comments.length === 0 ? (
-          <p className="text-sm text-gray-500">No messages yet</p>
+          <p className="text-sm text-gray-500">
+            {t('participant.commentsView.noMessages')}
+          </p>
         ) : (
           comments.map((comment) => (
             <div
               key={comment.id}
-              className={`rounded-lg p-3 ${
-                comment.authorType === 'host'
-                  ? 'bg-gray-50 dark:bg-gray-800'
-                  : 'bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800'
-              }`}
+              className={`rounded-lg p-3 ${comment.authorType === 'host'
+                ? 'bg-gray-50 dark:bg-gray-800'
+                : 'bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800'
+                }`}
             >
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-semibold">
                   {comment.authorType === 'host'
-                    ? `${comment.authorName} (Host)`
-                    : 'You'}
+                    ? `${comment.authorName} ${t('participant.commentsView.host')}`
+                    : t('participant.commentsView.you')}
                 </span>
                 <span className="text-xs text-gray-500">
                   {new Date(comment.createdAt).toLocaleString()}
@@ -116,7 +125,7 @@ export function ParticipantCommentsView({
       {/* Reply Form */}
       <div className="space-y-2 border-t pt-4">
         <Textarea
-          placeholder="Write your message..."
+          placeholder={t('participant.commentsView.placeholder')}
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           className="min-h-20"
@@ -126,7 +135,9 @@ export function ParticipantCommentsView({
           disabled={isSubmitting || !newComment.trim()}
           className="w-full"
         >
-          {isSubmitting ? 'Sending...' : 'Send Message'}
+          {isSubmitting
+            ? t('participant.comments.sending')
+            : t('participant.comments.sendMessage')}
         </Button>
       </div>
     </Card>

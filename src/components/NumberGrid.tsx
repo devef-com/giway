@@ -6,6 +6,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { NumberCell } from './NumberCell'
 import type { NumberSlotStatus } from './NumberCell'
 import { cn } from '@/lib/utils'
@@ -26,6 +27,7 @@ export function NumberGrid({
   isSelectable = true,
   className,
 }: NumberGridProps) {
+  const { t } = useTranslation()
   const [visibleRange, setVisibleRange] = useState({ start: 1, end: 100 })
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -124,14 +126,14 @@ export function NumberGrid({
       {/* Loading indicator for more numbers */}
       {visibleRange.end < totalNumbers && (
         <div className="mt-4 text-center text-sm text-muted-foreground">
-          Scroll down to see more numbers...
+          {t('number.grid.scrollMore')}
         </div>
       )}
 
       {/* Reached end indicator */}
       {visibleRange.end >= totalNumbers && totalNumbers > 100 && (
         <div className="mt-4 text-center text-sm text-muted-foreground">
-          All {totalNumbers} numbers loaded
+          {t('number.grid.allLoaded', { total: totalNumbers })}
         </div>
       )}
     </div>
