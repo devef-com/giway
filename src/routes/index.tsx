@@ -22,6 +22,7 @@ import {
   Mail,
   Play,
 } from 'lucide-react'
+import { t } from 'i18next'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -165,7 +166,7 @@ function LandingPage() {
       <section className="flex-1 flex flex-col items-center justify-center py-20 px-4 text-center space-y-8">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium">
           <Sparkles className="w-4 h-4" />
-          <span>Raffles & Giveaways Made Simple</span>
+          <span>{t('landing.badge')}</span>
         </div>
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
           Host Your <span className="text-primary">Giways</span> With Confidence

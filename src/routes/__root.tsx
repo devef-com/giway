@@ -1,7 +1,9 @@
+import React from 'react'
 import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
+  useRouter,
   useRouterState,
 } from '@tanstack/react-router'
 // import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
@@ -17,12 +19,16 @@ import appCss from '../styles.css?url'
 import type { QueryClient } from '@tanstack/react-query'
 import { Toaster } from '@/components/ui/sonner'
 import Footer from '@/components/Footer'
-
+import { useTranslation } from "react-i18next"
+import { setSSRLanguage } from "@/lib/i18n"
 interface MyRouterContext {
   queryClient: QueryClient
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  beforeLoad: async () => {
+    await setSSRLanguage()
+  },
   head: () => ({
     meta: [
       {
@@ -100,14 +106,27 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const router = useRouterState()
+  const routerState = useRouterState()
+  const router = useRouter()
+  const { i18n } = useTranslation()
+
   const isAuthRoute = [
     '/authentication/login',
     '/authentication/signup',
-  ].includes(router.location.pathname)
+  ].includes(routerState.location.pathname)
+
+  React.useEffect(() => {
+    const handler = () => {
+      router.invalidate()
+    }
+    i18n.on("languageChanged", handler)
+    return () => {
+      i18n.off("languageChanged", handler)
+    }
+  }, [router])
 
   return (
-    <html lang="en" suppressHydrationWarning className="notranslate">
+    <html lang={i18n.language} suppressHydrationWarning className="notranslate">
       <head>
         <HeadContent />
         <link href="https://fonts.googleapis.com" rel="preconnect" />
