@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { Menu, X } from 'lucide-react'
 import ThemeSwitcher from './ThemeSwitcher'
 import { cn } from '@/lib/utils'
+import LanguageSwitcher from './LanguageSwitcher'
 
 const NOT_VISIBLE_AT = [
   '/',
@@ -149,6 +150,7 @@ export default function Header() {
             <span className="hidden md:block w-24" />
           )}
         </div>
+        <LanguageSwitcher />
       </header>
 
       {/* Mobile Menu Overlay */}

@@ -22,7 +22,7 @@ import {
   Mail,
   Play,
 } from 'lucide-react'
-import { t } from 'i18next'
+import { useTranslation } from 'react-i18next'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -160,6 +160,7 @@ function GiwayNumbersPreview() {
 }
 
 function LandingPage() {
+  const { t } = useTranslation()
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground transition-colors duration-300">
       {/* Main Section */}
