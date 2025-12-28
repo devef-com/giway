@@ -2,6 +2,10 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { expo } from '@better-auth/expo'
 import { db } from '@/db/index'
+import { sendEmail } from './email'
+import { render } from '@react-email/components'
+import { VerificationEmail } from './emails/VerificationEmail'
+import { ResetPasswordEmail } from './emails/ResetPasswordEmail'
 
 export const auth = betterAuth({
   plugins: [expo()],
@@ -10,6 +14,32 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
+    // requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      const html = await render(ResetPasswordEmail({ url }))
+      await sendEmail({
+        to: user.email,
+        subject: 'Reset your password',
+        text: `Click the link to reset your password: ${url}`,
+        html,
+      })
+    },
+    onPasswordReset: async ({ user }) => {
+      // your logic here
+      console.log(`Password for user ${user.email} has been reset.`)
+    },
+  },
+  emailVerification: {
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      const html = await render(VerificationEmail({ url }))
+      await sendEmail({
+        to: user.email,
+        subject: 'Verify your email address',
+        text: `Click the link to verify your email: ${url}`,
+        html,
+      })
+    },
   },
   trustedOrigins: [
     // Basic scheme

@@ -138,13 +138,13 @@ function Login() {
               />
             </div>
 
-            <div className="hidden items-center justify-between">
-              <a
-                href="#"
+            <div className="flex items-center justify-between">
+              <Link
+                to="/authentication/forgot-password"
                 className="text-sm font-medium text-teal-primary hover:underline"
               >
-                Forgot password?
-              </a>
+                {t('auth.login.forgotPassword')}
+              </Link>
             </div>
 
             <div className="hidden items-center justify-between">

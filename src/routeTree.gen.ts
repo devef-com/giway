@@ -18,7 +18,9 @@ import { Route as AuthenticationIndexRouteImport } from './routes/authentication
 import { Route as AccountIndexRouteImport } from './routes/account/index'
 import { Route as DrawingsCreateRouteImport } from './routes/drawings/create'
 import { Route as AuthenticationSignupRouteImport } from './routes/authentication/signup'
+import { Route as AuthenticationResetPasswordRouteImport } from './routes/authentication/reset-password'
 import { Route as AuthenticationLoginRouteImport } from './routes/authentication/login'
+import { Route as AuthenticationForgotPasswordRouteImport } from './routes/authentication/forgot-password'
 import { Route as ApiCheckoutRouteImport } from './routes/api/checkout'
 import { Route as ACouponsRouteImport } from './routes/a/coupons'
 import { Route as SlotDrawingIdIndexRouteImport } from './routes/slot/$drawingId/index'
@@ -103,11 +105,23 @@ const AuthenticationSignupRoute = AuthenticationSignupRouteImport.update({
   path: '/authentication/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticationResetPasswordRoute =
+  AuthenticationResetPasswordRouteImport.update({
+    id: '/authentication/reset-password',
+    path: '/authentication/reset-password',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticationLoginRoute = AuthenticationLoginRouteImport.update({
   id: '/authentication/login',
   path: '/authentication/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticationForgotPasswordRoute =
+  AuthenticationForgotPasswordRouteImport.update({
+    id: '/authentication/forgot-password',
+    path: '/authentication/forgot-password',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiCheckoutRoute = ApiCheckoutRouteImport.update({
   id: '/api/checkout',
   path: '/api/checkout',
@@ -322,7 +336,9 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportRoute
   '/a/coupons': typeof ACouponsRoute
   '/api/checkout': typeof ApiCheckoutRoute
+  '/authentication/forgot-password': typeof AuthenticationForgotPasswordRoute
   '/authentication/login': typeof AuthenticationLoginRoute
+  '/authentication/reset-password': typeof AuthenticationResetPasswordRoute
   '/authentication/signup': typeof AuthenticationSignupRoute
   '/drawings/create': typeof DrawingsCreateRoute
   '/account': typeof AccountIndexRoute
@@ -372,7 +388,9 @@ export interface FileRoutesByTo {
   '/support': typeof SupportRoute
   '/a/coupons': typeof ACouponsRoute
   '/api/checkout': typeof ApiCheckoutRoute
+  '/authentication/forgot-password': typeof AuthenticationForgotPasswordRoute
   '/authentication/login': typeof AuthenticationLoginRoute
+  '/authentication/reset-password': typeof AuthenticationResetPasswordRoute
   '/authentication/signup': typeof AuthenticationSignupRoute
   '/drawings/create': typeof DrawingsCreateRoute
   '/account': typeof AccountIndexRoute
@@ -423,7 +441,9 @@ export interface FileRoutesById {
   '/support': typeof SupportRoute
   '/a/coupons': typeof ACouponsRoute
   '/api/checkout': typeof ApiCheckoutRoute
+  '/authentication/forgot-password': typeof AuthenticationForgotPasswordRoute
   '/authentication/login': typeof AuthenticationLoginRoute
+  '/authentication/reset-password': typeof AuthenticationResetPasswordRoute
   '/authentication/signup': typeof AuthenticationSignupRoute
   '/drawings/create': typeof DrawingsCreateRoute
   '/account/': typeof AccountIndexRoute
@@ -475,7 +495,9 @@ export interface FileRouteTypes {
     | '/support'
     | '/a/coupons'
     | '/api/checkout'
+    | '/authentication/forgot-password'
     | '/authentication/login'
+    | '/authentication/reset-password'
     | '/authentication/signup'
     | '/drawings/create'
     | '/account'
@@ -525,7 +547,9 @@ export interface FileRouteTypes {
     | '/support'
     | '/a/coupons'
     | '/api/checkout'
+    | '/authentication/forgot-password'
     | '/authentication/login'
+    | '/authentication/reset-password'
     | '/authentication/signup'
     | '/drawings/create'
     | '/account'
@@ -575,7 +599,9 @@ export interface FileRouteTypes {
     | '/support'
     | '/a/coupons'
     | '/api/checkout'
+    | '/authentication/forgot-password'
     | '/authentication/login'
+    | '/authentication/reset-password'
     | '/authentication/signup'
     | '/drawings/create'
     | '/account/'
@@ -626,7 +652,9 @@ export interface RootRouteChildren {
   SupportRoute: typeof SupportRoute
   ACouponsRoute: typeof ACouponsRoute
   ApiCheckoutRoute: typeof ApiCheckoutRoute
+  AuthenticationForgotPasswordRoute: typeof AuthenticationForgotPasswordRoute
   AuthenticationLoginRoute: typeof AuthenticationLoginRoute
+  AuthenticationResetPasswordRoute: typeof AuthenticationResetPasswordRoute
   AuthenticationSignupRoute: typeof AuthenticationSignupRoute
   DrawingsCreateRoute: typeof DrawingsCreateRoute
   AccountIndexRoute: typeof AccountIndexRoute
@@ -724,11 +752,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticationSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/authentication/reset-password': {
+      id: '/authentication/reset-password'
+      path: '/authentication/reset-password'
+      fullPath: '/authentication/reset-password'
+      preLoaderRoute: typeof AuthenticationResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/authentication/login': {
       id: '/authentication/login'
       path: '/authentication/login'
       fullPath: '/authentication/login'
       preLoaderRoute: typeof AuthenticationLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/authentication/forgot-password': {
+      id: '/authentication/forgot-password'
+      path: '/authentication/forgot-password'
+      fullPath: '/authentication/forgot-password'
+      preLoaderRoute: typeof AuthenticationForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/checkout': {
@@ -1054,7 +1096,9 @@ const rootRouteChildren: RootRouteChildren = {
   SupportRoute: SupportRoute,
   ACouponsRoute: ACouponsRoute,
   ApiCheckoutRoute: ApiCheckoutRoute,
+  AuthenticationForgotPasswordRoute: AuthenticationForgotPasswordRoute,
   AuthenticationLoginRoute: AuthenticationLoginRoute,
+  AuthenticationResetPasswordRoute: AuthenticationResetPasswordRoute,
   AuthenticationSignupRoute: AuthenticationSignupRoute,
   DrawingsCreateRoute: DrawingsCreateRoute,
   AccountIndexRoute: AccountIndexRoute,
