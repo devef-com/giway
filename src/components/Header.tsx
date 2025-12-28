@@ -10,6 +10,8 @@ const NOT_VISIBLE_AT = [
   '/',
   '/authentication/login',
   '/authentication/signup',
+  '/authentication/reset-password',
+  '/authentication/forgot-password',
   '/slot/*',
   '/s/*',
   '/drawings/$drawingId/p/$participateId',

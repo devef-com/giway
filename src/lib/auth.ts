@@ -8,6 +8,7 @@ import { VerificationEmail } from './emails/VerificationEmail'
 import { ResetPasswordEmail } from './emails/ResetPasswordEmail'
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL || 'http://localhost:3000',
   plugins: [expo()],
   database: drizzleAdapter(db, {
     provider: 'pg',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
 import { authClient } from '@/lib/auth-client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,20 +7,35 @@ import { Label } from '@/components/ui/label'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 
+type ResetPasswordSearch = {
+  token?: string
+}
+
 // @ts-ignore
 export const Route = createFileRoute('/authentication/reset-password')({
   component: ResetPassword,
+  validateSearch: (search: Record<string, unknown>): ResetPasswordSearch => {
+    return {
+      token: search.token as string | undefined,
+    }
+  },
 })
 
 function ResetPassword() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { token } = useSearch({ from: '/authentication/reset-password' })
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!token) {
+      toast.error(t('auth.resetPassword.errorInvalidToken'))
+      return
+    }
 
     if (password !== confirmPassword) {
       toast.error(t('auth.resetPassword.passwordsDoNotMatch'))
@@ -32,6 +47,7 @@ function ResetPassword() {
     try {
       const { error } = await authClient.resetPassword({
         newPassword: password,
+        token,
       })
 
       if (error) {

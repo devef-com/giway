@@ -23,8 +23,7 @@ function ForgotPassword() {
     setLoading(true)
 
     try {
-      // @ts-ignore
-      const { error } = await authClient.forgetPassword({
+      const { error } = await authClient.requestPasswordReset({
         email,
         redirectTo: '/authentication/reset-password',
       })

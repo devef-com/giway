@@ -17,9 +17,14 @@ import {
   XCircle,
   Coins,
   LogOut,
+  Lock,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { useTranslation } from 'react-i18next'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/account/')({
   component: RouteComponent,
@@ -31,10 +36,49 @@ function RouteComponent() {
   const { data: balance, isLoading: balanceLoading } = useUserBalance()
   const navigate = useNavigate()
 
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [updatingPassword, setUpdatingPassword] = useState(false)
+
   const signOut = () => {
     authClient.signOut().then(() => {
       navigate({ to: '/authentication/login' })
     })
+  }
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (newPassword !== confirmPassword) {
+      toast.error(t('account.passwordsDoNotMatch'))
+      return
+    }
+
+    setUpdatingPassword(true)
+
+    try {
+      const { error } = await authClient.changePassword({
+        currentPassword,
+        newPassword,
+        revokeOtherSessions: true,
+      })
+
+      if (error) {
+        toast.error(error.message || t('account.passwordUpdateError'))
+        return
+      }
+
+      toast.success(t('account.passwordUpdated'))
+      setCurrentPassword('')
+      setNewPassword('')
+      setConfirmPassword('')
+    } catch (err) {
+      toast.error(t('account.passwordUpdateError'))
+      console.error(err)
+    } finally {
+      setUpdatingPassword(false)
+    }
   }
 
   if (session.isPending) {
@@ -235,6 +279,64 @@ function RouteComponent() {
                 {t('account.balanceUnavailable')}
               </p>
             )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lock className="h-5 w-5" />
+              {t('account.security')}
+            </CardTitle>
+            <CardDescription>
+              {t('account.securityDescription')}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">
+                  {t('account.currentPassword')}
+                </Label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                  disabled={updatingPassword}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="newPassword">{t('account.newPassword')}</Label>
+                <Input
+                  id="newPassword"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  disabled={updatingPassword}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">
+                  {t('account.confirmNewPassword')}
+                </Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  disabled={updatingPassword}
+                />
+              </div>
+              <Button type="submit" disabled={updatingPassword}>
+                {updatingPassword
+                  ? t('account.updatingPassword')
+                  : t('account.updatePassword')}
+              </Button>
+            </form>
           </CardContent>
         </Card>
       </div>
