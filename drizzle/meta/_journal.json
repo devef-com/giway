@@ -15,6 +15,20 @@
       "when": 1765999526576,
       "tag": "0001_worried_smasher",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767819817805,
+      "tag": "0002_living_xorn",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1767820238808,
+      "tag": "0003_odd_living_tribunal",
+      "breakpoints": true
     }
   ]
 }

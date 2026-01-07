@@ -1,0 +1,1 @@
+ALTER TABLE "balance_consumptions" ALTER COLUMN "drawing_id" DROP NOT NULL;

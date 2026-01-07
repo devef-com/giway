@@ -285,8 +285,8 @@ export const balanceConsumptions = pgTable('balance_consumptions', {
     .notNull()
     .references(() => user.id, { onDelete: 'cascade' }),
   drawingId: varchar('drawing_id', { length: 255 })
-    .notNull()
-    .references(() => drawings.id, { onDelete: 'cascade' }),
+    // .notNull()
+    .references(() => drawings.id, { onDelete: 'set null' }),
   giwayType: giwayTypeEnum('giway_type').notNull(),
   participants: integer('participants').notNull().default(0), // participants allocated
   images: integer('images').notNull().default(0), // images used

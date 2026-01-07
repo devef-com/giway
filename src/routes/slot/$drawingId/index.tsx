@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import { eq, desc } from 'drizzle-orm'
 import {
   CircleAlert,
-  ImageIcon,
   InfoIcon,
   Trophy,
   X,
@@ -537,36 +536,33 @@ function SlotDrawingParticipation() {
           stats={stats}
           hasEnded={hasDrawingEnded}
         />
-        <div className="grid grid-cols-[max-content_1fr] items-center gap-4 mb-4">
+        <div className={cn(
+          "mb-4",
+          drawing.assets && drawing.assets.filter((a) => !a.isCover).length > 0
+            ? "grid grid-cols-[max-content_1fr] items-center gap-4"
+            : "block"
+        )}>
           {drawing.assets &&
-            drawing.assets.filter((a) => !a.isCover).length > 0 ? (
-            <div
-              className="relative w-30 h-30 rounded-lg overflow-hidden cursor-pointer group"
-              onClick={() => {
-                setGalleryIndex(0)
-                setGalleryOpen(true)
-              }}
-            >
-              <img
-                src={drawing.assets.filter((a) => !a.isCover)[0].url}
-                alt={drawing.title}
-                className="w-full h-full object-cover transition-transform group-hover:scale-105"
-              />
-              {drawing.assets.filter((a) => !a.isCover).length > 1 && (
-                <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
-                  +{drawing.assets.filter((a) => !a.isCover).length - 1}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="w-30 h-30 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-              <ImageIcon
-                size={48}
-                strokeWidth={0.7}
-                className="text-gray-400"
-              />
-            </div>
-          )}
+            drawing.assets.filter((a) => !a.isCover).length > 0 && (
+              <div
+                className="relative w-30 h-30 rounded-lg overflow-hidden cursor-pointer group"
+                onClick={() => {
+                  setGalleryIndex(0)
+                  setGalleryOpen(true)
+                }}
+              >
+                <img
+                  src={drawing.assets.filter((a) => !a.isCover)[0].url}
+                  alt={drawing.title}
+                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                />
+                {drawing.assets.filter((a) => !a.isCover).length > 1 && (
+                  <div className="absolute bottom-1 right-1 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded">
+                    +{drawing.assets.filter((a) => !a.isCover).length - 1}
+                  </div>
+                )}
+              </div>
+            )}
           {drawing.guidelines && drawing.guidelines.length > 0 && (
             <div>
               <h2 className="font-regular mb-2 text-text-light-primary dark:text-text-dark-primary">
@@ -673,10 +669,13 @@ function SlotDrawingParticipation() {
                     (_unused, i) => startIdx + i + 1,
                   )
 
-                  const ghostCount = Math.max(
-                    0,
-                    NUMBERS_PER_PAGE - pageNumbers.length,
-                  )
+                  const ghostCount = 0;
+                  // Copilot: dont remove the next commented code
+                  // disable ghost slots for now 
+                  // Math.max(
+                  //   0,
+                  //   NUMBERS_PER_PAGE - pageNumbers.length,
+                  // )
 
                   const pageSlotsData =
                     pageIndex === currentPage
