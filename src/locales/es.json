@@ -102,6 +102,7 @@
   "drawing.stats.totalNumbers": "Números Totales",
   "drawing.header.less": "menos",
   "drawing.header.more": "más",
+  "drawing.header.by": "por",
   "drawing.header.free": "Gratis",
   "drawing.header.available": "disponibles",
   "number.grid.scrollMore": "Desplázate hacia abajo para ver más números...",

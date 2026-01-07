@@ -31,7 +31,7 @@ import {
 import { useReservationTime } from '@/querys/useReservationTime'
 import { useParticipate } from '@/querys/useParticipate'
 import { useDrawingWinners } from '@/querys/useDrawingWinners'
-import { Drawing, drawings, drawingAssets, assets } from '@/db/schema'
+import { Drawing, drawings, drawingAssets, assets, user } from '@/db/schema'
 import { db } from '@/db/index'
 import i18n from '@/lib/i18n'
 
@@ -45,10 +45,15 @@ const getDrawing = createServerFn({
         drawing: drawings,
         asset: assets,
         isCover: drawingAssets.isCover,
+        user: {
+          name: user.name,
+          verifiedUser: user.verifiedUser,
+        },
       })
       .from(drawings)
       .leftJoin(drawingAssets, eq(drawingAssets.drawingId, drawings.id))
       .leftJoin(assets, eq(assets.id, drawingAssets.assetId))
+      .leftJoin(user, eq(user.id, drawings.userId))
       .where(eq(drawings.id, drawingId))
       .orderBy(desc(drawingAssets.isCover)) // Cover image comes first
 
@@ -56,8 +61,9 @@ const getDrawing = createServerFn({
       return null
     }
 
-    // Get the drawing data from the first result
+    // Get the drawing data and user from the first result
     const drawingData = result[0].drawing
+    const userData = result[0].user
 
     // Collect all assets with cover info (filter out nulls from left join)
     const drawingAssetsList = result
@@ -66,14 +72,16 @@ const getDrawing = createServerFn({
       )
       .filter((a): a is NonNullable<typeof a> => a !== null)
 
-    return { ...drawingData, assets: drawingAssetsList }
+    return { ...drawingData, assets: drawingAssetsList, user: userData }
   })
 
-type Asset = typeof assets.$inferSelect & { isCover: boolean }
+// type Asset = typeof assets.$inferSelect & { isCover: boolean }
 
 export const Route = createFileRoute('/slot/$drawingId/')({
   component: SlotDrawingParticipation,
-  loader: async ({ params }): Promise<Drawing & { assets: Asset[] }> => {
+  loader: async ({
+    params,
+  }) => {
     if (!params.drawingId) {
       throw new Response('Drawing ID is required', { status: 400 })
     }
@@ -533,6 +541,7 @@ function SlotDrawingParticipation() {
         {/* Drawing Details Card */}
         <DrawingSlotHeader
           drawing={drawing}
+          user={drawing.user}
           stats={stats}
           hasEnded={hasDrawingEnded}
         />

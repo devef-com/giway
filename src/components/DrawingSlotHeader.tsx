@@ -1,11 +1,15 @@
 import { useState } from 'react'
 import { Drawing } from '@/db/schema'
-import { Clock, HandCoins } from 'lucide-react'
+import { Clock, HandCoins, ShieldCheckIcon } from 'lucide-react'
 import { cn, getTimeRemainingText } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 
 interface DrawingSlotHeaderProps {
   drawing: Drawing
+  user?: {
+    name: string;
+    verifiedUser: boolean;
+  } | null
   stats?: {
     available: number
     total: number
@@ -15,6 +19,7 @@ interface DrawingSlotHeaderProps {
 
 function DrawingSlotHeader({
   drawing,
+  user,
   stats,
   hasEnded,
 }: DrawingSlotHeaderProps) {
@@ -24,6 +29,20 @@ function DrawingSlotHeader({
   return (
     <div>
       <div className="flex flex-col gap-2 justify-center">
+        {/* Drawing Owner */}
+        {user && (
+          <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-medium tracking-wider">
+              {t('drawing.header.by')}
+            </span>
+            <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+              {user.name}
+            </span>
+            {user.verifiedUser && (
+              <ShieldCheckIcon className="w-4 h-4 text-blue-500" />
+            )}
+          </div>
+        )}
         {/* Title */}
         <section>
           <h1

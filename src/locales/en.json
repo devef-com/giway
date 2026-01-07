@@ -102,6 +102,7 @@
   "drawing.stats.totalNumbers": "Total Numbers",
   "drawing.header.less": "less",
   "drawing.header.more": "more",
+  "drawing.header.by": "by",
   "drawing.header.free": "Free",
   "drawing.header.available": "available",
   "number.grid.scrollMore": "Scroll down to see more numbers...",
