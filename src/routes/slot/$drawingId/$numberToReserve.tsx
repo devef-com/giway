@@ -15,10 +15,19 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { PayoutProofUpload } from '@/components/PayoutProofUpload'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { useDrawing } from '@/querys/useDrawing'
 import { useParticipate } from '@/querys/useParticipate'
 import { useReservationTime } from '@/querys/useReservationTime'
+import i18n from '@/lib/i18n'
 
 export const updateAssetModelId = createServerFn({ method: 'POST' })
   .inputValidator(
@@ -37,7 +46,7 @@ export const updateAssetModelId = createServerFn({ method: 'POST' })
       return { success: true }
     } catch (error) {
       console.error('Error updating asset modelId:', error)
-      throw new Error(t('reserveForm.assetUpdateFailed'))
+      throw new Error(i18n.t('reserveForm.assetUpdateFailed'))
     }
   })
 
@@ -57,6 +66,7 @@ function ReserveNumberForm() {
     phone: '',
   })
   const [payoutProofFile, setPayoutProofFile] = useState<File | null>(null)
+  const [showNoProofConfirm, setShowNoProofConfirm] = useState(false)
   const [isUploadingProof, setIsUploadingProof] = useState(false)
   const [reservationComplete, setReservationComplete] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null)
@@ -275,19 +285,11 @@ function ReserveNumberForm() {
     },
   )
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    // If the drawing is paid and no payout proof is uploaded, show error
-    if (drawing?.isPaid && !payoutProofFile) {
-      toast.error(t('reserveForm.uploadProofRequired'))
-      return
-    }
-
+  const handleProcessSubmission = async (skipProof = false) => {
     let paymentCaptureId: number | undefined
 
     // Upload payout proof if it exists
-    if (drawing?.isPaid && payoutProofFile) {
+    if (drawing?.isPaid && payoutProofFile && !skipProof) {
       setIsUploadingProof(true)
       try {
         // 1. Get presigned upload URL
@@ -371,6 +373,23 @@ function ReserveNumberForm() {
     }
 
     participateMutation.mutate(registrationData)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // If the drawing is paid and no payout proof is uploaded, show confirmation modal
+    if (drawing?.isPaid && !payoutProofFile) {
+      setShowNoProofConfirm(true)
+      return
+    }
+
+    await handleProcessSubmission()
+  }
+
+  const handleConfirmWithoutProof = async () => {
+    setShowNoProofConfirm(false)
+    await handleProcessSubmission(true)
   }
 
   const handleCancel = async () => {
@@ -708,6 +727,34 @@ function ReserveNumberForm() {
           </div>
         </Card>
       </div>
+
+      <Dialog open={showNoProofConfirm} onOpenChange={setShowNoProofConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('reserveForm.noProofConfirmTitle')}</DialogTitle>
+            <DialogDescription>
+              {t('reserveForm.noProofConfirmDescription')}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowNoProofConfirm(false)}
+            >
+              {t('reserveForm.cancelAndUpload')}
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleConfirmWithoutProof}
+              disabled={participateMutation.isPending}
+            >
+              {participateMutation.isPending
+                ? t('common.loading')
+                : t('reserveForm.continueWithoutProof')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

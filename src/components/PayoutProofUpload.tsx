@@ -11,6 +11,10 @@ const ALLOWED_FILE_TYPES = [
   'image/jpeg',
   'image/png',
   'image/webp',
+  'image/avif',
+  'image/gif',
+  'image/heic',
+  'image/heif',
   'application/pdf',
 ] as const
 
@@ -40,6 +44,7 @@ export function PayoutProofUpload({
   const { t } = useTranslation()
   const [fileData, setFileData] = useState<PayoutProofFile | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   // Cleanup preview URL on unmount
@@ -51,13 +56,8 @@ export function PayoutProofUpload({
     }
   }, [fileData?.previewUrl])
 
-  const handleFileSelect = useCallback(
-    async (event: React.ChangeEvent<HTMLInputElement>) => {
-      const files = event.target.files
-      if (!files || files.length === 0) return
-
-      const file = files[0]
-
+  const processFile = useCallback(
+    async (file: File) => {
       // Validate file type
       if (!isAllowedFileType(file.type)) {
         toast.error(t('payoutProof.invalidType'))
@@ -98,7 +98,50 @@ export function PayoutProofUpload({
         setIsProcessing(false)
       }
     },
-    [onFileChange],
+    [onFileChange, t],
+  )
+
+  const handleFileSelect = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const files = event.target.files
+      if (files && files.length > 0) {
+        processFile(files[0])
+      }
+    },
+    [processFile],
+  )
+
+  const handleDragOver = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault()
+      event.stopPropagation()
+      if (!disabled && !isProcessing) {
+        setIsDragging(true)
+      }
+    },
+    [disabled, isProcessing],
+  )
+
+  const handleDragLeave = useCallback((event: React.DragEvent) => {
+    event.preventDefault()
+    event.stopPropagation()
+    setIsDragging(false)
+  }, [])
+
+  const handleDrop = useCallback(
+    (event: React.DragEvent) => {
+      event.preventDefault()
+      event.stopPropagation()
+      setIsDragging(false)
+
+      if (disabled || isProcessing) return
+
+      const files = event.dataTransfer.files
+      if (files && files.length > 0) {
+        processFile(files[0])
+      }
+    },
+    [disabled, isProcessing, processFile],
   )
 
   const removeFile = useCallback(() => {
@@ -151,14 +194,18 @@ export function PayoutProofUpload({
         </Card>
       ) : (
         <div
-          className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
-            disabled || isProcessing
+          className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${disabled || isProcessing
               ? 'border-gray-200 bg-gray-50 cursor-not-allowed'
-              : 'border-gray-300 hover:border-cyan-500 cursor-pointer'
-          }`}
+              : isDragging
+                ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-900/20'
+                : 'border-gray-300 hover:border-cyan-500 cursor-pointer'
+            }`}
           onClick={() =>
             !disabled && !isProcessing && fileInputRef.current?.click()
           }
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
         >
           <input
             ref={fileInputRef}
