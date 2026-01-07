@@ -1,12 +1,10 @@
-import nodemailer from 'nodemailer'
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
+const ses = new SESClient({
+  region: process.env.AWS_REGION || 'us-east-1',
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
   },
 })
 
@@ -21,18 +19,36 @@ export const sendEmail = async ({
   text: string
   html?: string
 }) => {
-  const from = process.env.SMTP_FROM || 'noreply@example.com'
+  const from = process.env.SMTP_FROM
+
+  const command = new SendEmailCommand({
+    Source: from,
+    Destination: {
+      ToAddresses: [to],
+    },
+    Message: {
+      Subject: {
+        Data: subject,
+      },
+      Body: {
+        Text: {
+          Data: text,
+        },
+        ...(html
+          ? {
+              Html: {
+                Data: html,
+              },
+            }
+          : {}),
+      },
+    },
+  })
 
   try {
-    await transporter.sendMail({
-      from,
-      to,
-      subject,
-      text,
-      html,
-    })
+    await ses.send(command)
   } catch (error) {
-    console.error('Error sending email:', error)
+    console.error('Error sending email via SES:', error)
     throw error
   }
 }
