@@ -19,7 +19,7 @@ export const sendEmail = async ({
   text: string
   html?: string
 }) => {
-  const from = process.env.SMTP_FROM
+  const from = process.env.SES_FROM_EMAIL
 
   const command = new SendEmailCommand({
     Source: from,
