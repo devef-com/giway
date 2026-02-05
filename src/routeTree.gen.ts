@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SupportRouteImport } from './routes/support'
 import { Route as StoreRouteImport } from './routes/store'
+import { Route as MercadopagoDemoRouteImport } from './routes/mercadopago-demo'
 import { Route as CoffeeRouteImport } from './routes/coffee'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DrawingsIndexRouteImport } from './routes/drawings/index'
@@ -39,6 +40,8 @@ import { Route as ApiParticipantsUploadRouteImport } from './routes/api/particip
 import { Route as ApiParticipantsAssetsRouteImport } from './routes/api/participants/assets'
 import { Route as ApiParticipantParticipantIdRouteImport } from './routes/api/participant.$participantId'
 import { Route as ApiPacksPurchaseRouteImport } from './routes/api/packs/purchase'
+import { Route as ApiMercadopagoWebhookRouteImport } from './routes/api/mercadopago/webhook'
+import { Route as ApiMercadopagoCreatePreferenceRouteImport } from './routes/api/mercadopago/create-preference'
 import { Route as ApiDrawingsReservationTimeRouteImport } from './routes/api/drawings/reservation-time'
 import { Route as ApiDrawingsDrawingIdRouteImport } from './routes/api/drawings/$drawingId'
 import { Route as ApiCouponsRedeemRouteImport } from './routes/api/coupons/redeem'
@@ -68,6 +71,11 @@ const SupportRoute = SupportRouteImport.update({
 const StoreRoute = StoreRouteImport.update({
   id: '/store',
   path: '/store',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MercadopagoDemoRoute = MercadopagoDemoRouteImport.update({
+  id: '/mercadopago-demo',
+  path: '/mercadopago-demo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CoffeeRoute = CoffeeRouteImport.update({
@@ -214,6 +222,17 @@ const ApiPacksPurchaseRoute = ApiPacksPurchaseRouteImport.update({
   path: '/api/packs/purchase',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMercadopagoWebhookRoute = ApiMercadopagoWebhookRouteImport.update({
+  id: '/api/mercadopago/webhook',
+  path: '/api/mercadopago/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiMercadopagoCreatePreferenceRoute =
+  ApiMercadopagoCreatePreferenceRouteImport.update({
+    id: '/api/mercadopago/create-preference',
+    path: '/api/mercadopago/create-preference',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiDrawingsReservationTimeRoute =
   ApiDrawingsReservationTimeRouteImport.update({
     id: '/api/drawings/reservation-time',
@@ -332,6 +351,7 @@ const ApiDrawingsDrawingIdPParticipantIdCommentsRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/coffee': typeof CoffeeRoute
+  '/mercadopago-demo': typeof MercadopagoDemoRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
   '/a/coupons': typeof ACouponsRoute
@@ -350,6 +370,8 @@ export interface FileRoutesByFullPath {
   '/api/coupons/redeem': typeof ApiCouponsRedeemRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
+  '/api/mercadopago/create-preference': typeof ApiMercadopagoCreatePreferenceRoute
+  '/api/mercadopago/webhook': typeof ApiMercadopagoWebhookRoute
   '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRouteWithChildren
   '/api/participants/assets': typeof ApiParticipantsAssetsRoute
@@ -384,6 +406,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/coffee': typeof CoffeeRoute
+  '/mercadopago-demo': typeof MercadopagoDemoRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
   '/a/coupons': typeof ACouponsRoute
@@ -402,6 +425,8 @@ export interface FileRoutesByTo {
   '/api/coupons/redeem': typeof ApiCouponsRedeemRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
+  '/api/mercadopago/create-preference': typeof ApiMercadopagoCreatePreferenceRoute
+  '/api/mercadopago/webhook': typeof ApiMercadopagoWebhookRoute
   '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRouteWithChildren
   '/api/participants/assets': typeof ApiParticipantsAssetsRoute
@@ -437,6 +462,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/coffee': typeof CoffeeRoute
+  '/mercadopago-demo': typeof MercadopagoDemoRoute
   '/store': typeof StoreRoute
   '/support': typeof SupportRoute
   '/a/coupons': typeof ACouponsRoute
@@ -455,6 +481,8 @@ export interface FileRoutesById {
   '/api/coupons/redeem': typeof ApiCouponsRedeemRoute
   '/api/drawings/$drawingId': typeof ApiDrawingsDrawingIdRouteWithChildren
   '/api/drawings/reservation-time': typeof ApiDrawingsReservationTimeRoute
+  '/api/mercadopago/create-preference': typeof ApiMercadopagoCreatePreferenceRoute
+  '/api/mercadopago/webhook': typeof ApiMercadopagoWebhookRoute
   '/api/packs/purchase': typeof ApiPacksPurchaseRoute
   '/api/participant/$participantId': typeof ApiParticipantParticipantIdRouteWithChildren
   '/api/participants/assets': typeof ApiParticipantsAssetsRoute
@@ -491,6 +519,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/coffee'
+    | '/mercadopago-demo'
     | '/store'
     | '/support'
     | '/a/coupons'
@@ -509,6 +538,8 @@ export interface FileRouteTypes {
     | '/api/coupons/redeem'
     | '/api/drawings/$drawingId'
     | '/api/drawings/reservation-time'
+    | '/api/mercadopago/create-preference'
+    | '/api/mercadopago/webhook'
     | '/api/packs/purchase'
     | '/api/participant/$participantId'
     | '/api/participants/assets'
@@ -543,6 +574,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/coffee'
+    | '/mercadopago-demo'
     | '/store'
     | '/support'
     | '/a/coupons'
@@ -561,6 +593,8 @@ export interface FileRouteTypes {
     | '/api/coupons/redeem'
     | '/api/drawings/$drawingId'
     | '/api/drawings/reservation-time'
+    | '/api/mercadopago/create-preference'
+    | '/api/mercadopago/webhook'
     | '/api/packs/purchase'
     | '/api/participant/$participantId'
     | '/api/participants/assets'
@@ -595,6 +629,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/coffee'
+    | '/mercadopago-demo'
     | '/store'
     | '/support'
     | '/a/coupons'
@@ -613,6 +648,8 @@ export interface FileRouteTypes {
     | '/api/coupons/redeem'
     | '/api/drawings/$drawingId'
     | '/api/drawings/reservation-time'
+    | '/api/mercadopago/create-preference'
+    | '/api/mercadopago/webhook'
     | '/api/packs/purchase'
     | '/api/participant/$participantId'
     | '/api/participants/assets'
@@ -648,6 +685,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CoffeeRoute: typeof CoffeeRoute
+  MercadopagoDemoRoute: typeof MercadopagoDemoRoute
   StoreRoute: typeof StoreRoute
   SupportRoute: typeof SupportRoute
   ACouponsRoute: typeof ACouponsRoute
@@ -666,6 +704,8 @@ export interface RootRouteChildren {
   ApiCouponsRedeemRoute: typeof ApiCouponsRedeemRoute
   ApiDrawingsDrawingIdRoute: typeof ApiDrawingsDrawingIdRouteWithChildren
   ApiDrawingsReservationTimeRoute: typeof ApiDrawingsReservationTimeRoute
+  ApiMercadopagoCreatePreferenceRoute: typeof ApiMercadopagoCreatePreferenceRoute
+  ApiMercadopagoWebhookRoute: typeof ApiMercadopagoWebhookRoute
   ApiPacksPurchaseRoute: typeof ApiPacksPurchaseRoute
   ApiParticipantParticipantIdRoute: typeof ApiParticipantParticipantIdRouteWithChildren
   ApiParticipantsAssetsRoute: typeof ApiParticipantsAssetsRoute
@@ -701,6 +741,13 @@ declare module '@tanstack/react-router' {
       path: '/store'
       fullPath: '/store'
       preLoaderRoute: typeof StoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mercadopago-demo': {
+      id: '/mercadopago-demo'
+      path: '/mercadopago-demo'
+      fullPath: '/mercadopago-demo'
+      preLoaderRoute: typeof MercadopagoDemoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/coffee': {
@@ -899,6 +946,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPacksPurchaseRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/mercadopago/webhook': {
+      id: '/api/mercadopago/webhook'
+      path: '/api/mercadopago/webhook'
+      fullPath: '/api/mercadopago/webhook'
+      preLoaderRoute: typeof ApiMercadopagoWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/mercadopago/create-preference': {
+      id: '/api/mercadopago/create-preference'
+      path: '/api/mercadopago/create-preference'
+      fullPath: '/api/mercadopago/create-preference'
+      preLoaderRoute: typeof ApiMercadopagoCreatePreferenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/drawings/reservation-time': {
       id: '/api/drawings/reservation-time'
       path: '/api/drawings/reservation-time'
@@ -1092,6 +1153,7 @@ const ApiParticipantParticipantIdRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CoffeeRoute: CoffeeRoute,
+  MercadopagoDemoRoute: MercadopagoDemoRoute,
   StoreRoute: StoreRoute,
   SupportRoute: SupportRoute,
   ACouponsRoute: ACouponsRoute,
@@ -1110,6 +1172,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiCouponsRedeemRoute: ApiCouponsRedeemRoute,
   ApiDrawingsDrawingIdRoute: ApiDrawingsDrawingIdRouteWithChildren,
   ApiDrawingsReservationTimeRoute: ApiDrawingsReservationTimeRoute,
+  ApiMercadopagoCreatePreferenceRoute: ApiMercadopagoCreatePreferenceRoute,
+  ApiMercadopagoWebhookRoute: ApiMercadopagoWebhookRoute,
   ApiPacksPurchaseRoute: ApiPacksPurchaseRoute,
   ApiParticipantParticipantIdRoute:
     ApiParticipantParticipantIdRouteWithChildren,
