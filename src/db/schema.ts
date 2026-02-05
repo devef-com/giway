@@ -213,6 +213,28 @@ export const paypalPayments = pgTable('paypal_payments', {
     .defaultNow(),
 })
 
+// Mercado Pago payments table
+export const mercadopagoPayments = pgTable('mercadopago_payments', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  packId: integer('pack_id').references(() => packs.id, {
+    onDelete: 'set null',
+  }),
+  preferenceId: varchar('preference_id', { length: 255 }).notNull().unique(),
+  paymentId: varchar('payment_id', { length: 255 }).unique(), // Filled when webhook receives payment
+  amountPaid: integer('amount_paid').notNull().default(0), // amount in cents
+  currency: varchar('currency', { length: 10 }).notNull().default('ARS'),
+  status: varchar('status', { length: 30 }).notNull().default('pending'), // pending, approved, rejected
+  createdAt: timestamp('created_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+})
+
 // User balances table - tracks current available balance for users
 export const userBalances = pgTable('user_balances', {
   id: serial('id').primaryKey(),
@@ -243,6 +265,9 @@ export const packRedemptions = pgTable('pack_redemptions', {
   }),
   paypalPaymentId: integer('paypal_payment_id')
     .references(() => paypalPayments.id, { onDelete: 'set null' })
+    .unique(),
+  mercadopagoPaymentId: integer('mercadopago_payment_id')
+    .references(() => mercadopagoPayments.id, { onDelete: 'set null' })
     .unique(),
   source: redemptionSourceEnum('source').notNull(), // 'purchase', 'coupon', 'ads', 'monthly'
   couponId: integer('coupon_id').references(() => coupons.id, {

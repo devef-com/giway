@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Image, Mail, Package, Sparkles, Users } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { PayPalCheckoutButton } from '@/components/PayPalCheckoutButton'
+import { MercadoPagoCheckoutButton } from '@/components/MercadoPagoCheckoutButton'
 import { usePacks } from '@/querys/usePacks'
 import { useUserBalance } from '@/querys/useUserBalance'
 import { authClient } from '@/lib/auth-client'
@@ -46,6 +47,15 @@ function StorePage() {
     refetch()
     setSelectedPackId(null)
   }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('status') === 'success') {
+      onSuccess()
+      // Clean up URL without reloading
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
 
   if (!session.data) {
     return (
@@ -204,11 +214,18 @@ function StorePage() {
                             </Button>
                           </div>
                           {selectedPackId === pack.id && session.data?.user && (
-                            <PayPalCheckoutButton
-                              packId={pack.id}
-                              className="w-full"
-                              onSuccess={onSuccess}
-                            />
+                            <div className="flex flex-col gap-2">
+                              <PayPalCheckoutButton
+                                packId={pack.id}
+                                className="w-full"
+                                onSuccess={onSuccess}
+                              />
+                              <MercadoPagoCheckoutButton
+                                packId={pack.id}
+                                className="w-full"
+                                onSuccess={onSuccess}
+                              />
+                            </div>
                           )}
                         </div>
                       </CardFooter>
@@ -282,11 +299,18 @@ function StorePage() {
                             </Button>
                           </div>
                           {selectedPackId === pack.id && session.data?.user && (
-                            <PayPalCheckoutButton
-                              packId={pack.id}
-                              className="w-full"
-                              onSuccess={onSuccess}
-                            />
+                            <div className="flex flex-col gap-2">
+                              <PayPalCheckoutButton
+                                packId={pack.id}
+                                className="w-full"
+                                onSuccess={onSuccess}
+                              />
+                              <MercadoPagoCheckoutButton
+                                packId={pack.id}
+                                className="w-full"
+                                onSuccess={onSuccess}
+                              />
+                            </div>
                           )}
                         </div>
                       </CardFooter>

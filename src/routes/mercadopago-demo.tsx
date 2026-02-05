@@ -34,8 +34,8 @@ function MercadoPagoDemo() {
             {
               title: "Producto Demo Checkout Pro",
               quantity: 1,
-              unit_price: 1,
-              currency_id: 'USD'
+              unit_price: 3600,
+              currency_id: 'COP'
             }
           ]
         })
@@ -78,7 +78,18 @@ function MercadoPagoDemo() {
       ) : (
         <div className="w-full mt-4">
           {/* El componente Wallet se encarga de mostrar el botón de Mercado Pago */}
-          <Wallet initialization={{ preferenceId: preferenceId }} />
+          {/* @ts-ignore */}
+          <Wallet
+            initialization={{ preferenceId: preferenceId, redirectMode: 'blank' }}
+            onReady={() => console.log('✅ Wallet Brick cargado y listo')}
+            onError={(error) => {
+              console.error('❌ Wallet Brick Error:', error);
+              setError(`Error en Wallet: ${JSON.stringify(error)}`);
+            }}
+            onSubmit={async () => {
+              console.log('Pago iniciado');
+            }}
+          />
           <button
             onClick={() => setPreferenceId(null)}
             className="mt-4 text-sm text-gray-500 hover:underline"
